@@ -1,7 +1,5 @@
 package frc.robot.devices;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class LidarLight {
     
     public Lemonlight limelight;

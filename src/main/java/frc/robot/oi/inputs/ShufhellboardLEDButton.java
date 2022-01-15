@@ -33,12 +33,12 @@ public class ShufhellboardLEDButton extends LEDButton {
         }
     }
 
-    //for later use
+    /*for later use
     private boolean getLed(){
         int value = entry.getNumber(0).intValue();
         // if the second bit is 1 return true
         return (value & ledMask) == 2;
-    }
+    }*/
 
     private void setLed(boolean newState){
         int pressedState = entry.getNumber(0).intValue() & pressMask; // gets the pressed value so we preserve it
