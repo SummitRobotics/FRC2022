@@ -8,9 +8,9 @@
 package frc.robot.utilities.lists;
 
 /**
- * all the prioritys for the status display
+ * all the priorities for the status display
  */
-public class StatusPrioritys {
+public class StatusPriorities {
     public static final int 
     on = 0,
     enabled = 1,

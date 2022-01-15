@@ -34,7 +34,7 @@ public class Shifter extends SubsystemBase {
     }
 
     /**
-     * Getes the shift state
+     * Gets the shift state
      * 
      * @return the shift state where true is high and false is low
      */
