@@ -11,10 +11,10 @@ import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 import java.util.function.BooleanSupplier;
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -54,12 +54,12 @@ public class Drivetrain extends SubsystemBase {
     private CANSparkMax rightBack = new CANSparkMax(Ports.RIGHT_DRIVE_1, MotorType.kBrushless);
 
     // pid controllers
-    private CANPIDController leftPID = left.getPIDController();
-    private CANPIDController rightPID = right.getPIDController();
+    private SparkMaxPIDController leftPID = left.getPIDController();
+    private SparkMaxPIDController rightPID = right.getPIDController();
 
     // encoders
-    private CANEncoder leftEncoder = left.getEncoder();
-    private CANEncoder rightEncoder = right.getEncoder();
+    private RelativeEncoder leftEncoder = left.getEncoder();
+    private RelativeEncoder rightEncoder = right.getEncoder();
 
     private DifferentialDriveOdometry odometry;
 
