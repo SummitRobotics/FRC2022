@@ -7,7 +7,7 @@ public class Ports {
     // OI
     XBOX_PORT = 0,
     LAUNCHPAD_PORT = 1,
-    JOYSTICK_PORT = 2,
+    JOYSTICK_PORT = 2;
     
     // drivetrain
     // TODO: Set ports
