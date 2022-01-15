@@ -13,10 +13,11 @@ public class Lemonlight {
     //TODO - make right
     public static final int X_OFFSET = 0;
 
-    public static final double mountAngle = 19.1;
+    //TODO - set mountAngle and mountHeight
+    public static final double mountAngle = 0;
 
     //in cm
-    public static final double mountHeight = 60.5;
+    public static final double mountHeight = 0;
     private double targetHeight = 230;
 
     private NetworkTable limelight;

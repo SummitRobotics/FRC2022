@@ -1,7 +1,8 @@
 package frc.robot.devices;
 
 public interface Lidar {
-    public static final float LIDAR_MOUNT_ANGLE = 25;
+    //TODO - set LIDAR_MOUNT_ANGLE
+    public static final float LIDAR_MOUNT_ANGLE = 0;
 
 	public int getDistance();
     public int getAverageDistance();

@@ -78,7 +78,7 @@ public class LidarV3 implements Lidar {
 		return (int) rollingAverage.getAverage();
 	}
 
-	// scarey
+	// scary
 	private int writeRegister(int address, int value) {
 		m_buffer.put(0, (byte) address);
 		m_buffer.put(1, (byte) value);

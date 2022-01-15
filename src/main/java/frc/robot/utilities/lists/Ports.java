@@ -1,7 +1,5 @@
 package frc.robot.utilities.lists;
 
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-
 public class Ports {
 
     public static final int
@@ -26,7 +24,7 @@ public class Ports {
 
     //leds
     LED_PORT = 0,
-    LED_LENGTH = 96,
+    LED_LENGTH = 0,
 
     // pneumatics
     PRESSURE_SENSOR = 0,
