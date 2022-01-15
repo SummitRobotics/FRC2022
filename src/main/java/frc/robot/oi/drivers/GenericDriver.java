@@ -8,9 +8,6 @@ import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 
 public abstract class GenericDriver {
-
-	private DriverStation driverStation = DriverStation.getInstance();
-
 	protected int port = 0;
 
 	protected GenericDriver(int port) {
@@ -24,7 +21,7 @@ public abstract class GenericDriver {
      * @return the axis value
      */
     protected double getRawAxis(int axis) {
-        return driverStation.getStickAxis(port, axis);
+		return DriverStation.getStickAxis(port, axis);
 	}
 
     /**
@@ -34,7 +31,7 @@ public abstract class GenericDriver {
      * @return whether the output is on or off
      */
     protected boolean getRawButton(int button) {
-        return driverStation.getStickButton(port, button);
+		return DriverStation.getStickButton(port, button);
 	}
 
 	/**
@@ -43,7 +40,7 @@ public abstract class GenericDriver {
 	 * @return the POV
 	 */
 	protected int getPOV() {
-		return driverStation.getStickPOV(port, 0);
+		return DriverStation.getStickPOV(port, 0);
 	}
 	
 	/**
@@ -101,11 +98,11 @@ public abstract class GenericDriver {
 	 * @param port the port of the joystic on the ds
 	 */
 	public boolean isConnected(){
-		return driverStation.isJoystickConnected(this.port);
+		return DriverStation.isJoystickConnected(this.port);
 	}
 
 	public boolean isXboxControler(){
-		return driverStation.getJoystickIsXbox(this.port);
+		return DriverStation.getJoystickIsXbox(this.port);
 	}
 
 }

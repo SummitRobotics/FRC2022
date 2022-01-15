@@ -64,8 +64,8 @@ public class ControllerDriver extends GenericDriver {
 		buttonY = generateOIButton(Button.kY.value, "y");
 		buttonStart = generateOIButton(Button.kStart.value, "start");
 		buttonBack = generateOIButton(Button.kBack.value, "back");
-		rightBumper = generateOIButton(Button.kBumperRight.value, "rightBumper");
-		leftBumper = generateOIButton(Button.kBumperLeft.value, "leftBumper");
+		rightBumper = generateOIButton(Button.kRightBumper.value, "rightBumper");
+		leftBumper = generateOIButton(Button.kLeftBumper.value, "leftBumper");
 
 		dPadUp = new OIButton(getDPadValue(DPadValues.UP), "up");
 		dPadDown = new OIButton(getDPadValue(DPadValues.DOWN), "down");
