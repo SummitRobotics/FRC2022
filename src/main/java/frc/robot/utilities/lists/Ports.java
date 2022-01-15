@@ -10,16 +10,17 @@ public class Ports {
     JOYSTICK_PORT = 2,
     
     // drivetrain
-    LEFT_DRIVE_2 = 31,
-    LEFT_DRIVE_3 = 32,
-    LEFT_DRIVE_1 = 30,
+    // TODO: Set ports
+    LEFT_DRIVE_2 = 0,
+    LEFT_DRIVE_3 = 0,
+    LEFT_DRIVE_1 = 0,
     
-    RIGHT_DRIVE_2 = 21,
-    RIGHT_DRIVE_3 = 22,
-    RIGHT_DRIVE_1 = 20,
+    RIGHT_DRIVE_2 = 0,
+    RIGHT_DRIVE_3 = 0,
+    RIGHT_DRIVE_1 = 0,
 
     SHIFT_SOLENOID_UP = 0,
-    SHIFT_SOLENOID_DOWN = 4,
+    SHIFT_SOLENOID_DOWN = 0,
 
     //leds
     LED_PORT = 0,
