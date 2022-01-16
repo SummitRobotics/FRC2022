@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
-import frc.robot.devices.LEDs.LEDs;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
@@ -64,7 +63,7 @@ public class FollowTrajectoryThreaded extends CommandBase {
         System.out.println("command initialized");
 
         // we CAN NOT touch the command outside of the thread once it has started
-        // nor can we touch the drivetrain but that should be ok beacuse the scedular should handle that
+        // nor can we touch the drivetrain but that should be ok beacuse the scheduler should handle that
         sin = new ThreadedSplineExecutor(command, drivetrain, period);
         executionThread = new Thread(sin);
         executionThread.setName("spline thread");

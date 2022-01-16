@@ -102,6 +102,7 @@ public class Functions {
      * @return the object read from thre file
      * @throws Exception throws an exception if the fie can not be read
      */
+    @SuppressWarnings("unchecked")
     public static <T> T RetriveObjectFromFile(String path) throws Exception {
         FileInputStream fis = new FileInputStream(path);
         ObjectInputStream ois = new ObjectInputStream(fis);
