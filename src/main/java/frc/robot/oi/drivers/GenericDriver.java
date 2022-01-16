@@ -15,34 +15,35 @@ public abstract class GenericDriver {
 	}
 
 	/**
-     * Gets analog axis
+	 * Gets analog axis
 	 * 
-     * @param axis the axis number
-     * @return the axis value
-     */
-    protected double getRawAxis(int axis) {
+	 * @param axis the axis number
+	 * @return the axis value
+	 */
+	protected double getRawAxis(int axis) {
 		return DriverStation.getStickAxis(port, axis);
 	}
 
-    /**
-     * Gets digital output
+	/**
+	 * Gets digital output
 	 * 
-     * @param button the button number
-     * @return whether the output is on or off
-     */
-    protected boolean getRawButton(int button) {
+	 * @param button the button number
+	 * @return whether the output is on or off
+	 */
+	protected boolean getRawButton(int button) {
 		return DriverStation.getStickButton(port, button);
 	}
 
 	/**
-	 * Gets POV for an XBox controller (In this class because it requires DriverStation)
+	 * Gets POV for an XBox controller (In this class because it requires
+	 * DriverStation)
 	 * 
 	 * @return the POV
 	 */
 	protected int getPOV() {
 		return DriverStation.getStickPOV(port, 0);
 	}
-	
+
 	/**
 	 * Gets a getter function for a digital output
 	 * 
@@ -71,17 +72,18 @@ public abstract class GenericDriver {
 	 */
 	protected OIButton generateOIButton(int port) {
 		return new OIButton(getButtonGetter(port));
-    }
-    
-    /**
-     * Creates an OI button with a given id using a port
-     * @param port the button port
-     * @param id the button's id
-     * @return the generated button
-     */
-    protected OIButton generateOIButton(int port, String id) {
-        return new OIButton(getButtonGetter(port), id);
-    }
+	}
+
+	/**
+	 * Creates an OI button with a given id using a port
+	 * 
+	 * @param port the button port
+	 * @param id   the button's id
+	 * @return the generated button
+	 */
+	protected OIButton generateOIButton(int port, String id) {
+		return new OIButton(getButtonGetter(port), id);
+	}
 
 	/**
 	 * Creates an axis using an port
@@ -95,13 +97,14 @@ public abstract class GenericDriver {
 
 	/**
 	 * gets if the joystick is connected to the driver station
+	 * 
 	 * @param port the port of the joystic on the ds
 	 */
-	public boolean isConnected(){
+	public boolean isConnected() {
 		return DriverStation.isJoystickConnected(this.port);
 	}
 
-	public boolean isXboxControler(){
+	public boolean isXboxControler() {
 		return DriverStation.getJoystickIsXbox(this.port);
 	}
 

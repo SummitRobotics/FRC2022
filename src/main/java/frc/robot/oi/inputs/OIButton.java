@@ -12,42 +12,42 @@ import frc.robot.utilities.Usable;
  */
 public class OIButton extends Button implements Usable {
 
-    private ArrayList<Object> users;
+	private ArrayList<Object> users;
 
-    public OIButton(BooleanSupplier getter) {
-        super(getter);
+	public OIButton(BooleanSupplier getter) {
+		super(getter);
 
-        users = new ArrayList<>();
+		users = new ArrayList<>();
 
-        whenHeld(Konami.nonRegisteredButtonPress());
-    }
+		whenHeld(Konami.nonRegisteredButtonPress());
+	}
 
-    public OIButton(BooleanSupplier getter, String id) {
-        super(getter);
+	public OIButton(BooleanSupplier getter, String id) {
+		super(getter);
 
-        users = new ArrayList<>();
+		users = new ArrayList<>();
 
-        whenHeld(Konami.registeredButtonPress(id));
-    }
+		whenHeld(Konami.registeredButtonPress(id));
+	}
 
-    public OIButton() {
-        super();
+	public OIButton() {
+		super();
 
-        users = new ArrayList<>();
-    }
+		users = new ArrayList<>();
+	}
 
-    @Override
-    public void using(Object user) {
-        users.add(user);
-    }
+	@Override
+	public void using(Object user) {
+		users.add(user);
+	}
 
-    @Override
-    public void release(Object user) {
-        users.remove(user);
-    }
+	@Override
+	public void release(Object user) {
+		users.remove(user);
+	}
 
-    @Override
-    public boolean inUse() {
-        return !users.isEmpty();
-    }
+	@Override
+	public boolean inUse() {
+		return !users.isEmpty();
+	}
 }

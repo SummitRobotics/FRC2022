@@ -20,146 +20,150 @@ import frc.robot.utilities.lists.LEDPriorities;
 //TODO move this to a command that is threded with commandThreder
 public class FollowTrajectoryThreaded extends CommandBase {
 
-    private Trajectory trajectory;
-    private Drivetrain drivetrain;
-    private Thread executionThread;
-    private int period;
-    private ThreadedSplineExecutor sin;
+	private Trajectory trajectory;
+	private Drivetrain drivetrain;
+	private Thread executionThread;
+	private int period;
+	private ThreadedSplineExecutor sin;
 
-    private RamseteCommand command;
+	private RamseteCommand command;
 
-    private LEDCall splineLEDs = new LEDCall(LEDPriorities.splines, LEDRange.All).sine(Colors.Purple);
+	private LEDCall splineLEDs = new LEDCall(LEDPriorities.splines, LEDRange.All).sine(Colors.Purple);
 
-    /**
-     * command to folow a trejectory object that has been saved to the roborio with threading to make it more precice
-     * @param drivetrain drivetain to control
-     * @param path path to the saved SerialisableMultiGearTrejectory object
-     */
-    public FollowTrajectoryThreaded(Drivetrain drivetrain, Trajectory trajectory) {
-        super();
+	/**
+	 * command to folow a trejectory object that has been saved to the roborio with
+	 * threading to make it more precice
+	 * 
+	 * @param drivetrain drivetain to control
+	 * @param path       path to the saved SerialisableMultiGearTrejectory object
+	 */
+	public FollowTrajectoryThreaded(Drivetrain drivetrain, Trajectory trajectory) {
+		super();
 
-        this.drivetrain = drivetrain;
-        this.trajectory = trajectory;
+		this.drivetrain = drivetrain;
+		this.trajectory = trajectory;
 
-        this.period = 5_000_000;
+		this.period = 5_000_000;
 
-        addRequirements(drivetrain);
-    }
+		addRequirements(drivetrain);
+	}
 
-    @Override
-    public void initialize() {
-        splineLEDs.activate();
+	@Override
+	public void initialize() {
+		splineLEDs.activate();
 
-        command = new RamseteCommand(
-            trajectory, 
-            drivetrain::getPose,
-            new RamseteController(1.5, 0.8), Drivetrain.DriveKinimatics,
-            drivetrain::setMotorTargetSpeed, drivetrain
-        );
+		command = new RamseteCommand(
+				trajectory,
+				drivetrain::getPose,
+				new RamseteController(1.5, 0.8), Drivetrain.DriveKinimatics,
+				drivetrain::setMotorTargetSpeed, drivetrain);
 
-        drivetrain.setPose(trajectory.getInitialPose());
-        
-        command.initialize();
-        System.out.println("command initialized");
+		drivetrain.setPose(trajectory.getInitialPose());
 
-        // we CAN NOT touch the command outside of the thread once it has started
-        // nor can we touch the drivetrain but that should be ok beacuse the scheduler should handle that
-        sin = new ThreadedSplineExecutor(command, drivetrain, period);
-        executionThread = new Thread(sin);
-        executionThread.setName("spline thread");
-        //1-10
-        executionThread.setPriority(10);
-        executionThread.start();
-        System.out.println("thread started");
-    }
+		command.initialize();
+		System.out.println("command initialized");
 
-    @Override
-    public boolean isFinished() {
-        //checks if thread is running or ended
-        return executionThread.getState() == State.TERMINATED;
-    }
+		// we CAN NOT touch the command outside of the thread once it has started
+		// nor can we touch the drivetrain but that should be ok beacuse the scheduler
+		// should handle that
+		sin = new ThreadedSplineExecutor(command, drivetrain, period);
+		executionThread = new Thread(sin);
+		executionThread.setName("spline thread");
+		// 1-10
+		executionThread.setPriority(10);
+		executionThread.start();
+		System.out.println("thread started");
+	}
 
-    @Override
-    public void end(boolean interrupted) {
-        if (interrupted) {
-            // tells the thread to stop
-            sin.stopRunning();
-        }
+	@Override
+	public boolean isFinished() {
+		// checks if thread is running or ended
+		return executionThread.getState() == State.TERMINATED;
+	}
 
-        boolean stopped = executionThread.getState() == State.TERMINATED;
+	@Override
+	public void end(boolean interrupted) {
+		if (interrupted) {
+			// tells the thread to stop
+			sin.stopRunning();
+		}
 
-        // makes sure thread is stopped before allowing scheduler to continue to prevent unintentional movement
-        while(!stopped){
-            stopped = executionThread.getState() == State.TERMINATED;
-        }
-        //stops the drivetrain motors
-        drivetrain.stop();
+		boolean stopped = executionThread.getState() == State.TERMINATED;
 
-        splineLEDs.cancel();
-    }
+		// makes sure thread is stopped before allowing scheduler to continue to prevent
+		// unintentional movement
+		while (!stopped) {
+			stopped = executionThread.getState() == State.TERMINATED;
+		}
+		// stops the drivetrain motors
+		drivetrain.stop();
+
+		splineLEDs.cancel();
+	}
 
 }
 
-//class that is run by the thread to run the 
+// class that is run by the thread to run the
 class ThreadedSplineExecutor extends Thread {
-    private Command command;
-    private volatile boolean done = false;
-    private volatile Drivetrain drivetrain;
-    private long period;
+	private Command command;
+	private volatile boolean done = false;
+	private volatile Drivetrain drivetrain;
+	private long period;
 
-    /**
-     * Creates a spline executor on its own thread to speed up period
-     * @param command the spline to run
-     * @param period the period in nanoseconds
-     */
-    ThreadedSplineExecutor(Command command, Drivetrain drivetrain, long period) {
-        super();
-        this.drivetrain = drivetrain;
-        this.command = command;
-        this.done = false;
-        this.period = period;
-    }
+	/**
+	 * Creates a spline executor on its own thread to speed up period
+	 * 
+	 * @param command the spline to run
+	 * @param period  the period in nanoseconds
+	 */
+	ThreadedSplineExecutor(Command command, Drivetrain drivetrain, long period) {
+		super();
+		this.drivetrain = drivetrain;
+		this.command = command;
+		this.done = false;
+		this.period = period;
+	}
 
-    @Override
-    //gets called when thread starts
-    public void run() {
-        super.run();
+	@Override
+	// gets called when thread starts
+	public void run() {
+		super.run();
 
-        while (!command.isFinished() && !done) {
+		while (!command.isFinished() && !done) {
 
-            long commandStartingTime = System.nanoTime();
+			long commandStartingTime = System.nanoTime();
 
-            // Executes the ramsete command to set drivetrain motor powers
-            drivetrain.updateOdometry();
-            //put a measurement here
-            command.execute();
+			// Executes the ramsete command to set drivetrain motor powers
+			drivetrain.updateOdometry();
+			// put a measurement here
+			command.execute();
 
-            //System.out.println("command executed!");
+			// System.out.println("command executed!");
 
-            try {
-                //sleep period ms to make the timing consistant
-                long executeTime = (System.nanoTime() - commandStartingTime);
-                long sleepPeriod = period - executeTime;
+			try {
+				// sleep period ms to make the timing consistant
+				long executeTime = (System.nanoTime() - commandStartingTime);
+				long sleepPeriod = period - executeTime;
 
-                if (sleepPeriod < 0) {
-                    System.out.println(String.format("Loop overran with time %d", Math.abs((sleepPeriod)/1_000_00)));
+				if (sleepPeriod < 0) {
+					System.out.println(String.format("Loop overran with time %d", Math.abs((sleepPeriod) / 1_000_00)));
 
-                } else {
-                    sleep(sleepPeriod / 1_000_000, (int) (sleepPeriod % 1_000_000));
-                }
+				} else {
+					sleep(sleepPeriod / 1_000_000, (int) (sleepPeriod % 1_000_000));
+				}
 
-            } catch (InterruptedException e) {
-                // chronic
-                e.printStackTrace();
-            }
-        }
-    }
+			} catch (InterruptedException e) {
+				// chronic
+				e.printStackTrace();
+			}
+		}
+	}
 
-    // Stops the thread if called for by another
-    public synchronized void stopRunning(){
-        synchronized(command){
-            command.cancel();
-        }
-        done = true;
-    }
+	// Stops the thread if called for by another
+	public synchronized void stopRunning() {
+		synchronized (command) {
+			command.cancel();
+		}
+		done = true;
+	}
 }

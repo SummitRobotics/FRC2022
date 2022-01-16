@@ -11,11 +11,11 @@ package frc.robot.utilities.lists;
  * all the priorities for the status display
  */
 public class StatusPriorities {
-    public static final int 
-    on = 0,
-    enabled = 1,
-    badLidarReadings = 2,
-    stuckBall = 3,
-    shooterOver75 = 4;
+	public static final int 
+		on = 0,
+		enabled = 1,
+		badLidarReadings = 2,
+		stuckBall = 3,
+		shooterOver75 = 4;
 
 }
