@@ -17,9 +17,8 @@ public class MoveByDistance extends CommandBase {
 	private double left, right;
 	private double leftRotations, rightRotations;
 
+	//TODO move to drivetrain
 	private final double wheelDiameter = 6;
-	private final double lowGearRatio = 19.61 / 1;
-	private final double highGearRatio = 9.07 / 1;
 
 	private Drivetrain drive;
 	private Shifter shifter;

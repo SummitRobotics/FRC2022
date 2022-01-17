@@ -18,7 +18,7 @@ public class CommandThreader extends CommandBase {
 	private Executor executor;
 
 	/**
-	 * wrapps a command inside a thred allowing it to be exicuted independently of
+	 * wraps a command inside a thred allowing it to be exicuted independently of
 	 * the sceduler
 	 * it is important to not use the command in any way after it is passed
 	 * 

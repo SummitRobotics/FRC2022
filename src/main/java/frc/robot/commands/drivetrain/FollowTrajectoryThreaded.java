@@ -55,6 +55,7 @@ public class FollowTrajectoryThreaded extends CommandBase {
 		RamseteCommand ramseteCommand = new RamseteCommand(
 				trajectory,
 				drivetrain::getPose,
+				//TODO tune controller values
 				new RamseteController(1.5, 0.8), Drivetrain.DriveKinimatics,
 				drivetrain::setMotorTargetSpeed, drivetrain);
 
