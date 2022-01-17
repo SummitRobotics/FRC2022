@@ -8,5 +8,5 @@
 package frc.robot.utilities.functionalinterfaces;
 
 public interface LEDControlFunction {
-    int[] getLedColor (int loop, int led);
-   }
+	int[] getLedColor(int loop, int led);
+}

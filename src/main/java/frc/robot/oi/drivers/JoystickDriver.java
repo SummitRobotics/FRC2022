@@ -9,21 +9,21 @@ import frc.robot.utilities.Functions;
  */
 public class JoystickDriver extends GenericDriver {
 
-	public OIButton
-	button5,
-	button2,
-	button3,
-	button4,
-    trigger;
+	public OIButton 
+		button5,
+		button2,
+		button3,
+		button4,
+		trigger;
 
-	public OIAxis
-	axisX,
-	axisY,
-    axisZ;
-    
-    private boolean
-    assureZUp = false,
-    assureZDown = false;
+	public OIAxis 
+		axisX,
+		axisY,
+		axisZ;
+
+	private boolean 
+		assureZUp = false,
+		assureZDown = false;
 
 	public JoystickDriver(int port) {
 		super(port);
@@ -36,43 +36,43 @@ public class JoystickDriver extends GenericDriver {
 		button5 = generateOIButton(5);
 
 		axisX = generateOIAxis(0);
-        axisY = generateOIAxis(1);
-        // axisZ = generateOIAxis(2);
-        
-        axisZ = new OIAxis(getAxisGetter(2)) {
-            @Override
-            public double get() {
-                double position  = (getter.getAsDouble() - 1) / -2;
+		axisY = generateOIAxis(1);
+		// axisZ = generateOIAxis(2);
 
-                if (!assureZUp) {
-                    if (position > .95) {
-                        assureZUp = true;
-                        //System.out.println("axis z is up");
-                    }
+		axisZ = new OIAxis(getAxisGetter(2)) {
+			@Override
+			public double get() {
+				double position = (getter.getAsDouble() - 1) / -2;
 
-                    return 0;
-                }
+				if (!assureZUp) {
+					if (position > .95) {
+						assureZUp = true;
+						// System.out.println("axis z is up");
+					}
 
-                if (!assureZDown) {
-                    if (position < .05) {
-                        assureZDown = true;
-                        //System.out.println("axis z is down, activated");
-                    }
+					return 0;
+				}
 
-                    return 0;
-                }
+				if (!assureZDown) {
+					if (position < .05) {
+						assureZDown = true;
+						// System.out.println("axis z is down, activated");
+					}
 
-                if (Functions.isWithin(position, 0, deadzone)) {
-                    return 0;
-                }
-        
-                return (1 + deadzone) * position - Math.copySign(deadzone, position);
-            }
-        };
-    }
-    
-    public void ReEnableJoysticCalibrationCheck(){
-        assureZDown = false;
-        assureZUp = false;
-    }
+					return 0;
+				}
+
+				if (Functions.isWithin(position, 0, deadzone)) {
+					return 0;
+				}
+
+				return (1 + deadzone) * position - Math.copySign(deadzone, position);
+			}
+		};
+	}
+
+	public void ReEnableJoysticCalibrationCheck() {
+		assureZDown = false;
+		assureZUp = false;
+	}
 }

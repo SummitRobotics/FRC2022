@@ -18,7 +18,8 @@ public class Lemonlight {
 
     //in cm
     public static final double mountHeight = 0;
-    private double targetHeight = 230;
+
+    private static final double targetHeight = 0;
 
     private NetworkTable limelight;
 
@@ -139,11 +140,11 @@ public class Lemonlight {
     }
 
     /**
-     * gets a distance estimate of the target using the limelight
-     * @param ReportedAngle the angle from 0 the limelight reports
+     * gets a distance estimate of the target using the limelight and trig
+     * you need to check if the limelight has a target before running this
      * @return the distance estmate
      */
-    public double getLimelightDistanceEstimateIN(double reportedAngle){
-        return ((targetHeight-mountHeight) / Math.tan(((reportedAngle + Lemonlight.mountAngle) * (Math.PI/180)))) * 0.393701;
+    public double getLimelightDistanceEstimateIN(){
+        return ((targetHeight-mountHeight) / Math.tan(((getVerticalOffset() + Lemonlight.mountAngle) * (Math.PI/180)))) * 0.393701;
     }
 }

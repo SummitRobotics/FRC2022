@@ -11,23 +11,23 @@ import frc.robot.utilities.RollingAverage;;
  */
 public class LidarV3 implements Lidar {
 
-    private RollingAverage rollingAverage;
-    
-    private boolean hasStartedMeasuring = false;
+	private RollingAverage rollingAverage;
 
-    public LidarV3() {
+	private boolean hasStartedMeasuring = false;
 
-        m_port = (byte) Port.kOnboard.value;
+	public LidarV3() {
+
+		m_port = (byte) Port.kOnboard.value;
 		I2CJNI.i2CInitialize(m_port);
 
-        rollingAverage = new RollingAverage(50, true);
+		rollingAverage = new RollingAverage(50, true);
 
-        hasStartedMeasuring = false;
+		hasStartedMeasuring = false;
 
-        startMeasuring();
-    }
-    
-    private static final byte k_deviceAddress = 0x62;
+		startMeasuring();
+	}
+
+	private static final byte k_deviceAddress = 0x62;
 
 	private final byte m_port;
 
@@ -57,10 +57,10 @@ public class LidarV3 implements Lidar {
 	 */
 	@Override
 	public int getDistance() {
-        if(!hasStartedMeasuring){
-            startMeasuring();
-            hasStartedMeasuring = true;
-        }
+		if (!hasStartedMeasuring) {
+			startMeasuring();
+			hasStartedMeasuring = true;
+		}
 		short value = readShort(0x8f);
 		rollingAverage.update(value);
 
@@ -91,6 +91,6 @@ public class LidarV3 implements Lidar {
 		m_buffer.put(0, (byte) address);
 		I2CJNI.i2CWrite(m_port, k_deviceAddress, m_buffer, (byte) 1);
 		I2CJNI.i2CRead(m_port, k_deviceAddress, m_buffer, (byte) 2);
-        return m_buffer.getShort(0);
-    }
+		return m_buffer.getShort(0);
+	}
 }

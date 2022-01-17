@@ -7,18 +7,18 @@ import edu.wpi.first.networktables.NetworkTableEntry;
  */
 public class DoubleDisplayWidget {
 
-    private NetworkTableEntry entry;
+	private NetworkTableEntry entry;
 
-    public DoubleDisplayWidget(NetworkTableEntry entry){
+	public DoubleDisplayWidget(NetworkTableEntry entry) {
 
-        this.entry = entry;
-        entry.forceSetDouble(0);
-    }
+		this.entry = entry;
+		entry.forceSetDouble(0);
+	}
 
-    /**
-     * @param value the value that the diplay should show
-     */
-    public void setValue(double value){
-        entry.setDouble(value);
-    }
+	/**
+	 * @param value the value that the diplay should show
+	 */
+	public void setValue(double value) {
+		entry.setDouble(value);
+	}
 }
