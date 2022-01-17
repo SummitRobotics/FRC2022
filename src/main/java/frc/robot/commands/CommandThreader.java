@@ -15,7 +15,7 @@ public class CommandThreader extends CommandBase {
 	private int period;
 	private int priority;
 
-	private Exicutor exicutor;
+	private Executor executor;
 
 	/**
 	 * wrapps a command inside a thred allowing it to be exicuted independently of
@@ -45,11 +45,11 @@ public class CommandThreader extends CommandBase {
 	public void initialize() {
 		command.initialize();
 
-		exicutor = new Exicutor(command, period);
-		exicutor.setName(Command.class.getName() + " exicution thred");
+		executor = new Executor(command, period);
+		executor.setName(Command.class.getName() + " exicution thred");
 		// 1-10
-		exicutor.setPriority(priority);
-		exicutor.start();
+		executor.setPriority(priority);
+		executor.start();
 	}
 
 	// Called once the command ends or is interrupted.
@@ -57,7 +57,7 @@ public class CommandThreader extends CommandBase {
 	public void end(boolean interrupted) {
 		if (!isFinished()) {
 			// tells the thread to stop
-			exicutor.interrupt();
+			executor.interrupt();
 
 			boolean stopped = isFinished();
 
@@ -75,16 +75,16 @@ public class CommandThreader extends CommandBase {
 	@Override
 	public boolean isFinished() {
 		// command ends if thred stops
-		return exicutor.getState() == State.TERMINATED;
+		return executor.getState() == State.TERMINATED;
 	}
 
 }
 
-class Exicutor extends Thread {
+class Executor extends Thread {
 	private volatile Command command;
 	private int period;
 
-	protected Exicutor(Command command, int period) {
+	protected Executor(Command command, int period) {
 		this.command = command;
 		this.period = period;
 	}
