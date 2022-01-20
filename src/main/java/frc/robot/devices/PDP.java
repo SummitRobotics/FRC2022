@@ -1,7 +1,6 @@
 package frc.robot.devices;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
-
 public class PDP {
 
     private PowerDistribution panel;
@@ -20,10 +19,6 @@ public class PDP {
 
     public double getCurrent(int channel) {
         return panel.getCurrent(channel);
-    }
-    
-    public int getModule() {
-        return panel.getModule();
     }
 
     public boolean getSwitchableChannel() {
@@ -48,5 +43,13 @@ public class PDP {
 
     public double getVoltage() {
         return panel.getVoltage();
+    }
+
+    public void resetTotalEnergy() {
+        panel.resetTotalEnergy();
+    }
+
+    public void toggleSwitchableChannel() {
+        panel.setSwitchableChannel(!panel.getSwitchableChannel());
     }
 }
