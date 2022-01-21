@@ -34,3 +34,12 @@ The code is divided into several packages, each responsible for a different aspe
 
 ## Variable Naming Conventions
 - TODO
+
+## Branch Naming Conventions
+- clean_##### - A branch for cleaning up code
+- clean_NAME - A branch for cleaning up code
+- dev_##### - A branch for rapid development (Ex. At comps)
+- dev_NAME - A branch for rapid development
+- fix_NAME - A branch for making thoughout fixes
+- hotfix_NAME - A branch for hotfixes
+- \#\#\#\#\# - Number in the format MonthDayIncrement (Ex. for the second cleanup branch on Jan 20 (clean_01202))
