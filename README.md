@@ -34,8 +34,8 @@ The code is divided into several packages, each responsible for a different aspe
 
 ## Variable Naming Conventions
 - CONSTANT_VARIABLE - Constant variables are all caps with underscores seperating names.
-- aNormalVariable - Most everything else uses cammelCase.
-- AClassName - All classes use Title Case per normal java convention.
+- normalVariable - Most everything else uses cammelCase.
+- ClassName - All classes use Title Case per normal java convention.
 
 ## Branch Naming Conventions
 - a_branch_name - Generic branches. Mainly feature branches
