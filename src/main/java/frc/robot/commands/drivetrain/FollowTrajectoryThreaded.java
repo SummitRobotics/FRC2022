@@ -61,27 +61,15 @@ public class FollowTrajectoryThreaded extends CommandBase {
 
 		drivetrain.setPose(trajectory.getInitialPose());
 
-		// Creates all of thease so we can update drivetrain odometry
-		// on the execute.
-		Runnable onInit = () -> {
-			ramseteCommand.initialize();
-		};
 
+		// Wraps the command so we can update odometry every cycle.
 		Runnable onExecute = () -> {
 			drivetrain.updateOdometry();
 			ramseteCommand.initialize();
 		};
-
-		Consumer<Boolean> onEnd = (interrupted) -> {
-			ramseteCommand.end(interrupted);
-		};
-
-		BooleanSupplier isFinished = () -> {
-			return ramseteCommand.isFinished();
-		};
 		
 		// Wraps the ramseteCommand in a functional command so we can update drivetrain odometry still.
-		command = new FunctionalCommand( onInit, onExecute, onEnd, isFinished, drivetrain);
+		command = new FunctionalCommand( ramseteCommand::initialize, onExecute, ramseteCommand::end, ramseteCommand::isFinished, drivetrain);
 
 		// Creates the command threader
 		commandThreader = new CommandThreader(command, period, 10);
