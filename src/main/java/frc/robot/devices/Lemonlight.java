@@ -160,7 +160,7 @@ public class Lemonlight {
     /**
      * Returns the custom vision data outputed by the limelight when in python mode.
      * In the limelight you output to the array labeled llpython.
-     * @return custom vision data as an array of Numbers
+     * @return custom vision data as an ArrayList of Numbers
      */
     public ArrayList<Number> getCustomVisionDataNumbers(){
         // For some reason I get errors if i put {} straight into getNumberArray.
@@ -168,6 +168,11 @@ public class Lemonlight {
         return new ArrayList<>(Arrays.asList(llpython.getNumberArray(defaultArray)));
     }
 
+    /**
+     * Returns the custom vision data outputed by the limelight when in python mode.
+     * In the limelight you output to the array labeled llpython.
+     * @return custom vision data as an ArrayList of Integers
+     */
     public ArrayList<Integer> getCustomVisionData(){
         ArrayList<Number> customVisionData = getCustomVisionDataNumbers();
 
