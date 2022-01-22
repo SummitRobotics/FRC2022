@@ -33,13 +33,14 @@ The code is divided into several packages, each responsible for a different aspe
 * Run `./gradlew test` to run all of the JUnit tests
 
 ## Variable Naming Conventions
-- TODO
+- CONSTANT_VARIABLE - Constant variables are all caps with underscores seperating names.
+- normalVariable - Most everything else uses cammelCase.
+- ClassName - All classes use Title Case per normal java convention.
 
 ## Branch Naming Conventions
-- clean_##### - A branch for cleaning up code
-- clean_NAME - A branch for cleaning up code
-- dev_##### - A branch for rapid development (Ex. At comps)
-- dev_NAME - A branch for rapid development
-- fix_NAME - A branch for making thoughout fixes
-- hotfix_NAME - A branch for hotfixes
+- a_branch_name - Generic branches. Mainly feature branches
+- clean_##### or clean_NAME - A branch for cleaning up code
+- dev_##### or dev_NAME - A branch for rapid development (Ex. At comps)
+- fix_##### or fix_NAME - A branch for making thoughout fixes
+- hotfix_##### or hotfix_NAME - A branch for hotfixes
 - \#\#\#\#\# - Number in the format MonthDayIncrement (Ex. for the second cleanup branch on Jan 20 (clean_01202))
