@@ -73,7 +73,7 @@ public class RobotContainer {
 
 		gyro = new AHRS();
 		targetingLimelight = new Lemonlight("limelight");
-		// TODO: need to ensure that this name is set on the limelight aswell.
+		// TODO: need to ensure that this name is set on the limelight as well.
 		ballDetectionLimelight = new Lemonlight("balldetect");
 
 		shifter = new Shifter();
@@ -155,13 +155,13 @@ public class RobotContainer {
 	}
 
 	/**
-	 * runs once every ~20ms when in telyop
+	 * runs once every ~20ms when in teleop
 	 */
 	public void teleopPeriodic() {
 	}
 
 	/**
-	 * runs when robot is inited to telyop
+	 * runs when robot is inited to teleop
 	 */
 	public void teleopInit() {
 	}
