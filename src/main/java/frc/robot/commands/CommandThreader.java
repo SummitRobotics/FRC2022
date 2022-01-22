@@ -11,8 +11,8 @@ import java.lang.Thread.State;
 public class CommandThreader extends CommandBase {
 
     private volatile Command command;
-    private int period;
-    private int priority;
+    private final int period;
+    private final int priority;
 
     private Executor executor;
 
@@ -38,7 +38,7 @@ public class CommandThreader extends CommandBase {
         this.m_requirements = command.getRequirements();
     }
 
-    // inits the command and then starts the thread
+    // init the command and then starts the thread
     @Override
     public void initialize() {
         command.initialize();
@@ -79,7 +79,7 @@ public class CommandThreader extends CommandBase {
 
 class Executor extends Thread {
     private volatile Command command;
-    private int period;
+    private final int period;
 
     protected Executor(Command command, int period) {
         this.command = command;
@@ -106,10 +106,9 @@ class Executor extends Thread {
 
                 if (sleepPeriod < 0) {
                     // print out if the thread overran
-                    System.out.println(
-                            String.format(
-                                    "Loop overran by %f ms",
-                                    Math.abs(((double) (sleepPeriod)) / 1_000_000)));
+                    System.out.printf(
+                            "Loop overran by %f ms%n",
+                            Math.abs(((double) (sleepPeriod)) / 1_000_000));
 
                 } else {
                     // sleeps the thread for the calculated time

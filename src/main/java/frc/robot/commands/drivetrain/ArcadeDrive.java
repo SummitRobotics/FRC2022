@@ -34,7 +34,7 @@ public class ArcadeDrive extends CommandBase {
 
     private final RollingAverage avgPower = new RollingAverage(2, true);
 
-    private boolean isSingleAxis = false;
+    private final boolean isSingleAxis;
 
     /**
      * teleop driver control.

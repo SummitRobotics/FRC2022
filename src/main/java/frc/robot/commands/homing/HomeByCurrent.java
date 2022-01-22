@@ -13,15 +13,15 @@ import frc.robot.utilities.RollingAverage;
 
 public class HomeByCurrent extends CommandBase {
 
-    private boolean setlimits;
+    private final boolean limits;
 
-    private Homeable toHome;
-    private double homingPower;
-    private double currentThreshold;
+    private final Homeable toHome;
+    private final double homingPower;
+    private final double currentThreshold;
     private double reverseLimit;
     private double forwardLimit;
 
-    private RollingAverage currentAverage = new RollingAverage(10, false);
+    private final RollingAverage currentAverage = new RollingAverage(10, false);
 
     /**
      * Creates a new HomeByCurrent.
@@ -31,7 +31,7 @@ public class HomeByCurrent extends CommandBase {
         this.homingPower = homingPower;
         this.currentThreshold = currentThreshold;
 
-        setlimits = false;
+        limits = false;
 
         addRequirements(toHome.getSubsystemObject());
     }
@@ -48,7 +48,7 @@ public class HomeByCurrent extends CommandBase {
         this.reverseLimit = reversLimit;
         this.forwardLimit = forwardLimit;
 
-        setlimits = true;
+        limits = true;
 
         addRequirements(toHome.getSubsystemObject());
     }
@@ -65,7 +65,7 @@ public class HomeByCurrent extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // System.out.println("homing curent: " + toHome.getCurrent());
+        // System.out.println("homing current: " + toHome.getCurrent());
         toHome.setHomingPower(homingPower);
         currentAverage.update(toHome.getCurrent());
     }
@@ -78,11 +78,11 @@ public class HomeByCurrent extends CommandBase {
         System.out.println(
                 "homing of "
                         + toHome.getSubsystemObject().getClass().getCanonicalName()
-                        + " ended with intrupted "
+                        + " ended with interrupted "
                         + interrupted);
         if (!interrupted) {
             toHome.setHome(0);
-            if (setlimits) {
+            if (limits) {
                 toHome.setSoftLimits(reverseLimit, forwardLimit);
                 toHome.EnableSoftLimits();
             }
@@ -93,7 +93,6 @@ public class HomeByCurrent extends CommandBase {
     @Override
     public boolean isFinished() {
         double current = currentAverage.getAverage();
-        boolean done = current >= currentThreshold;
-        return done;
+        return current >= currentThreshold;
     }
 }

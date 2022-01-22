@@ -9,8 +9,8 @@ import frc.robot.subsystems.Drivetrain;
 
 public class FollowTrajectory extends CommandBase {
 
-    private Drivetrain drivetrain;
-    private Trajectory trajectory;
+    private final Drivetrain drivetrain;
+    private final Trajectory trajectory;
 
     private RamseteCommand command;
 

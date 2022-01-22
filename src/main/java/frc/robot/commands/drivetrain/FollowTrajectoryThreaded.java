@@ -18,14 +18,12 @@ import frc.robot.utilities.lists.LEDPriorities;
 
 public class FollowTrajectoryThreaded extends CommandBase {
 
-    private Trajectory trajectory;
-    private Drivetrain drivetrain;
-    private int period;
+    private final Trajectory trajectory;
+    private final Drivetrain drivetrain;
+    private final int period;
     private CommandThreader commandThreader;
 
-    private FunctionalCommand command;
-
-    private LEDCall splineLEDs = new LEDCall(LEDPriorities.SPLINES, LEDRange.All)
+    private final LEDCall splineLEDs = new LEDCall(LEDPriorities.SPLINES, LEDRange.All)
             .sine(Colors.PURPLE);
 
     /**
@@ -34,7 +32,7 @@ public class FollowTrajectoryThreaded extends CommandBase {
      * it more precise
      *
      * @param drivetrain drivetrain to control
-     * @param trajectory path to the saved SerialisableMultiGearTrejectory object
+     * @param trajectory path to the saved SerializableMultiGearTrajectory object
      */
     public FollowTrajectoryThreaded(Drivetrain drivetrain, Trajectory trajectory) {
         super();
@@ -63,7 +61,7 @@ public class FollowTrajectoryThreaded extends CommandBase {
 
         drivetrain.setPose(trajectory.getInitialPose());
 
-        // Wraps the command so we can update odometry every cycle.
+        // Wraps the command, so we can update odometry every cycle.
         Runnable onExecute =
                 () -> {
                     drivetrain.updateOdometry();
@@ -72,13 +70,12 @@ public class FollowTrajectoryThreaded extends CommandBase {
 
         // Wraps the ramseteCommand in a functional command,
         // so we can update drivetrain odometry still.
-        command =
-                new FunctionalCommand(
-                        ramseteCommand::initialize,
-                        onExecute,
-                        ramseteCommand::end,
-                        ramseteCommand::isFinished,
-                        drivetrain);
+        FunctionalCommand command = new FunctionalCommand(
+                ramseteCommand::initialize,
+                onExecute,
+                ramseteCommand::end,
+                ramseteCommand::isFinished,
+                drivetrain);
 
         // Creates the command threader
         commandThreader = new CommandThreader(command, period, 10);

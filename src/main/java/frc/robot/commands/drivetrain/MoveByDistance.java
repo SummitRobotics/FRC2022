@@ -7,6 +7,9 @@
 
 package frc.robot.commands.drivetrain;
 
+import static frc.robot.subsystems.Drivetrain.HIGH_GEAR_RATIO;
+import static frc.robot.subsystems.Drivetrain.LOW_GEAR_RATIO;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shifter;
@@ -41,12 +44,12 @@ public class MoveByDistance extends CommandBase {
     @Override
     public void initialize() {
         if (shifter.getShiftState()) {
-            rightRotations = ((WHEEL_DIAMETER * Math.PI) * right) * drive.HIGH_GEAR_RATIO;
-            leftRotations = (WHEEL_DIAMETER * Math.PI) * drive.HIGH_GEAR_RATIO * left;
+            rightRotations = ((WHEEL_DIAMETER * Math.PI) * right) * HIGH_GEAR_RATIO;
+            leftRotations = (WHEEL_DIAMETER * Math.PI) * HIGH_GEAR_RATIO * left;
 
         } else {
-            rightRotations = (WHEEL_DIAMETER * Math.PI) * drive.LOW_GEAR_RATIO * right;
-            leftRotations = (WHEEL_DIAMETER * Math.PI) * drive.LOW_GEAR_RATIO * left;
+            rightRotations = (WHEEL_DIAMETER * Math.PI) * LOW_GEAR_RATIO * right;
+            leftRotations = (WHEEL_DIAMETER * Math.PI) * LOW_GEAR_RATIO * left;
         }
     }
 

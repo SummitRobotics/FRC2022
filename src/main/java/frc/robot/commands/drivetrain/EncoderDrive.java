@@ -12,9 +12,9 @@ import frc.robot.subsystems.Drivetrain;
 
 public class EncoderDrive extends CommandBase {
 
-    private Drivetrain drivetrain;
-    private double left;
-    private double right;
+    private final Drivetrain drivetrain;
+    private final double left;
+    private final double right;
 
     public EncoderDrive(Drivetrain drivetrain, double left, double right) {
         this.drivetrain = drivetrain;

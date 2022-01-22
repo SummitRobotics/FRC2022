@@ -9,10 +9,10 @@ import frc.robot.utilities.Homeable;
 
 public class HomeByEncoder extends CommandBase {
 
-    private boolean setlimits;
-    private Homeable toHome;
-    private double homingPower;
-    private int minLoops;
+    private final boolean limits;
+    private final Homeable toHome;
+    private final double homingPower;
+    private final int minLoops;
     private double reverseLimit;
     private double forwardLimit;
 
@@ -25,7 +25,7 @@ public class HomeByEncoder extends CommandBase {
 
         loops = 0;
 
-        setlimits = false;
+        limits = false;
 
         addRequirements(toHome.getSubsystemObject());
     }
@@ -42,7 +42,7 @@ public class HomeByEncoder extends CommandBase {
         this.reverseLimit = reverseLimit;
         this.forwardLimit = forwardLimit;
 
-        setlimits = true;
+        limits = true;
 
         loops = 0;
 
@@ -69,7 +69,7 @@ public class HomeByEncoder extends CommandBase {
         toHome.setHomingPower(0);
         if (!interrupted) {
             toHome.setHome(0);
-            if (setlimits) {
+            if (limits) {
                 toHome.setSoftLimits(reverseLimit, forwardLimit);
                 toHome.EnableSoftLimits();
             }
@@ -81,8 +81,6 @@ public class HomeByEncoder extends CommandBase {
     public boolean isFinished() {
         double v = toHome.getVelocity();
 
-        boolean done = (loops > minLoops) && (Math.abs(v) < 1);
-
-        return done;
+        return (loops > minLoops) && (Math.abs(v) < 1);
     }
 }
