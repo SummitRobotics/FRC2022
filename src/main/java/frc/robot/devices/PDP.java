@@ -2,6 +2,9 @@ package frc.robot.devices;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 
+/**
+ * Contains methods for interfacing with the PDP (Power Distribution Panel)
+ */
 public class PDP {
 
     private PowerDistribution panel;
