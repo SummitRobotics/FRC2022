@@ -14,7 +14,6 @@ public class PDP implements Sendable {
 
   public PDP() {
     panel = new PowerDistribution();
-    SmartDashboard.putData("PDP", this);
   }
 
   public void clearStickyFaults() {
