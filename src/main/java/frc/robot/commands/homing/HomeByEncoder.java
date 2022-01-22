@@ -9,75 +9,76 @@ import frc.robot.utilities.Homeable;
 
 public class HomeByEncoder extends CommandBase {
 
-	private boolean setlimits;
-	private Homeable toHome;
-	private double homingPower;
-	private int minLoops;
-	private double reverseLimit;
-	private double fowardLimit;
+  private boolean setlimits;
+  private Homeable toHome;
+  private double homingPower;
+  private int minLoops;
+  private double reverseLimit;
+  private double fowardLimit;
 
-	private int loops;
+  private int loops;
 
-	public HomeByEncoder(Homeable toHome, double homingPower, int minLoops) {
-		this.toHome = toHome;
-		this.homingPower = homingPower;
-		this.minLoops = minLoops;
+  public HomeByEncoder(Homeable toHome, double homingPower, int minLoops) {
+    this.toHome = toHome;
+    this.homingPower = homingPower;
+    this.minLoops = minLoops;
 
-		loops = 0;
+    loops = 0;
 
-		setlimits = false;
+    setlimits = false;
 
-		addRequirements(toHome.getSubsystemObject());
-	}
+    addRequirements(toHome.getSubsystemObject());
+  }
 
-	public HomeByEncoder(Homeable toHome, double homingPower, int minLoops, double reverseLimit, double fowardLimit) {
-		this.toHome = toHome;
-		this.homingPower = homingPower;
-		this.minLoops = minLoops;
-		this.reverseLimit = reverseLimit;
-		this.fowardLimit = fowardLimit;
+  public HomeByEncoder(
+      Homeable toHome, double homingPower, int minLoops, double reverseLimit, double fowardLimit) {
+    this.toHome = toHome;
+    this.homingPower = homingPower;
+    this.minLoops = minLoops;
+    this.reverseLimit = reverseLimit;
+    this.fowardLimit = fowardLimit;
 
-		setlimits = true;
+    setlimits = true;
 
-		loops = 0;
+    loops = 0;
 
-		addRequirements(toHome.getSubsystemObject());
-	}
+    addRequirements(toHome.getSubsystemObject());
+  }
 
-	// Called when the command is initially scheduled.
-	@Override
-	public void initialize() {
-		loops = 0;
-		toHome.DisableSoftLimits();
-	}
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    loops = 0;
+    toHome.DisableSoftLimits();
+  }
 
-	// Called every time the scheduler runs while the command is scheduled.
-	@Override
-	public void execute() {
-		toHome.setHomingPower(homingPower);
-		loops += (loops > minLoops) ? 0 : 1;
-	}
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    toHome.setHomingPower(homingPower);
+    loops += (loops > minLoops) ? 0 : 1;
+  }
 
-	// Called once the command ends or is interrupted.
-	@Override
-	public void end(boolean interrupted) {
-		toHome.setHomingPower(0);
-		if (!interrupted) {
-			toHome.setHome(0);
-			if (setlimits) {
-				toHome.setSoftLimits(reverseLimit, fowardLimit);
-				toHome.EnableSoftLimits();
-			}
-		}
-	}
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    toHome.setHomingPower(0);
+    if (!interrupted) {
+      toHome.setHome(0);
+      if (setlimits) {
+        toHome.setSoftLimits(reverseLimit, fowardLimit);
+        toHome.EnableSoftLimits();
+      }
+    }
+  }
 
-	// Returns true when the command should end.
-	@Override
-	public boolean isFinished() {
-		double v = toHome.getVelocity();
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    double v = toHome.getVelocity();
 
-		boolean done = (loops > minLoops) && (Math.abs(v) < 1);
+    boolean done = (loops > minLoops) && (Math.abs(v) < 1);
 
-		return done;
-	}
+    return done;
+  }
 }

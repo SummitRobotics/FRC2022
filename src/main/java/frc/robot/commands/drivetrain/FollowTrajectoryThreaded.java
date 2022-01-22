@@ -21,79 +21,87 @@ import frc.robot.utilities.lists.LEDPriorities;
 
 public class FollowTrajectoryThreaded extends CommandBase {
 
-	private Trajectory trajectory;
-	private Drivetrain drivetrain;
-	private int period;
-	private CommandThreader commandThreader;
+  private Trajectory trajectory;
+  private Drivetrain drivetrain;
+  private int period;
+  private CommandThreader commandThreader;
 
-	private FunctionalCommand command;
+  private FunctionalCommand command;
 
-	private LEDCall splineLEDs = new LEDCall(LEDPriorities.splines, LEDRange.All).sine(Colors.Purple);
+  private LEDCall splineLEDs = new LEDCall(LEDPriorities.splines, LEDRange.All).sine(Colors.Purple);
 
-	/**
-	 * command to folow a trejectory object that has been saved to the roborio with
-	 * threading to make it more precice
-	 * 
-	 * @param drivetrain drivetain to control
-	 * @param path       path to the saved SerialisableMultiGearTrejectory object
-	 */
-	public FollowTrajectoryThreaded(Drivetrain drivetrain, Trajectory trajectory) {
-		super();
+  /**
+   * command to folow a trejectory object that has been saved to the roborio with threading to make
+   * it more precice
+   *
+   * @param drivetrain drivetain to control
+   * @param path path to the saved SerialisableMultiGearTrejectory object
+   */
+  public FollowTrajectoryThreaded(Drivetrain drivetrain, Trajectory trajectory) {
+    super();
 
-		this.drivetrain = drivetrain;
-		this.trajectory = trajectory;
+    this.drivetrain = drivetrain;
+    this.trajectory = trajectory;
 
-		this.period = 5;
+    this.period = 5;
 
-		addRequirements(drivetrain);
-	}
+    addRequirements(drivetrain);
+  }
 
-	@Override
-	public void initialize() {
-		splineLEDs.activate();
+  @Override
+  public void initialize() {
+    splineLEDs.activate();
 
-		RamseteCommand ramseteCommand = new RamseteCommand(
-				trajectory,
-				drivetrain::getPose,
-				//TODO tune controller values
-				new RamseteController(1.5, 0.8), Drivetrain.DriveKinimatics,
-				drivetrain::setMotorTargetSpeed, drivetrain);
+    RamseteCommand ramseteCommand =
+        new RamseteCommand(
+            trajectory,
+            drivetrain::getPose,
+            // TODO tune controller values
+            new RamseteController(1.5, 0.8),
+            Drivetrain.DriveKinimatics,
+            drivetrain::setMotorTargetSpeed,
+            drivetrain);
 
-		drivetrain.setPose(trajectory.getInitialPose());
+    drivetrain.setPose(trajectory.getInitialPose());
 
+    // Wraps the command so we can update odometry every cycle.
+    Runnable onExecute =
+        () -> {
+          drivetrain.updateOdometry();
+          ramseteCommand.initialize();
+        };
 
-		// Wraps the command so we can update odometry every cycle.
-		Runnable onExecute = () -> {
-			drivetrain.updateOdometry();
-			ramseteCommand.initialize();
-		};
-		
-		// Wraps the ramseteCommand in a functional command so we can update drivetrain odometry still.
-		command = new FunctionalCommand( ramseteCommand::initialize, onExecute, ramseteCommand::end, ramseteCommand::isFinished, drivetrain);
+    // Wraps the ramseteCommand in a functional command so we can update drivetrain odometry still.
+    command =
+        new FunctionalCommand(
+            ramseteCommand::initialize,
+            onExecute,
+            ramseteCommand::end,
+            ramseteCommand::isFinished,
+            drivetrain);
 
-		// Creates the command threader
-		commandThreader = new CommandThreader(command, period, 10);
-		commandThreader.initialize();
-		
-		System.out.println("thread started");
-	}
+    // Creates the command threader
+    commandThreader = new CommandThreader(command, period, 10);
+    commandThreader.initialize();
 
-	@Override
-	public boolean isFinished() {
-		// checks if thread is running or ended
-		return commandThreader.isFinished();
-	}
+    System.out.println("thread started");
+  }
 
-	@Override
-	public void end(boolean interrupted) {
+  @Override
+  public boolean isFinished() {
+    // checks if thread is running or ended
+    return commandThreader.isFinished();
+  }
 
-		// stops the thread
-		commandThreader.end(interrupted);
+  @Override
+  public void end(boolean interrupted) {
 
-		// stops the drivetrain motors
-		drivetrain.stop();
+    // stops the thread
+    commandThreader.end(interrupted);
 
-		splineLEDs.cancel();
-	}
+    // stops the drivetrain motors
+    drivetrain.stop();
 
+    splineLEDs.cancel();
+  }
 }

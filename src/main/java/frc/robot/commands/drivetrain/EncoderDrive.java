@@ -12,43 +12,42 @@ import frc.robot.subsystems.Drivetrain;
 
 public class EncoderDrive extends CommandBase {
 
-	private Drivetrain drivetrain;
-	private double left;
-	private double right;
+  private Drivetrain drivetrain;
+  private double left;
+  private double right;
 
-	public EncoderDrive(Drivetrain drivetrain, double left, double right) {
-		this.drivetrain = drivetrain;
-		this.left = left;
-		this.right = right;
+  public EncoderDrive(Drivetrain drivetrain, double left, double right) {
+    this.drivetrain = drivetrain;
+    this.left = left;
+    this.right = right;
 
-		addRequirements(drivetrain);
-	}
+    addRequirements(drivetrain);
+  }
 
-	// Called when the command is initially scheduled.
-	@Override
-	public void initialize() {
-		drivetrain.stop();
-		drivetrain.zeroEncoders();
-		drivetrain.setLeftMotorTarget(left);
-		drivetrain.setRightMotorTarget(right);
-	}
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    drivetrain.stop();
+    drivetrain.zeroEncoders();
+    drivetrain.setLeftMotorTarget(left);
+    drivetrain.setRightMotorTarget(right);
+  }
 
-	@Override
-	public void execute() {
-		// System.out.println(drivetrain.getLeftEncoderPosition());
-	}
+  @Override
+  public void execute() {
+    // System.out.println(drivetrain.getLeftEncoderPosition());
+  }
 
-	// Called once the command ends or is interrupted.
-	@Override
-	public void end(boolean interrupted) {
-		drivetrain.stop();
-	}
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    drivetrain.stop();
+  }
 
-	// Returns true when the command should end.
-	@Override
-	public boolean isFinished() {
-		return Math.abs(drivetrain.getLeftEncoderPosition() - left) < 1
-				&& Math.abs(drivetrain.getRightEncoderPosition() - right) < 1;
-
-	}
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return Math.abs(drivetrain.getLeftEncoderPosition() - left) < 1
+        && Math.abs(drivetrain.getRightEncoderPosition() - right) < 1;
+  }
 }

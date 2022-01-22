@@ -1,20 +1,20 @@
 package frc.robot.devices;
 
 public interface Lidar {
-	// TODO - set LIDAR_MOUNT_ANGLE
-	public static final float LIDAR_MOUNT_ANGLE = 0;
+  // TODO - set LIDAR_MOUNT_ANGLE
+  public static final float LIDAR_MOUNT_ANGLE = 0;
 
-	public int getDistance();
+  public int getDistance();
 
-	public int getAverageDistance();
+  public int getAverageDistance();
 
-	/**
-	 * Compensated the lidar distance for the lidar mount angle in inches
-	 * 
-	 * @param reportedDistance the distance reported by the lidar
-	 * @return the new corrected distance
-	 */
-	public default double getCompensatedLidarDistance(double reportedDistance) {
-		return reportedDistance * Math.cos(Math.toDegrees(LIDAR_MOUNT_ANGLE)) * 0.393701;
-	}
+  /**
+   * Compensated the lidar distance for the lidar mount angle in inches
+   *
+   * @param reportedDistance the distance reported by the lidar
+   * @return the new corrected distance
+   */
+  public default double getCompensatedLidarDistance(double reportedDistance) {
+    return reportedDistance * Math.cos(Math.toDegrees(LIDAR_MOUNT_ANGLE)) * 0.393701;
+  }
 }

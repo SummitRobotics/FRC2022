@@ -6,11 +6,11 @@ import frc.robot.subsystems.Shifter;
 
 public class TurnByEncoder extends ParallelCommandGroup {
 
-	private final double robotRadius = 15;
+  private final double robotRadius = 15;
 
-	public TurnByEncoder(double angle, Drivetrain drive, Shifter shift) {
-		double radians = Math.PI / 180;
-		double distance = robotRadius * radians;
-		addCommands(new MoveByDistance(distance, -distance, drive, shift));
-	}
+  public TurnByEncoder(double angle, Drivetrain drive, Shifter shift) {
+    double radians = Math.PI / 180;
+    double distance = robotRadius * radians;
+    addCommands(new MoveByDistance(distance, -distance, drive, shift));
+  }
 }

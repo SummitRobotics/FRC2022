@@ -1,6 +1,7 @@
 # FRC 2022
 
 [![CI](https://github.com/SummitRobotics/FRC2022/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SummitRobotics/FRC2022/actions/workflows/main.yml)
+[![GitHub Super-Linter](https://github.com/SummitRobotics/FRC2022/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 Team 5468's 2022 FRC robot code. This code is written in Java and is based off of WPILib's Java control system and utilizes a command based system.
 
