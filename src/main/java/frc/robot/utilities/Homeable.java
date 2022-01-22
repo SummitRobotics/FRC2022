@@ -9,21 +9,23 @@ package frc.robot.utilities;
 
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
-/** interface for homing a subsystem */
+/**
+ * interface for homing a subsystem
+ */
 public interface Homeable {
-  public double getCurrent();
+    public double getCurrent();
 
-  public double getVelocity();
+    public double getVelocity();
 
-  public void setHomingPower(double power);
+    public void setHomingPower(double power);
 
-  public void setHome(double position);
+    public void setHome(double position);
 
-  public void setSoftLimits(double revers, double foward);
+    public void setSoftLimits(double revers, double foward);
 
-  public void DisableSoftLimits();
+    public void DisableSoftLimits();
 
-  public void EnableSoftLimits();
+    public void EnableSoftLimits();
 
-  public Subsystem getSubsystemObject();
+    public Subsystem getSubsystemObject();
 }

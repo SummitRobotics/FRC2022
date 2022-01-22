@@ -128,7 +128,6 @@
                      value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
         </module>
         <module name="OneStatementPerLine"/>
-        <module name="MultipleVariableDeclarations"/>
         <module name="ArrayTypeStyle"/>
         <module name="MissingSwitchDefault"/>
         <module name="FallThrough"/>
@@ -180,12 +179,12 @@
                      value="Type name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="MemberName">
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <property name="format" value="^[a-z][a-zA-Z][a-zA-Z0-9]*$"/>
             <message key="name.invalidPattern"
                      value="Member name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="ParameterName">
-            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <property name="format" value="^([a-z][a-z0-9][a-zA-Z0-9]*)?$"/>
             <message key="name.invalidPattern"
                      value="Parameter name ''{0}'' must match pattern ''{1}''."/>
         </module>
@@ -203,6 +202,12 @@
             <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
             <message key="name.invalidPattern"
                      value="Local variable name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <module name="LocalFinalVariableName">
+            <property name="tokens" value="VARIABLE_DEF,PARAMETER_DEF"/>
+            <property name="format" value="^[A-Z][A-Z0-9_]*$"/>
+            <message key="name.invalidPattern"
+                     value="Pattern variable name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="PatternVariableName">
             <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
@@ -234,6 +239,10 @@
             <message key="name.invalidPattern"
                      value="Interface type name ''{0}'' must match pattern ''{1}''."/>
         </module>
+        <module name="ConstantName">
+            <property name="format"
+                      value="^[A-Z][A-Z0-9_]*$"/>
+        </module>
         <module name="NoFinalizer"/>
         <module name="GenericWhitespace">
             <message key="ws.followed"
@@ -255,7 +264,7 @@
         </module>
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="0"/>
+            <property name="allowedAbbreviationLength" value="5"/>
             <property name="tokens"
                       value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, ANNOTATION_FIELD_DEF,
                     PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF,

@@ -16,135 +16,140 @@ import frc.robot.utilities.RollingAverage;
 
 public class ArcadeDrive extends CommandBase {
 
-  private Drivetrain drivetrain;
+    private final Drivetrain drivetrain;
 
-  private OIAxis forwardPowerAxis;
-  private OIAxis reversePowerAxis;
-  private OIAxis turnAxis;
+    private final OIAxis forwardPowerAxis;
+    private OIAxis reversePowerAxis;
+    private final OIAxis turnAxis;
 
-  private ChangeRateLimiter limiter;
+    private final ChangeRateLimiter limiter;
 
-  private final double DEADZONE = .1;
+    private static final double DEAD_ZONE = .1;
 
-  private double max_change_rate = 0.05;
+    private static final double MAX_CHANGE_RATE = 0.05;
 
-  private Runnable shiftLow;
+    private final Runnable shiftLow;
 
-  private RollingAverage avgSpeed = new RollingAverage(2, true);
+    private final RollingAverage avgSpeed = new RollingAverage(2, true);
 
-  private RollingAverage avgPower = new RollingAverage(2, true);
+    private final RollingAverage avgPower = new RollingAverage(2, true);
 
-  private boolean isSingleAxis = false;
+    private boolean isSingleAxis = false;
 
-  /**
-   * teleop driver control
-   *
-   * @param drivetrain drivetrain instance
-   * @param shift shifter instance
-   * @param powerAxis control axis for the drivetrain power
-   * @param turnAxis control axis for the drivetrain turn
-   */
-  public ArcadeDrive(
-      Drivetrain drivetrain,
-      OIAxis forwardPowerAxis,
-      OIAxis reversePowerAxis,
-      OIAxis turnAxis,
-      Runnable shiftLow) {
+    /**
+     * teleop driver control.
+     *
+     * @param drivetrain       drivetrain instance
+     * @param forwardPowerAxis control axis for forward power
+     * @param reversePowerAxis control axis for reverse power
+     * @param turnAxis         control axis for the drivetrain turn
+     */
+    public ArcadeDrive(
+            Drivetrain drivetrain,
+            OIAxis forwardPowerAxis,
+            OIAxis reversePowerAxis,
+            OIAxis turnAxis,
+            Runnable shiftLow) {
 
-    this.drivetrain = drivetrain;
+        this.drivetrain = drivetrain;
 
-    this.forwardPowerAxis = forwardPowerAxis;
-    this.reversePowerAxis = reversePowerAxis;
-    this.turnAxis = turnAxis;
-    this.shiftLow = shiftLow;
+        this.forwardPowerAxis = forwardPowerAxis;
+        this.reversePowerAxis = reversePowerAxis;
+        this.turnAxis = turnAxis;
+        this.shiftLow = shiftLow;
 
-    limiter = new ChangeRateLimiter(max_change_rate);
+        limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
-    addRequirements(drivetrain);
-    isSingleAxis = false;
-  }
-
-  /**
-   * teleop driver control
-   *
-   * @param drivetrain drivetrain instance
-   * @param shift shifter instance
-   * @param powerAxis control axis for the drivetrain power
-   * @param turnAxis control axis for the drivetrain turn
-   */
-  public ArcadeDrive(Drivetrain drivetrain, OIAxis PowerAxis, OIAxis turnAxis, Runnable shiftLow) {
-
-    this.drivetrain = drivetrain;
-
-    this.forwardPowerAxis = PowerAxis;
-    this.turnAxis = turnAxis;
-    this.shiftLow = shiftLow;
-
-    limiter = new ChangeRateLimiter(max_change_rate);
-
-    addRequirements(drivetrain);
-    isSingleAxis = true;
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    drivetrain.setOpenRampRate(0);
-    avgPower.reset();
-    avgSpeed.reset();
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-
-    double power;
-
-    if (isSingleAxis) {
-      power = Math.pow(Functions.deadzone(DEADZONE, forwardPowerAxis.get()), 3);
-    } else {
-      double forwardPower = forwardPowerAxis.get();
-      double reversePower = reversePowerAxis.get();
-
-      forwardPower = Functions.deadzone(DEADZONE, forwardPower);
-      reversePower = Functions.deadzone(DEADZONE, reversePower);
-
-      forwardPower = Math.pow(forwardPower, 2);
-      reversePower = Math.pow(reversePower, 2);
-
-      power = forwardPower - reversePower;
+        addRequirements(drivetrain);
+        isSingleAxis = false;
     }
 
-    double turn = Math.pow(turnAxis.get(), 3);
+    /**
+     * teleop driver control.
+     *
+     * @param drivetrain drivetrain instance
+     * @param shiftLow   shifter instance
+     * @param powerAxis  control axis for the drivetrain power
+     * @param turnAxis   control axis for the drivetrain turn
+     */
+    public ArcadeDrive(
+            Drivetrain drivetrain,
+            OIAxis powerAxis,
+            OIAxis turnAxis,
+            Runnable shiftLow) {
 
-    power = limiter.getRateLimitedValue(power);
+        this.drivetrain = drivetrain;
 
-    avgPower.update(Math.abs(power));
+        this.forwardPowerAxis = powerAxis;
+        this.turnAxis = turnAxis;
+        this.shiftLow = shiftLow;
 
-    avgSpeed.update(Math.abs(drivetrain.getRightRPM()) + Math.abs(drivetrain.getLeftRPM()));
+        limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
-    // shifts into low gear if drivetrain stalled
-    if ((avgPower.getAverage() > .5) && avgSpeed.getAverage() < 15) {
-      shiftLow.run();
+        addRequirements(drivetrain);
+        isSingleAxis = true;
     }
 
-    // calculates power to the motors
-    double leftPower = power + turn;
-    double rightPower = power - turn;
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        drivetrain.setOpenRampRate(0);
+        avgPower.reset();
+        avgSpeed.reset();
+    }
 
-    drivetrain.setLeftMotorPower(leftPower);
-    drivetrain.setRightMotorPower(rightPower);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    drivetrain.stop();
-  }
+        double power;
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+        if (isSingleAxis) {
+            power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
+        } else {
+            double forwardPower = forwardPowerAxis.get();
+            double reversePower = reversePowerAxis.get();
+
+            forwardPower = Functions.deadzone(DEAD_ZONE, forwardPower);
+            reversePower = Functions.deadzone(DEAD_ZONE, reversePower);
+
+            forwardPower = Math.pow(forwardPower, 2);
+            reversePower = Math.pow(reversePower, 2);
+
+            power = forwardPower - reversePower;
+        }
+
+        power = limiter.getRateLimitedValue(power);
+
+        avgPower.update(Math.abs(power));
+
+        avgSpeed.update(Math.abs(drivetrain.getRightRPM()) + Math.abs(drivetrain.getLeftRPM()));
+
+        // shifts into low gear if drivetrain stalled
+        if ((avgPower.getAverage() > .5) && avgSpeed.getAverage() < 15) {
+            shiftLow.run();
+        }
+
+        double turn = Math.pow(turnAxis.get(), 3);
+
+
+        // calculates power to the motors
+        double leftPower = power + turn;
+        double rightPower = power - turn;
+
+        drivetrain.setLeftMotorPower(leftPower);
+        drivetrain.setRightMotorPower(rightPower);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        drivetrain.stop();
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

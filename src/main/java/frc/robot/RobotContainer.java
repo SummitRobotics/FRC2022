@@ -39,140 +39,153 @@ import frc.robot.utilities.lists.StatusPriorities;
  */
 public class RobotContainer {
 
-  private CommandScheduler scheduler;
+    private CommandScheduler scheduler;
 
-  private ControllerDriver controller1;
-  private LaunchpadDriver launchpad;
-  private JoystickDriver joystick;
+    private ControllerDriver controller1;
+    private LaunchpadDriver launchpad;
+    private JoystickDriver joystick;
 
-  private Drivetrain drivetrain;
-  private Shifter shifter;
+    private Drivetrain drivetrain;
+    private Shifter shifter;
 
-  private Lemonlight targetingLimelight, ballDetectionLimelight;
-  private AHRS gyro;
+    private Lemonlight targetingLimelight, ballDetectionLimelight;
+    private AHRS gyro;
 
-  private Command teleInit;
-  private Command autoInit;
+    private Command teleInit;
+    private Command autoInit;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
 
-    scheduler = CommandScheduler.getInstance();
+        scheduler = CommandScheduler.getInstance();
 
-    controller1 = new ControllerDriver(Ports.XBOX_PORT);
-    launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
-    joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
+        controller1 = new ControllerDriver(Ports.XBOX_PORT);
+        launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
+        joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
 
-    new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
-    ShufhellboardDriver.statusDisplay.addStatus(
-        "default", "robot on", Colors.WHITE, StatusPriorities.ON);
+        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        ShufhellboardDriver.statusDisplay.addStatus(
+                "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
-    gyro = new AHRS();
-    targetingLimelight = new Lemonlight("limelight");
-    // TODO: need to ensure that this name is set on the limelight aswell.
-    ballDetectionLimelight = new Lemonlight("balldetect");
+        gyro = new AHRS();
+        targetingLimelight = new Lemonlight("limelight");
+        // TODO: need to ensure that this name is set on the limelight aswell.
+        ballDetectionLimelight = new Lemonlight("balldetect");
 
-    shifter = new Shifter();
-    drivetrain = new Drivetrain(gyro, () -> shifter.getShiftState());
+        shifter = new Shifter();
+        drivetrain = new Drivetrain(gyro, () -> shifter.getShiftState());
 
-    autoInit =
-        new SequentialCommandGroup(
-            new InstantCommand(
-                () ->
-                    ShufhellboardDriver.statusDisplay.addStatus(
-                        "auto", "robot in auto", Colors.TEAM, StatusPriorities.ENABLED)),
-            new InstantCommand(shifter::highGear),
-            new InstantCommand(
-                () -> {
-                  launchpad.bigLEDRed.set(false);
-                  launchpad.bigLEDGreen.set(true);
-                }));
+        autoInit =
+                new SequentialCommandGroup(
+                        new InstantCommand(
+                                () ->
+                                        ShufhellboardDriver.statusDisplay.addStatus(
+                                                "auto", "robot in auto", Colors.TEAM, StatusPriorities.ENABLED)),
+                        new InstantCommand(shifter::highGear),
+                        new InstantCommand(
+                                () -> {
+                                    launchpad.bigLEDRed.set(false);
+                                    launchpad.bigLEDGreen.set(true);
+                                }));
 
-    teleInit =
-        new SequentialCommandGroup(
-            new InstantCommand(
-                () -> {
-                  // simulated robots don't have joysticks
-                  if (RobotBase.isReal()) {
-                    if (!controller1.isConnected()
-                        || !launchpad.isConnected()
-                        || !joystick.isConnected()) {
-                      System.out.println(
-                          "not enough joysticks connected, please make sure the xbox controller, launchpad, and joystick are connected to the driverstation");
-                      throw (new RuntimeException("not enough joysticks connected"));
-                    }
+        teleInit =
+                new SequentialCommandGroup(
+                        new InstantCommand(
+                                () -> {
+                                    // simulated robots don't have joysticks
+                                    if (RobotBase.isReal()) {
+                                        if (!controller1.isConnected()
+                                                || !launchpad.isConnected()
+                                                || !joystick.isConnected()) {
+                                            System.out.println(
+                                                    "not enough joysticks connected, please make sure the xbox controller, launchpad, and joystick are connected to the driverstation");
+                                            throw (new RuntimeException("not enough joysticks connected"));
+                                        }
 
-                    if (!controller1.isXboxControler()) {
-                      System.out.println("controller 0 is not the xbox controller");
-                      throw (new RuntimeException("incorrect joystick in port 0"));
-                    }
-                  }
-                }),
-            new InstantCommand(() -> ShufhellboardDriver.statusDisplay.removeStatus("auto")),
-            new InstantCommand(
-                () ->
-                    ShufhellboardDriver.statusDisplay.addStatus(
-                        "enabled", "robot enabled", Colors.TEAM, StatusPriorities.ENABLED)),
-            new InstantCommand(() -> joystick.ReEnableJoysticCalibrationCheck()),
-            new InstantCommand(shifter::highGear),
-            new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
-            new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
-            new InstantCommand(
-                () -> {
-                  launchpad.bigLEDRed.set(false);
-                  launchpad.bigLEDGreen.set(true);
-                }));
+                                        if (!controller1.isXboxControler()) {
+                                            System.out.println("controller 0 is not the xbox controller");
+                                            throw (new RuntimeException("incorrect joystick in port 0"));
+                                        }
+                                    }
+                                }),
+                        new InstantCommand(() -> ShufhellboardDriver.statusDisplay.removeStatus("auto")),
+                        new InstantCommand(
+                                () ->
+                                        ShufhellboardDriver.statusDisplay.addStatus(
+                                                "enabled", "robot enabled", Colors.TEAM, StatusPriorities.ENABLED)),
+                        new InstantCommand(() -> joystick.ReEnableJoysticCalibrationCheck()),
+                        new InstantCommand(shifter::highGear),
+                        new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                        new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                        new InstantCommand(
+                                () -> {
+                                    launchpad.bigLEDRed.set(false);
+                                    launchpad.bigLEDGreen.set(true);
+                                }));
 
-    // Configure the button bindings
-    setDefaultCommands();
-    configureButtonBindings();
-  }
+        // Configure the button bindings
+        setDefaultCommands();
+        configureButtonBindings();
+    }
 
-  private void setDefaultCommands() {
-    // drive by controller
-    drivetrain.setDefaultCommand(
-        new ArcadeDrive(
-            drivetrain,
-            controller1.rightTrigger,
-            controller1.leftTrigger,
-            controller1.leftX,
-            shifter::lowGear));
-  }
+    private void setDefaultCommands() {
+        // drive by controller
+        drivetrain.setDefaultCommand(
+                new ArcadeDrive(
+                        drivetrain,
+                        controller1.rightTrigger,
+                        controller1.leftTrigger,
+                        controller1.leftX,
+                        shifter::lowGear));
+    }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {}
+    /**
+     * Use this method to define your button->command mappings. Buttons can be created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+    }
 
-  /** runs when the robot gets disabled */
-  public void disabledInit() {
-    LEDs.getInstance().removeAllCalls();
-    new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
-    ShufhellboardDriver.statusDisplay.removeStatus("enabled");
-    ChangeRateLimiter.resetAllChangeRateLimiters();
-  }
+    /**
+     * runs when the robot gets disabled
+     */
+    public void disabledInit() {
+        LEDs.getInstance().removeAllCalls();
+        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        ShufhellboardDriver.statusDisplay.removeStatus("enabled");
+        ChangeRateLimiter.resetAllChangeRateLimiters();
+    }
 
-  /** runs once every ~20ms when in telyop */
-  public void teleopPeriodic() {}
+    /**
+     * runs once every ~20ms when in telyop
+     */
+    public void teleopPeriodic() {
+    }
 
-  /** runs when robot is inited to teleop */
-  public void teleopInit() {}
+    /**
+     * runs when robot is inited to teleop
+     */
+    public void teleopInit() {
+    }
 
-  /** runs when the robot is powered on */
-  public void robotInit() {
-    ShufhellboardDriver.init();
-  }
+    /**
+     * runs when the robot is powered on
+     */
+    public void robotInit() {
+        ShufhellboardDriver.init();
+    }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return null;
-  }
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        // An ExampleCommand will run in autonomous
+        return null;
+    }
 }

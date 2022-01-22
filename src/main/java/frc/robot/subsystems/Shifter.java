@@ -12,38 +12,38 @@ import frc.robot.utilities.lists.LEDPriorities;
 
 public class Shifter extends SubsystemBase {
 
-  private DoubleSolenoid shift;
-  private boolean oldShift;
+    private DoubleSolenoid shift;
+    private boolean oldShift;
 
-  private LEDCall lowShift = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
+    private LEDCall lowShift = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
 
-  public Shifter() {
-    shift =
-        new DoubleSolenoid(
-            Ports.PCM_1,
-            PneumaticsModuleType.REVPH,
-            Ports.SHIFT_SOLENOID_UP,
-            Ports.SHIFT_SOLENOID_DOWN);
-  }
+    public Shifter() {
+        shift =
+                new DoubleSolenoid(
+                        Ports.PCM_1,
+                        PneumaticsModuleType.REVPH,
+                        Ports.SHIFT_SOLENOID_UP,
+                        Ports.SHIFT_SOLENOID_DOWN);
+    }
 
-  public void highGear() {
-    lowShift.cancel();
-    oldShift = true;
-    shift.set(Value.kForward);
-  }
+    public void highGear() {
+        lowShift.cancel();
+        oldShift = true;
+        shift.set(Value.kForward);
+    }
 
-  public void lowGear() {
-    lowShift.activate();
-    oldShift = false;
-    shift.set(Value.kReverse);
-  }
+    public void lowGear() {
+        lowShift.activate();
+        oldShift = false;
+        shift.set(Value.kReverse);
+    }
 
-  /**
-   * Gets the shift state
-   *
-   * @return the shift state where true is high and false is low
-   */
-  public boolean getShiftState() {
-    return oldShift;
-  }
+    /**
+     * Gets the shift state
+     *
+     * @return the shift state where true is high and false is low
+     */
+    public boolean getShiftState() {
+        return oldShift;
+    }
 }
