@@ -1,5 +1,8 @@
 package frc.robot.devices;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -23,17 +26,23 @@ public class Lemonlight {
 
     private NetworkTable limelight;
 
-    private NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline;
+    private NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline, llpython;
 
     private RollingAverage horizontalSmoothed;
 
-    public Lemonlight() {
-        limelight = NetworkTableInstance.getDefault().getTable("limelight");
+    /**
+     * Creates a new limelight object.
+     * @param tablename The table of the limelight. Default is "limelight"
+     */
+    public Lemonlight(String tablename) {
+        limelight = NetworkTableInstance.getDefault().getTable(tablename);
 
         tv = limelight.getEntry("tv");
         tx = limelight.getEntry("tx");
         ty = limelight.getEntry("ty");
         ta = limelight.getEntry("ta");
+
+        llpython = limelight.getEntry("llpython");
 
         ledMode = limelight.getEntry("ledMode");
         camMode = limelight.getEntry("camMode");
@@ -146,5 +155,31 @@ public class Lemonlight {
      */
     public double getLimelightDistanceEstimateIN(){
         return ((targetHeight-mountHeight) / Math.tan(((getVerticalOffset() + Lemonlight.mountAngle) * (Math.PI/180)))) * 0.393701;
+    }
+
+    /**
+     * Returns the custom vision data outputed by the limelight when in python mode.
+     * In the limelight you output to the array labeled llpython.
+     * @return custom vision data as an ArrayList of Numbers
+     */
+    public ArrayList<Number> getCustomVisionDataNumbers(){
+        // For some reason I get errors if i put {} straight into getNumberArray.
+        Number[] defaultArray = {};
+        return new ArrayList<>(Arrays.asList(llpython.getNumberArray(defaultArray)));
+    }
+
+    /**
+     * Returns the custom vision data outputed by the limelight when in python mode.
+     * In the limelight you output to the array labeled llpython.
+     * @return custom vision data as an ArrayList of Integers
+     */
+    public ArrayList<Integer> getCustomVisionData(){
+        ArrayList<Number> customVisionData = getCustomVisionDataNumbers();
+
+        ArrayList<Integer> output = new ArrayList<>();
+
+        customVisionData.forEach(ele -> output.add(ele.intValue()));
+
+        return output;
     }
 }

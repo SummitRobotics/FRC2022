@@ -51,7 +51,7 @@ public class RobotContainer {
 	private Drivetrain drivetrain;
 	private Shifter shifter;
 
-	private Lemonlight limelight;
+	private Lemonlight targetingLimelight, ballDetectionLimelight;
 	private AHRS gyro;
 
 	private Command teleInit;
@@ -72,7 +72,9 @@ public class RobotContainer {
 		ShufhellboardDriver.statusDisplay.addStatus("default", "robot on", Colors.White, StatusPriorities.on);
 
 		gyro = new AHRS();
-		limelight = new Lemonlight();
+		targetingLimelight = new Lemonlight("limelight");
+		// TODO: need to ensure that this name is set on the limelight aswell.
+		ballDetectionLimelight = new Lemonlight("balldetect");
 
 		shifter = new Shifter();
 		drivetrain = new Drivetrain(gyro, () -> shifter.getShiftState());
@@ -108,7 +110,8 @@ public class RobotContainer {
 								StatusPriorities.enabled)),
 				new InstantCommand(() -> joystick.ReEnableJoysticCalibrationCheck()),
 				new InstantCommand(shifter::highGear),
-				new InstantCommand(() -> limelight.setLEDMode(LEDModes.FORCE_OFF)),
+				new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+				new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
 				new InstantCommand(() -> {
 					launchpad.bigLEDRed.set(false);
 					launchpad.bigLEDGreen.set(true);
