@@ -10,7 +10,7 @@ The code is divided into several packages, each responsible for a different aspe
 ## Setup Instructions
 
 ### General
-1. Clone this repo
+1. Clone this repository
 1. Run `./gradlew` to download gradle and needed FRC/Vendor libraries
 1. Run `./gradlew tasks` to see available options
 1. Enjoy!
