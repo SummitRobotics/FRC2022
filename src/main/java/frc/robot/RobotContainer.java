@@ -19,6 +19,7 @@ import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
 import frc.robot.devices.Lemonlight.LEDModes;
+import frc.robot.devices.PDP;
 import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
@@ -52,6 +53,7 @@ public class RobotContainer {
 	private Shifter shifter;
 
 	private Lemonlight targetingLimelight, ballDetectionLimelight;
+	private PDP pdp;
 	private AHRS gyro;
 
 	private Command teleInit;
@@ -67,6 +69,7 @@ public class RobotContainer {
 		controller1 = new ControllerDriver(Ports.XBOX_PORT);
 		launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
 		joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
+		pdp = new PDP();
 
 		new LEDCall("disabled", LEDPriorities.on, LEDRange.All).solid(Colors.DimGreen).activate();
 		ShufhellboardDriver.statusDisplay.addStatus("default", "robot on", Colors.White, StatusPriorities.on);
@@ -123,7 +126,7 @@ public class RobotContainer {
 	}
 
 	private void setDefaultCommands() {
-		// drive by controler
+		// drive by controller
 		drivetrain.setDefaultCommand(new ArcadeDrive(
 				drivetrain,
 				controller1.rightTrigger,

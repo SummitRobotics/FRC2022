@@ -61,7 +61,8 @@ public class ShufhellboardDriver {
 
 	public static void init() {
 		SmartDashboard.putData(ShufhellboardDriver.autoChooser);
-		removeBadItems();
+		// TODO - Fix removeBadItems
+		//removeBadItems();
 	}
 
 	/**
