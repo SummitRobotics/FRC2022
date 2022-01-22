@@ -1,59 +1,72 @@
 package frc.robot.devices;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Contains methods for interfacing with the PDP (Power Distribution Panel)
  */
-public class PDP {
+public class PDP implements Sendable {
 
-    private PowerDistribution panel;
+  private PowerDistribution panel;
 
-    public PDP() {
-        panel = new PowerDistribution();
-    }
+  public PDP() {
+    panel = new PowerDistribution();
+    SmartDashboard.putData("PDP", this);
+  }
 
-    public void clearStickyFaults() {
-        panel.clearStickyFaults();
-    }
-    
-    public void close() {
-        panel.close();
-    }
+  public void clearStickyFaults() {
+    panel.clearStickyFaults();
+  }
 
-    public double getCurrent(int channel) {
-        return panel.getCurrent(channel);
-    }
+  public void close() {
+    panel.close();
+  }
 
-    public boolean getSwitchableChannel() {
-        return panel.getSwitchableChannel();
-    }
+  public double getCurrent(int channel) {
+    return panel.getCurrent(channel);
+  }
 
-    public double getTemperature() {
-        return panel.getTemperature();
-    }
+  public boolean getSwitchableChannel() {
+    return panel.getSwitchableChannel();
+  }
 
-    public double getTotalCurrent() {
-        return panel.getTotalCurrent();
-    }
+  public double getTemperature() {
+    return panel.getTemperature();
+  }
 
-    public double getTotalEnergy() {
-        return panel.getTotalEnergy();
-    }
+  public double getTotalCurrent() {
+    return panel.getTotalCurrent();
+  }
 
-    public double getTotalPower() {
-        return panel.getTotalPower();
-    }
+  public double getTotalEnergy() {
+    return panel.getTotalEnergy();
+  }
 
-    public double getVoltage() {
-        return panel.getVoltage();
-    }
+  public double getTotalPower() {
+    return panel.getTotalPower();
+  }
 
-    public void resetTotalEnergy() {
-        panel.resetTotalEnergy();
-    }
+  public double getVoltage() {
+    return panel.getVoltage();
+  }
 
-    public void toggleSwitchableChannel() {
-        panel.setSwitchableChannel(!panel.getSwitchableChannel());
-    }
+  public void resetTotalEnergy() {
+    panel.resetTotalEnergy();
+  }
+
+  public void toggleSwitchableChannel() {
+    panel.setSwitchableChannel(!panel.getSwitchableChannel());
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("PDP");
+    builder.addDoubleProperty("temperature", this::getTemperature, null);
+    builder.addDoubleProperty("total current", this::getTotalCurrent, null);
+    builder.addDoubleProperty("voltage", this::getVoltage, null);
+
+  }
 }
