@@ -157,5 +157,7 @@ gradle-app.setting
 bin/
 imgui.ini
 
+# # IntelliJ Folders
+.idea
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
