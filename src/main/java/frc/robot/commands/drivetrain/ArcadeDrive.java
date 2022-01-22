@@ -24,7 +24,7 @@ public class ArcadeDrive extends CommandBase {
 
   private ChangeRateLimiter limiter;
 
-  private final double deadzone = .1;
+  private final double DEADZONE = .1;
 
   private double max_change_rate = 0.05;
 
@@ -101,13 +101,13 @@ public class ArcadeDrive extends CommandBase {
     double power;
 
     if (isSingleAxis) {
-      power = Math.pow(Functions.deadzone(deadzone, forwardPowerAxis.get()), 3);
+      power = Math.pow(Functions.deadzone(DEADZONE, forwardPowerAxis.get()), 3);
     } else {
       double forwardPower = forwardPowerAxis.get();
       double reversePower = reversePowerAxis.get();
 
-      forwardPower = Functions.deadzone(deadzone, forwardPower);
-      reversePower = Functions.deadzone(deadzone, reversePower);
+      forwardPower = Functions.deadzone(DEADZONE, forwardPower);
+      reversePower = Functions.deadzone(DEADZONE, reversePower);
 
       forwardPower = Math.pow(forwardPower, 2);
       reversePower = Math.pow(reversePower, 2);

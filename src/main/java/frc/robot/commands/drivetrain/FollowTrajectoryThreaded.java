@@ -4,9 +4,6 @@
 
 package frc.robot.commands.drivetrain;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -28,7 +25,7 @@ public class FollowTrajectoryThreaded extends CommandBase {
 
   private FunctionalCommand command;
 
-  private LEDCall splineLEDs = new LEDCall(LEDPriorities.splines, LEDRange.All).sine(Colors.Purple);
+  private LEDCall splineLEDs = new LEDCall(LEDPriorities.SPLINES, LEDRange.All).sine(Colors.PURPLE);
 
   /**
    * command to folow a trejectory object that has been saved to the roborio with threading to make

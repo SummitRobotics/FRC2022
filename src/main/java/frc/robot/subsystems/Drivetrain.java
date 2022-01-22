@@ -23,24 +23,24 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class Drivetrain extends SubsystemBase {
 
   // TODO re tune/calculate all these
-  public static final double LowP = 2.29,
-      LowI = 0.0,
-      LowD = 0.0,
-      LowKs = 0.177,
-      LowKv = 1.55,
-      LowKa = 0.133,
-      HighP = 2.85,
-      HighI = 0.0,
-      HighD = 0.0,
-      HighKs = 0.211,
-      HighKv = 0.734,
-      HighKa = 0.141,
-      HighGearRatio = 9.1,
-      LowGearRatio = 19.65,
-      WheelRadiusInMeters = 0.0762,
-      wheleCirconfranceInMeters = (2 * WheelRadiusInMeters) * Math.PI,
-      MaxOutputVoltage = 11,
-      DriveWidth = 0.7112;
+  public static final double LOW_P = 2.29,
+      LOW_I = 0.0,
+      LOW_D = 0.0,
+      LOW_KS = 0.177,
+      LOW_KV = 1.55,
+      LOW_KA = 0.133,
+      HIGH_P = 2.85,
+      HIGH_I = 0.0,
+      HIGH_D = 0.0,
+      HIGH_KS = 0.211,
+      HIGH_KV = 0.734,
+      HIGH_KA = 0.141,
+      HIGH_GEAR_RATIO = 9.1,
+      LOW_GEAR_RATIO = 19.65,
+      WHEEL_RADIUS_IN_METERS = 0.0762,
+      WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
+      MAX_OUTPUT_VOLTAGE = 11,
+      DRIVE_WIDTH = 0.7112;
 
   // left motors
   private CANSparkMax left = new CANSparkMax(Ports.LEFT_DRIVE_3, MotorType.kBrushless);
@@ -66,19 +66,19 @@ public class Drivetrain extends SubsystemBase {
   private AHRS gyro;
 
   public static DifferentialDriveKinematics DriveKinimatics =
-      new DifferentialDriveKinematics(DriveWidth);
+      new DifferentialDriveKinematics(DRIVE_WIDTH);
 
   public static SimpleMotorFeedforward HighFeedFoward =
-      new SimpleMotorFeedforward(HighKs, HighKv, HighKa);
+      new SimpleMotorFeedforward(HIGH_KS, HIGH_KV, HIGH_KA);
 
   public static SimpleMotorFeedforward LowFeedFoward =
-      new SimpleMotorFeedforward(LowKs, LowKv, LowKa);
+      new SimpleMotorFeedforward(LOW_KS, LOW_KV, LOW_KA);
 
   public static DifferentialDriveVoltageConstraint HighVoltageConstraint =
-      new DifferentialDriveVoltageConstraint(HighFeedFoward, DriveKinimatics, MaxOutputVoltage);
+      new DifferentialDriveVoltageConstraint(HighFeedFoward, DriveKinimatics, MAX_OUTPUT_VOLTAGE);
 
   public static DifferentialDriveVoltageConstraint LowVoltageConstraint =
-      new DifferentialDriveVoltageConstraint(LowFeedFoward, DriveKinimatics, MaxOutputVoltage);
+      new DifferentialDriveVoltageConstraint(LowFeedFoward, DriveKinimatics, MAX_OUTPUT_VOLTAGE);
 
   /**
    * i am in PAIN wow this is BAD
@@ -223,10 +223,10 @@ public class Drivetrain extends SubsystemBase {
    * @return the corresponding RPM
    */
   public double MPStoRPM(double input) {
-    double out = input / WheelRadiusInMeters;
+    double out = input / WHEEL_RADIUS_IN_METERS;
     out = out * 60;
     out = out * (2 * Math.PI);
-    out = out * HighGearRatio;
+    out = out * HIGH_GEAR_RATIO;
     out /= 39.4784176044;
     return out;
   }
@@ -301,42 +301,42 @@ public class Drivetrain extends SubsystemBase {
   /** @return the total distance in meters the side as travled sense the last reset */
   public double getLeftDistance() {
     if (shift.getAsBoolean()) {
-      return (getLeftEncoderPosition() / HighGearRatio) * wheleCirconfranceInMeters;
+      return (getLeftEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
     } else {
-      return (getLeftEncoderPosition() / LowGearRatio) * wheleCirconfranceInMeters;
+      return (getLeftEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
     }
   }
 
   /** @return the total distance in meters the side as travled sense the last reset */
   public synchronized double getRightDistance() {
     if (shift.getAsBoolean()) {
-      return (getRightEncoderPosition() / HighGearRatio) * wheleCirconfranceInMeters;
+      return (getRightEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
     } else {
-      return (getRightEncoderPosition() / LowGearRatio) * wheleCirconfranceInMeters;
+      return (getRightEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
     }
   }
 
   /** @return the linear speed of the side in meters per second */
   public synchronized double getLeftSpeed() {
     if (shift.getAsBoolean()) {
-      return convertRpmToMetersPerSecond((getLeftRPM() / HighGearRatio));
+      return convertRpmToMetersPerSecond((getLeftRPM() / HIGH_GEAR_RATIO));
     } else {
-      return convertRpmToMetersPerSecond((getLeftRPM() / LowGearRatio));
+      return convertRpmToMetersPerSecond((getLeftRPM() / LOW_GEAR_RATIO));
     }
   }
 
   /** @return the linear speed of the side in meters per second */
   public synchronized double getRightSpeed() {
     if (shift.getAsBoolean()) {
-      return convertRpmToMetersPerSecond((getRightRPM() / HighGearRatio));
+      return convertRpmToMetersPerSecond((getRightRPM() / HIGH_GEAR_RATIO));
     } else {
-      return convertRpmToMetersPerSecond((getRightRPM() / LowGearRatio));
+      return convertRpmToMetersPerSecond((getRightRPM() / LOW_GEAR_RATIO));
     }
   }
 
   // could things be good for once please
   private double convertRpmToMetersPerSecond(double RPM) {
-    return ((RPM / 60) * (2 * Math.PI)) * WheelRadiusInMeters;
+    return ((RPM / 60) * (2 * Math.PI)) * WHEEL_RADIUS_IN_METERS;
   }
 
   /**
@@ -390,11 +390,11 @@ public class Drivetrain extends SubsystemBase {
    */
   public double[] getPid() {
     if (shift.getAsBoolean()) {
-      double[] out = {HighP, HighI, HighD};
+      double[] out = {HIGH_P, HIGH_I, HIGH_D};
       return out;
 
     } else {
-      double[] out = {LowP, LowI, LowD};
+      double[] out = {LOW_P, LOW_I, LOW_D};
       return out;
     }
   }

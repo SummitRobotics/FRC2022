@@ -15,7 +15,7 @@ public class Shifter extends SubsystemBase {
   private DoubleSolenoid shift;
   private boolean oldShift;
 
-  private LEDCall lowShift = new LEDCall(LEDPriorities.lowGear, LEDRange.All).sine(Colors.Red);
+  private LEDCall lowShift = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
 
   public Shifter() {
     shift =

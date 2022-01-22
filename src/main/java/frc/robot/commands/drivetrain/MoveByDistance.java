@@ -40,12 +40,12 @@ public class MoveByDistance extends CommandBase {
   @Override
   public void initialize() {
     if (shifter.getShiftState()) {
-      rightRotations = ((wheelDiameter * Math.PI) * right) * drive.HighGearRatio;
-      leftRotations = (wheelDiameter * Math.PI) * drive.HighGearRatio * left;
+      rightRotations = ((wheelDiameter * Math.PI) * right) * drive.HIGH_GEAR_RATIO;
+      leftRotations = (wheelDiameter * Math.PI) * drive.HIGH_GEAR_RATIO * left;
 
     } else {
-      rightRotations = (wheelDiameter * Math.PI) * drive.LowGearRatio * right;
-      leftRotations = (wheelDiameter * Math.PI) * drive.LowGearRatio * left;
+      rightRotations = (wheelDiameter * Math.PI) * drive.LOW_GEAR_RATIO * right;
+      leftRotations = (wheelDiameter * Math.PI) * drive.LOW_GEAR_RATIO * left;
     }
   }
 

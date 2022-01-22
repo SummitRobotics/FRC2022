@@ -16,8 +16,8 @@ public class LidarV3 implements Lidar {
 
   public LidarV3() {
 
-    m_port = (byte) Port.kOnboard.value;
-    I2CJNI.i2CInitialize(m_port);
+    PORT = (byte) Port.kOnboard.value;
+    I2CJNI.i2CInitialize(PORT);
 
     rollingAverage = new RollingAverage(50, true);
 
@@ -26,11 +26,11 @@ public class LidarV3 implements Lidar {
     startMeasuring();
   }
 
-  private static final byte k_deviceAddress = 0x62;
+  private static final byte DEVICE_ADDRESS = 0x62;
 
-  private final byte m_port;
+  private final byte PORT;
 
-  private final ByteBuffer m_buffer = ByteBuffer.allocateDirect(2);
+  private final ByteBuffer BUFFER = ByteBuffer.allocateDirect(2);
 
   /** Tells the lidar to start taking measurements. Must be called before geting measurements */
   public void startMeasuring() {
@@ -74,17 +74,17 @@ public class LidarV3 implements Lidar {
 
   // scary
   private int writeRegister(int address, int value) {
-    m_buffer.put(0, (byte) address);
-    m_buffer.put(1, (byte) value);
+    BUFFER.put(0, (byte) address);
+    BUFFER.put(1, (byte) value);
 
-    return I2CJNI.i2CWrite(m_port, k_deviceAddress, m_buffer, (byte) 2);
+    return I2CJNI.i2CWrite(PORT, DEVICE_ADDRESS, BUFFER, (byte) 2);
   }
 
   // i dont understand how this works
   private short readShort(int address) {
-    m_buffer.put(0, (byte) address);
-    I2CJNI.i2CWrite(m_port, k_deviceAddress, m_buffer, (byte) 1);
-    I2CJNI.i2CRead(m_port, k_deviceAddress, m_buffer, (byte) 2);
-    return m_buffer.getShort(0);
+    BUFFER.put(0, (byte) address);
+    I2CJNI.i2CWrite(PORT, DEVICE_ADDRESS, BUFFER, (byte) 1);
+    I2CJNI.i2CRead(PORT, DEVICE_ADDRESS, BUFFER, (byte) 2);
+    return BUFFER.getShort(0);
   }
 }

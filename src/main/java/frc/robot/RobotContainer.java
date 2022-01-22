@@ -63,9 +63,9 @@ public class RobotContainer {
     launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
     joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
 
-    new LEDCall("disabled", LEDPriorities.on, LEDRange.All).solid(Colors.DimGreen).activate();
+    new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
     ShufhellboardDriver.statusDisplay.addStatus(
-        "default", "robot on", Colors.White, StatusPriorities.on);
+        "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
     gyro = new AHRS();
     targetingLimelight = new Lemonlight("limelight");
@@ -80,7 +80,7 @@ public class RobotContainer {
             new InstantCommand(
                 () ->
                     ShufhellboardDriver.statusDisplay.addStatus(
-                        "auto", "robot in auto", Colors.Team, StatusPriorities.enabled)),
+                        "auto", "robot in auto", Colors.TEAM, StatusPriorities.ENABLED)),
             new InstantCommand(shifter::highGear),
             new InstantCommand(
                 () -> {
@@ -112,7 +112,7 @@ public class RobotContainer {
             new InstantCommand(
                 () ->
                     ShufhellboardDriver.statusDisplay.addStatus(
-                        "enabled", "robot enabled", Colors.Team, StatusPriorities.enabled)),
+                        "enabled", "robot enabled", Colors.TEAM, StatusPriorities.ENABLED)),
             new InstantCommand(() -> joystick.ReEnableJoysticCalibrationCheck()),
             new InstantCommand(shifter::highGear),
             new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
@@ -150,7 +150,7 @@ public class RobotContainer {
   /** runs when the robot gets disabled */
   public void disabledInit() {
     LEDs.getInstance().removeAllCalls();
-    new LEDCall("disabled", LEDPriorities.on, LEDRange.All).solid(Colors.DimGreen).activate();
+    new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
     ShufhellboardDriver.statusDisplay.removeStatus("enabled");
     ChangeRateLimiter.resetAllChangeRateLimiters();
   }

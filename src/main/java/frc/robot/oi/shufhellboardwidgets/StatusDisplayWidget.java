@@ -29,7 +29,7 @@ public class StatusDisplayWidget extends SubsystemBase {
 
     changed = true;
     NameAndMessage = new HashMap<>();
-    defaultColor = Colors.White;
+    defaultColor = Colors.WHITE;
   }
 
   /** @param color the color to use when none is provided, deafults to white */

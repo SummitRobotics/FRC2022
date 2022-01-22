@@ -15,12 +15,12 @@ public class Lemonlight {
   public static final int X_OFFSET = 0;
 
   // TODO - set mountAngle and mountHeight
-  public static final double mountAngle = 0;
+  public static final double MOUNT_ANGLE = 0;
 
   // in cm
-  public static final double mountHeight = 0;
+  public static final double MOUNT_HEIGHT = 0;
 
-  private static final double targetHeight = 0;
+  private static final double TARGET_HEIGHT = 0;
 
   private NetworkTable limelight;
 
@@ -142,8 +142,8 @@ public class Lemonlight {
    * @return the distance estmate
    */
   public double getLimelightDistanceEstimateIN() {
-    return ((targetHeight - mountHeight)
-            / Math.tan(((getVerticalOffset() + Lemonlight.mountAngle) * (Math.PI / 180))))
+    return ((TARGET_HEIGHT - MOUNT_HEIGHT)
+            / Math.tan(((getVerticalOffset() + Lemonlight.MOUNT_ANGLE) * (Math.PI / 180))))
         * 0.393701;
   }
 
