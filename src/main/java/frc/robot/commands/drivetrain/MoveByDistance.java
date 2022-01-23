@@ -15,6 +15,9 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shifter;
 import frc.robot.utilities.Functions;
 
+/**
+ * Command to mode the robot by a certain distance.
+ */
 public class MoveByDistance extends CommandBase {
 
     private double left, right;
@@ -26,7 +29,16 @@ public class MoveByDistance extends CommandBase {
     private Drivetrain drive;
     private Shifter shifter;
 
-    // TODO probably rewright this whole thing to use the spline system
+    // TODO probably re wright this whole thing to use the spline system
+
+    /**
+     * Constructor to move the robot a set distance.
+     *
+     * @param left Distance for the left motors to move (Meeter I think)
+     * @param right Distance for the right motors to move (Meeter I think)
+     * @param drivetrain Drivetrain subsystem
+     * @param shift Shifter subsystem
+     */
     public MoveByDistance(double left, double right, Drivetrain drivetrain, Shifter shift) {
         drive = drivetrain;
         shifter = shift;

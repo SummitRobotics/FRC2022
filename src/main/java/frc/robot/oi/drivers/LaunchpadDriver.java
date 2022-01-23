@@ -1,22 +1,22 @@
 package frc.robot.oi.drivers;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.oi.inputs.LEDButton;
+import frc.robot.oi.inputs.LEDButton.LED;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
-import frc.robot.oi.inputs.LEDButton.LED;
+import java.util.function.DoubleSupplier;
+
 
 /**
- * Wrappper class for the TI Launchpad in mode 1
+ * Wrapper class for the TI Launchpad in mode 1.
  */
 public class LaunchpadDriver extends GenericDriver {
 
     private int outputs;
 
-    public LEDButton buttonA, buttonB, buttonC, buttonD, buttonE, buttonF, buttonG, buttonH, buttonI;
+    public LEDButton
+            buttonA, buttonB, buttonC, buttonD, buttonE, buttonF, buttonG, buttonH, buttonI;
     public OIButton missileA, missileB, funLeft, funMiddle, funRight;
     public OIAxis axisA, axisB, axisC, axisD, axisE, axisF, axisG, axisH;
 
@@ -24,6 +24,11 @@ public class LaunchpadDriver extends GenericDriver {
 
     public LED bigLEDGreen, bigLEDRed;
 
+    /**
+     * Constructor for the TI Launchpad.\
+     *
+     * @param port The port of the TI Launchpad. This is retrieved from the driver station.
+     */
     public LaunchpadDriver(int port) {
         super(port);
 
@@ -81,7 +86,7 @@ public class LaunchpadDriver extends GenericDriver {
     }
 
     /**
-     * Black box to set outputs copied from wpilib
+     * Black box to set outputs copied from wpilib.
      *
      * @param outputNumber the output number
      * @param value        the state of the output

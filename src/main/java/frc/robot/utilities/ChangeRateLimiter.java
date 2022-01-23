@@ -10,17 +10,17 @@ package frc.robot.utilities;
 import java.util.Vector;
 
 /**
- * Add your docs here.
+ * Rate limiter class.
  */
 public class ChangeRateLimiter {
 
-    private double rate;
+    private final double rate;
     private double old;
 
-    public static Vector<ChangeRateLimiter> allLimiters = new Vector<ChangeRateLimiter>();
+    public static Vector<ChangeRateLimiter> allLimiters = new Vector<>();
 
     /**
-     * new rate limiter with starting value of 0
+     * new rate limiter with starting value of 0.
      *
      * @param rate the maximum change each time the function is called
      */
@@ -31,7 +31,7 @@ public class ChangeRateLimiter {
     }
 
     /**
-     * new rate limiter
+     * new rate limiter.
      *
      * @param rate          the maximum change each time the function is called
      * @param startingValue the value to start out to allow things to run at full at init
@@ -43,7 +43,7 @@ public class ChangeRateLimiter {
     }
 
     /**
-     * limits a rate
+     * limits a rate.
      *
      * @param value the value that's changing
      * @return the rate-limited value
@@ -66,6 +66,9 @@ public class ChangeRateLimiter {
         old = 0;
     }
 
+    /**
+     * Resets all rate limiters.
+     */
     public static void resetAllChangeRateLimiters() {
         for (ChangeRateLimiter x : allLimiters) {
             x.resetOld();

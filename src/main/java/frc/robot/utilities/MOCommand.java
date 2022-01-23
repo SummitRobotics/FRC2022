@@ -1,19 +1,18 @@
 package frc.robot.utilities;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
 /**
- * abstract class for creating MOcommands
+ * abstract class for creating MOcommands.
  */
 public abstract class MOCommand extends CommandBase {
 
     private ArrayList<Usable> used = new ArrayList<>();
 
     public void addUsed(Usable... users) {
-        used = new ArrayList<Usable>(Arrays.asList(users));
+        used = new ArrayList<>(Arrays.asList(users));
     }
 
     @Override

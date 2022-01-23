@@ -1,21 +1,23 @@
 package frc.robot.oi.drivers;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
+/**
+ * Abstract class which defines a Generic Driver.
+ */
 public abstract class GenericDriver {
-    protected int port = 0;
+    protected int port;
 
     protected GenericDriver(int port) {
         this.port = port;
     }
 
     /**
-     * Gets analog axis
+     * Gets analog axis.
      *
      * @param axis the axis number
      * @return the axis value
@@ -25,7 +27,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Gets digital output
+     * Gets digital output.
      *
      * @param button the button number
      * @return whether the output is on or off
@@ -35,7 +37,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Gets POV for an XBox controller (In this class because it requires DriverStation)
+     * Gets POV for an XBox controller (In this class because it requires DriverStation).
      *
      * @return the POV
      */
@@ -44,7 +46,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Gets a getter function for a digital output
+     * Gets a getter function for a digital output.
      *
      * @param button the button number
      * @return the getter function
@@ -54,7 +56,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Gets a getter function for an analog output
+     * Gets a getter function for an analog output.
      *
      * @param axis the axis number
      * @return the getter function
@@ -64,7 +66,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Creates an OI button using a port
+     * Creates an OI button using a port.
      *
      * @param port the button port
      * @return the generated button
@@ -74,7 +76,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Creates an OI button with a given id using a port
+     * Creates an OI button with a given id using a port.
      *
      * @param port the button port
      * @param id   the button's id
@@ -85,7 +87,7 @@ public abstract class GenericDriver {
     }
 
     /**
-     * Creates an axis using an port
+     * Creates an axis using a port.
      *
      * @param port the axis port
      * @return the generated axis
@@ -95,15 +97,13 @@ public abstract class GenericDriver {
     }
 
     /**
-     * gets if the joystick is connected to the driver station
-     *
-     * @param port the port of the joystic on the ds
+     * gets if the joystick is connected to the driver station.
      */
     public boolean isConnected() {
         return DriverStation.isJoystickConnected(this.port);
     }
 
-    public boolean isXboxControler() {
+    public boolean isXboxController() {
         return DriverStation.getJoystickIsXbox(this.port);
     }
 }

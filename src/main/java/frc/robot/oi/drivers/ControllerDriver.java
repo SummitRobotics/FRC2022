@@ -1,28 +1,36 @@
 package frc.robot.oi.drivers;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
+import java.util.function.BooleanSupplier;
 
 /**
- * Wrapper class for XBox controllers
+ * Wrapper class for XBox controllers.
  */
 public class ControllerDriver extends GenericDriver {
 
+    /**
+     * Enum for the possible DPAD values and positions.
+     */
     public enum DPadValues {
         UP(0, 45, 315),
         DOWN(180, 135, 225),
         RIGHT(90, 45, 135),
         LEFT(270, 225, 315);
 
-        public int[] values;
+        public final int[] values;
 
-        private DPadValues(int... values) {
+        DPadValues(int... values) {
             this.values = values;
         }
 
+        /**
+         * Checks to see if a value is equal to a DPadValue.
+         *
+         * @param value A value to compare
+         * @return a boolean weather it is equal or not
+         */
         public boolean isEqual(int value) {
             for (int element : values) {
                 if (value == element) {
@@ -47,6 +55,12 @@ public class ControllerDriver extends GenericDriver {
             dPadRight;
     public OIAxis leftX, leftY, leftTrigger, rightX, rightY, rightTrigger;
 
+    /**
+     * Constructor for generating a Controller Driver.
+     *
+     * @param port the port of the control device
+     *             this is found on the driver station.
+     */
     public ControllerDriver(int port) {
         super(port);
 

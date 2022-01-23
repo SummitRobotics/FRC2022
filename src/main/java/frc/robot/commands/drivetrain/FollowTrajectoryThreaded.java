@@ -16,6 +16,11 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 
+/**
+ * Command to follow a trajectory.
+ * This command is threaded using Command Threader
+ * This means the trajectory calculations runs every ~5ms
+ */
 public class FollowTrajectoryThreaded extends CommandBase {
 
     private final Trajectory trajectory;

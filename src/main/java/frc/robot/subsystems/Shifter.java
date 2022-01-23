@@ -1,15 +1,18 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.lists.Colors;
-import frc.robot.utilities.lists.Ports;
 import frc.robot.utilities.lists.LEDPriorities;
+import frc.robot.utilities.lists.Ports;
 
+/**
+ * Subsystem for the Shifter on the drivetrain.
+ */
 public class Shifter extends SubsystemBase {
 
     private DoubleSolenoid shift;
@@ -17,6 +20,9 @@ public class Shifter extends SubsystemBase {
 
     private LEDCall lowShift = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
 
+    /**
+     * Creates the shifter.
+     */
     public Shifter() {
         shift =
                 new DoubleSolenoid(
@@ -26,12 +32,18 @@ public class Shifter extends SubsystemBase {
                         Ports.SHIFT_SOLENOID_DOWN);
     }
 
+    /**
+     * Shifts into High Gear.
+     */
     public void highGear() {
         lowShift.cancel();
         oldShift = true;
         shift.set(Value.kForward);
     }
 
+    /**
+     * Shifts into Low Gear.
+     */
     public void lowGear() {
         lowShift.activate();
         oldShift = false;
@@ -39,7 +51,7 @@ public class Shifter extends SubsystemBase {
     }
 
     /**
-     * Gets the shift state
+     * Gets the shift state.
      *
      * @return the shift state where true is high and false is low
      */

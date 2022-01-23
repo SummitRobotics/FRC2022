@@ -10,12 +10,22 @@ package frc.robot.commands.drivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 
+/**
+ * Command to move the drivetrain with the encoders.
+ */
 public class EncoderDrive extends CommandBase {
 
     private final Drivetrain drivetrain;
     private final double left;
     private final double right;
 
+    /**
+     * The Constructor.
+     *
+     * @param drivetrain the robot's drivetrain
+     * @param left The number of motor rotations to move the left side
+     * @param right The number of motor rotations to move the right side
+     */
     public EncoderDrive(Drivetrain drivetrain, double left, double right) {
         this.drivetrain = drivetrain;
         this.left = left;

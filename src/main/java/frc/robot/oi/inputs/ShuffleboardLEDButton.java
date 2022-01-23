@@ -3,14 +3,20 @@ package frc.robot.oi.inputs;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
-public class ShufhellboardLEDButton extends LEDButton {
+/**
+ * LED Button for shuffleboard.
+ */
+public class ShuffleboardLEDButton extends LEDButton {
 
     private static final int LED_MASK = 0b00000000000000000000000000000010,
-            pressMask = 0b00000000000000000000000000000001;
+            PRESS_MASK = 0b00000000000000000000000000000001;
 
-    private NetworkTableEntry entry;
+    private final NetworkTableEntry entry;
 
-    public ShufhellboardLEDButton(NetworkTableEntry entry) {
+    /**
+     * Constructor.
+     */
+    public ShuffleboardLEDButton(NetworkTableEntry entry) {
         this.entry = entry;
 
         entry.forceSetNumber(0);
@@ -41,27 +47,33 @@ public class ShufhellboardLEDButton extends LEDButton {
 
     private void setLed(boolean newState) {
         int pressedState =
-                entry.getNumber(0).intValue() & pressMask; // gets the pressed value so we preserve it
+                // gets the pressed value so we preserve it
+                entry.getNumber(0).intValue() & PRESS_MASK;
         if (newState) {
             entry.setNumber(
-                    pressedState | LED_MASK); // combines the pressed state with an active led state
+                    // combines the pressed state with an active led state
+                    pressedState | LED_MASK);
         } else {
-            entry.setNumber(pressedState); // pressedValue defaults to led being false
+            // pressedValue defaults to led being false
+            entry.setNumber(pressedState);
         }
     }
 
     private boolean getPressed() {
         int value = entry.getNumber(0).intValue();
-        return (value & pressMask) == 1; // if the first bit is 1 return true
+        return (value & PRESS_MASK) == 1; // if the first bit is 1 return true
     }
 
     private void setPressed(boolean newState) {
         int ledState =
-                entry.getNumber(0).intValue() & LED_MASK; // gets the led value so we can perserve it
+                // gets the LED value so we can preserve it
+                entry.getNumber(0).intValue() & LED_MASK;
         if (newState) {
-            entry.setNumber(ledState | pressMask); // combines the led state with an active pressed state
+            // combines the LED state with an active pressed state
+            entry.setNumber(ledState | PRESS_MASK);
         } else {
-            entry.setNumber(ledState); // ledState defaults to pressed being false
+            // ledState defaults to pressed being false
+            entry.setNumber(ledState);
         }
     }
 }

@@ -1,19 +1,23 @@
 package frc.robot.oi.inputs;
 
-import java.util.ArrayList;
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.oi.Konami;
 import frc.robot.utilities.Usable;
+import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
 /**
- * Wrapper class for WPI's button that allows for better management
+ * Wrapper class for WPI's button that allows for better management.
  */
 public class OIButton extends Button implements Usable {
 
-    private ArrayList<Object> users;
+    private final ArrayList<Object> users;
 
+    /**
+     * Creates a button with just a BooleanSupplier.
+     *
+     * @param getter BooleanSupplier
+     */
     public OIButton(BooleanSupplier getter) {
         super(getter);
 
@@ -22,6 +26,12 @@ public class OIButton extends Button implements Usable {
         whenHeld(Konami.nonRegisteredButtonPress());
     }
 
+    /**
+     * Creates a button with an ID as well.
+     *
+     * @param getter BooleanSupplier
+     * @param id Button ID
+     */
     public OIButton(BooleanSupplier getter, String id) {
         super(getter);
 
@@ -30,6 +40,9 @@ public class OIButton extends Button implements Usable {
         whenHeld(Konami.registeredButtonPress(id));
     }
 
+    /**
+     * Creates and OI Button.
+     */
     public OIButton() {
         super();
 

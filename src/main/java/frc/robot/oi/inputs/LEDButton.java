@@ -1,19 +1,27 @@
 package frc.robot.oi.inputs;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.BooleanSupplier;
 
+/**
+ * Class for LED Buttons.
+ */
 public class LEDButton extends OIButton {
 
+    /**
+     * LED interface.
+     */
     public interface LED {
-        public void set(boolean state);
+        void set(boolean state);
     }
 
     protected Command controller;
 
+    /**
+     * Constructor to create a LED Button.
+     */
     public LEDButton(BooleanSupplier getter, LED led) {
         super(getter);
 

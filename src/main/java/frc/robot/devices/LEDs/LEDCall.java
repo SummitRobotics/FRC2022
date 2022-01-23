@@ -3,18 +3,21 @@ package frc.robot.devices.LEDs;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
+/**
+ * Class to make an LED Call. This is so we can change the LED's on the robot.
+ */
 public class LEDCall implements LEDHandler {
 
-    private String name;
-    private int priority;
-    private LEDRange range;
+    private final String name;
+    private final int priority;
+    private final LEDRange range;
 
-    private Color8Bit defaultColor;
+    private final Color8Bit defaultColor;
 
-    private int startLoop = 0;
+    private int startLoop;
 
     /**
-     * Creates a new LEDCall
+     * Creates a new LEDCall.
      *
      * @param name     the unique name of the call
      * @param priority the priority, where higher values override lower values
@@ -31,7 +34,7 @@ public class LEDCall implements LEDHandler {
     }
 
     /**
-     * Creates a new LEDCall without a supplied name
+     * Creates a new LEDCall without a supplied name.
      *
      * @param priority the priority, where higher values override lower values
      * @param range    the LEDRange the call applies to
@@ -50,7 +53,7 @@ public class LEDCall implements LEDHandler {
     }
 
     /**
-     * Gets the used LEDRange
+     * Gets the used LEDRange.
      *
      * @return the LEDRange
      */
@@ -62,9 +65,8 @@ public class LEDCall implements LEDHandler {
         return name;
     }
 
-    public LEDHandler activate() {
+    public void activate() {
         LEDs.getInstance().addCall(name, this);
-        return this;
     }
 
     public void cancel() {
@@ -72,7 +74,7 @@ public class LEDCall implements LEDHandler {
     }
 
     /**
-     * The color generator function, which can be overloaded. By default it returns black
+     * The color generator function, which can be overloaded. By default, it returns black
      *
      * @param loop the current LED loop
      * @param led  the LED color in question
@@ -98,7 +100,8 @@ public class LEDCall implements LEDHandler {
     }
 
     /**
-     * Creates a new LEDCall with getColor overloaded. Makes LEDs in its range flash between 2 colors
+     * Creates a new LEDCall with getColor overloaded.
+     * Makes LEDs in its range flash between 2 colors
      * at a set interval.
      *
      * @param onColor  the first color to flash
@@ -164,21 +167,22 @@ public class LEDCall implements LEDHandler {
      */
     public LEDCall sine(Color8Bit color) {
         return new LEDCall(priority, range) {
-            private final double waveLength = 6.068;
 
             @Override
             public Color8Bit getColor(int loop, int led) {
-                double scaler = (Math.cos((((led * Math.PI) / waveLength) - (loop / 4)) + 3) + 1) * 0.25;
+                double waveLength = 6.068;
+                double scalar =
+                        (Math.cos((((led * Math.PI) / waveLength) - (loop / 4.0)) + 3) + 1) * 0.25;
                 return new Color8Bit(
-                        (int) ((color.red * scaler) + 0.5),
-                        (int) ((color.green * scaler) + 0.5),
-                        (int) ((color.blue * scaler) + .5));
+                        (int) ((color.red * scalar) + 0.5),
+                        (int) ((color.green * scalar) + 0.5),
+                        (int) ((color.blue * scalar) + .5));
             }
         };
     }
 
     /**
-     * Creates a new LEDCall that makes a rainbow
+     * Creates a new LEDCall that makes a rainbow.
      *
      * @return the modified LEDCall
      */

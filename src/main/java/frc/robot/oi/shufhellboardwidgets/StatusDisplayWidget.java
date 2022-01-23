@@ -7,46 +7,52 @@
 
 package frc.robot.oi.shufhellboardwidgets;
 
-import java.util.HashMap;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.lists.Colors;
+import java.util.HashMap;
 
 /**
  * Add your docs here.
  */
 public class StatusDisplayWidget extends SubsystemBase {
 
-    private NetworkTableEntry entry;
+    private final NetworkTableEntry entry;
     private String message;
     private Color8Bit defaultColor;
-    private HashMap<String, StatusMessage> NameAndMessage;
+    private final HashMap<String, StatusMessage> nameAndMessage;
     private boolean changed;
 
+    /**
+     * Constructor.
+     *
+     * @param entry Takes in a Network Table Entry
+     */
     public StatusDisplayWidget(NetworkTableEntry entry) {
         this.entry = entry;
         entry.forceSetString("");
 
         changed = true;
-        NameAndMessage = new HashMap<>();
+        nameAndMessage = new HashMap<>();
         defaultColor = Colors.WHITE;
     }
 
     /**
-     * @param color the color to use when none is provided, deafults to white
+     * Sets the default color.
+     *
+     * @param color the color to use when none is provided, defaults to white
      */
-    public void SetDefaultColor(Color8Bit color) {
+    public void setDefaultColor(Color8Bit color) {
         defaultColor = color;
     }
 
     /**
-     * adds a status to display
+     * adds a status to display.
      *
      * @param status the message to display. NOTE: status cannot contain any :'s because of the way
      *               data is encoded
-     * @param color  the css compatable color string to dsiplay it in for example #ff0000 or red are
+     * @param color  the css compatible color string to display it in for example #ff0000 or red are
      *               both valid and would be the same
      */
     public void addStatus(String name, String status, String color, int priority) {
@@ -56,11 +62,11 @@ public class StatusDisplayWidget extends SubsystemBase {
             throw new IllegalArgumentException("Status cannot contain :");
         }
 
-        NameAndMessage.put(name, new StatusMessage(priority, status + ":" + color));
+        nameAndMessage.put(name, new StatusMessage(priority, status + ":" + color));
     }
 
     /**
-     * adds a status to display
+     * adds a status to display.
      *
      * @param status the message to display. NOTE: status cannot contain any :'s because of the way
      *               data is encoded
@@ -72,11 +78,11 @@ public class StatusDisplayWidget extends SubsystemBase {
     }
 
     /**
-     * adds a status to display
+     * adds a status to display.
      *
      * @param status the message to display. NOTE: status cannot contain any :'s because of the way
-     *               data is encoded the takes no color and insted uses the color set with {@link
-     *               #SetDefaultColor(Color8Bit color)}
+     *               data is encoded the takes no color and instead uses the color set with {@link
+     *               #setDefaultColor(Color8Bit color)}
      */
     public void addStatus(String name, String status, int priority) {
         changed = true;
@@ -84,7 +90,9 @@ public class StatusDisplayWidget extends SubsystemBase {
     }
 
     /**
-     * @return the curent status
+     * Gets the current status.
+     *
+     * @return the current status
      */
     public String getStatus() {
         return message;
@@ -92,11 +100,11 @@ public class StatusDisplayWidget extends SubsystemBase {
 
     public void removeStatus(String name) {
         changed = true;
-        NameAndMessage.remove(name);
+        nameAndMessage.remove(name);
     }
 
     /**
-     * Formats a Color8Bit into a hex string
+     * Formats a Color8Bit into a hex string.
      *
      * @param color the color to be formatted
      * @return the color in hex format (e.g. #ffffff)
@@ -111,12 +119,12 @@ public class StatusDisplayWidget extends SubsystemBase {
         if (changed) {
 
             // sorts through all messages and gets the one with the highest priority
-            int CurrentPriority = Integer.MIN_VALUE;
+            int currentPriority = Integer.MIN_VALUE;
             String message = "";
 
-            for (StatusMessage x : NameAndMessage.values()) {
-                if (x.getPriority() > CurrentPriority) {
-                    CurrentPriority = x.getPriority();
+            for (StatusMessage x : nameAndMessage.values()) {
+                if (x.getPriority() > currentPriority) {
+                    currentPriority = x.getPriority();
                     message = x.getMessage();
                 }
             }
@@ -129,18 +137,19 @@ public class StatusDisplayWidget extends SubsystemBase {
     }
 
     /**
-     * Internal wrapper for status messages, so that they can be sorted and the one with the highest
-     * priority
+     * Internal wrapper for status messages.
+     * It so that they can be sorted and the one with the highest priority
      */
-    private class StatusMessage {
+    private static class StatusMessage {
 
-        private int priority;
-        private String message;
+        private final int priority;
+        private final String message;
 
         /**
-         * makes a new status
+         * Makes a new status.
          *
-         * @param priority the integer priorty of the message. a higher number means a higher priority
+         * @param priority the integer priority of the message.
+         *                  A higher number means a higher priority
          * @param message  the string of the message test to display. CAN NOT CONTAIN A ":"
          */
         public StatusMessage(int priority, String message) {

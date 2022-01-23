@@ -17,13 +17,22 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.subsystems.Drivetrain;
 import java.util.List;
 
-// this is REAL bad
+/**
+ * Command to make drivetrain follow splines.
+ *
+ * @apiNote THIS IS A BAD IMPLEMENTATION AND SHOULD BE UPDATED.
+ */
 public class FollowSpline extends CommandBase {
 
     private final Drivetrain drivetrain;
 
     private RamseteCommand command;
 
+    /**
+     * The Constructor.
+     *
+     * @param drivetrain The robot's drivetrain.
+     */
     public FollowSpline(Drivetrain drivetrain) {
         super();
 
@@ -63,7 +72,7 @@ public class FollowSpline extends CommandBase {
                         trajectory,
                         drivetrain::getPose,
                         new RamseteController(2, 0.7),
-                        drivetrain.getFeedFoward(),
+                        drivetrain.getFeedForward(),
                         Drivetrain.DriveKinimatics,
                         drivetrain::getWheelSpeeds,
                         new PIDController(pid[0], pid[1], pid[2]),

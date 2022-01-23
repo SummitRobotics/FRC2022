@@ -1,13 +1,12 @@
 package frc.robot.oi.inputs;
 
+import frc.robot.utilities.Functions;
+import frc.robot.utilities.Usable;
 import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
 
-import frc.robot.utilities.Functions;
-import frc.robot.utilities.Usable;
-
 /**
- * Wrapper for axes that allows for better management
+ * Wrapper for axes that allows for better management.
  */
 public class OIAxis implements Usable {
 
@@ -16,12 +15,15 @@ public class OIAxis implements Usable {
     protected DoubleSupplier getter;
     protected double deadzone;
 
-    private ArrayList<Object> users;
+    private final ArrayList<Object> users;
 
     public OIAxis(DoubleSupplier getter) {
         this(getter, DEFAULT_DEADZONE);
     }
 
+    /**
+     * Creates an OI axes this is used for better management.
+     */
     public OIAxis(DoubleSupplier getter, double deadzone) {
         this.getter = getter;
         this.deadzone = deadzone;
@@ -30,7 +32,7 @@ public class OIAxis implements Usable {
     }
 
     /**
-     * Gets the position of the axis
+     * Gets the position of the axis.
      *
      * @return the position
      */
@@ -45,6 +47,8 @@ public class OIAxis implements Usable {
     }
 
     /**
+     * Gets the deadzone.
+     *
      * @return the deadzone
      */
     public double getDeadzone() {
@@ -52,6 +56,8 @@ public class OIAxis implements Usable {
     }
 
     /**
+     * Sets the deadzone.
+     *
      * @param deadzone the deadzone to set
      */
     public void setDeadzone(double deadzone) {

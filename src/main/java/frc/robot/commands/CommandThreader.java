@@ -8,6 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.lang.Thread.State;
 
+/**
+ * Command which implements Threading.
+ * This allows commands to be run more than every 20ms
+ */
 public class CommandThreader extends CommandBase {
 
     private volatile Command command;
@@ -75,51 +79,55 @@ public class CommandThreader extends CommandBase {
         // command ends if thread stops
         return executor.getState() == State.TERMINATED;
     }
-}
 
-class Executor extends Thread {
-    private volatile Command command;
-    private final int period;
+    /**
+     * Executor class which handles the Thread stuff.
+     */
+    static class Executor extends Thread {
+        private volatile Command command;
+        private final int period;
 
-    protected Executor(Command command, int period) {
-        this.command = command;
-        this.period = period;
-    }
+        protected Executor(Command command, int period) {
+            this.command = command;
+            this.period = period;
+        }
 
-    @Override
-    // gets called when thread starts
-    public void run() {
-        super.run();
+        @Override
+        // gets called when thread starts
+        public void run() {
+            super.run();
 
-        while (!command.isFinished() && !isInterrupted()) {
-            // gets the system time
-            long commandStartingTime = System.nanoTime();
+            while (!command.isFinished() && !isInterrupted()) {
+                // gets the system time
+                long commandStartingTime = System.nanoTime();
 
-            // executes the command
-            command.execute();
+                // executes the command
+                command.execute();
 
-            try {
-                // sleeps the thread the remaining time so that the execution period is
-                // consistent
-                long executeTime = (System.nanoTime() - commandStartingTime);
-                long sleepPeriod = period - executeTime;
+                try {
+                    // sleeps the thread the remaining time so that the execution period is
+                    // consistent
+                    long executeTime = (System.nanoTime() - commandStartingTime);
+                    long sleepPeriod = period - executeTime;
 
-                if (sleepPeriod < 0) {
-                    // print out if the thread overran
-                    System.out.printf(
-                            "Loop overran by %f ms%n",
-                            Math.abs(((double) (sleepPeriod)) / 1_000_000));
+                    if (sleepPeriod < 0) {
+                        // print out if the thread overran
+                        System.out.printf(
+                                "Loop overran by %f ms%n",
+                                Math.abs(((double) (sleepPeriod)) / 1_000_000));
 
-                } else {
-                    // sleeps the thread for the calculated time
-                    sleep(sleepPeriod / 1_000_000, (int) (sleepPeriod % 1_000_000));
+                    } else {
+                        // sleeps the thread for the calculated time
+                        sleep(sleepPeriod / 1_000_000, (int) (sleepPeriod % 1_000_000));
+                    }
+
+                } catch (InterruptedException e) {
+                    // will happen if the command is interrupted and needs to end early
+                    // no need to handle
+                    System.out.println(getName() + " was interrupted");
                 }
-
-            } catch (InterruptedException e) {
-                // will happen if the command is interrupted and needs to end early
-                // no need to handle
-                System.out.println(getName() + " was interrupted");
             }
         }
     }
 }
+

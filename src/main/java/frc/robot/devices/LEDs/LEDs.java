@@ -1,30 +1,32 @@
 package frc.robot.devices.LEDs;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDRange.Atomic;
 import frc.robot.utilities.lists.Ports;
+import java.util.HashMap;
+import java.util.UUID;
 
+/**
+ * Subsystem for the LEDs on the robot.
+ */
 public class LEDs extends SubsystemBase {
 
     private static LEDs instance = null;
 
-    private AddressableLED ledStrip;
-    private AddressableLEDBuffer buffer;
+    private final AddressableLED ledStrip;
+    private final AddressableLEDBuffer buffer;
 
-    private HashMap<String, LEDCall> calls;
+    private final HashMap<String, LEDCall> calls;
     private boolean callsOutOfDate;
 
     private int loop;
 
     /**
-     * Gets the LED instance using the singleton pattern
+     * Gets the LED instance using the singleton pattern.
      *
-     * @return
+     * @return the LED instance
      */
     public static LEDs getInstance() {
         if (instance == null) {
@@ -51,14 +53,14 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Applies modifications made to the LED buffer to the LED strip
+     * Applies modifications made to the LED buffer to the LED strip.
      */
     private void applyChanges() {
         ledStrip.setData(buffer);
     }
 
     /**
-     * Adds a call to the currently active calls
+     * Adds a call to the currently active calls.
      *
      * @param name the call's name (for removal later)
      * @param call the LEDCall object
@@ -69,7 +71,7 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Removes a call
+     * Removes a call.
      *
      * @param name the call's name
      */
@@ -79,7 +81,7 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Removes all calls
+     * Removes all calls.
      */
     public void removeAllCalls() {
         callsOutOfDate = true;
@@ -87,8 +89,8 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Reassigns the states of the LED atoms, to assure that priorities up-to date. Runs whenever the
-     * currently active calls are modified
+     * Reassigns the states of the LED atoms, to assure that priorities up-to date.
+     * Runs whenever the currently active calls are modified
      */
     private void reassignCalls() {
 
@@ -106,14 +108,14 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * Generates a unique string ID for a unnamed LEDCall
+     * Generates a unique string ID for a unnamed LEDCall.
      *
      * @return the unique ID
      */
     public String getUniqueID() {
         while (true) {
             String potentialID = UUID.randomUUID().toString();
-            if (!calls.keySet().contains(potentialID)) {
+            if (!calls.containsKey(potentialID)) {
                 return potentialID;
             }
         }
@@ -123,7 +125,7 @@ public class LEDs extends SubsystemBase {
     public void periodic() {
         loop++;
 
-        // Reassigns calls if they have been modified
+        // Reassigns call if they have been modified
         if (callsOutOfDate) {
             reassignCalls();
             callsOutOfDate = false;

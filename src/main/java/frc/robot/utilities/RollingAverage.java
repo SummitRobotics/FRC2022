@@ -3,21 +3,21 @@ package frc.robot.utilities;
 import java.util.Arrays;
 
 /**
- * Gets a running average of a value
+ * Gets a running average of a value.
  */
 public class RollingAverage {
 
-    private Double[] rollingAverageArray;
+    private final Double[] rollingAverageArray;
     private int rollingTarget;
     private boolean initialized;
-    private boolean fill;
+    private final boolean fill;
 
     /**
-     * creates new rollingavrage
+     * creates new rolling average.
      *
-     * @param size the number of values you want to avrage
-     * @param fill true will fill the array with the first value input on the first update, false will
-     *             fill the array with 0's
+     * @param size the number of values you want to average
+     * @param fill true will fill the array with the first value input on the first update,
+     *             false will fill the array with 0's
      */
     public RollingAverage(int size, boolean fill) {
         rollingAverageArray = new Double[size];
@@ -36,7 +36,7 @@ public class RollingAverage {
     }
 
     /**
-     * Adds a new value to the average
+     * Adds a new value to the average.
      *
      * @param value the new value
      */
@@ -54,7 +54,7 @@ public class RollingAverage {
     }
 
     /**
-     * Gets the running average
+     * Gets the running average.
      *
      * @return the average
      */

@@ -14,6 +14,9 @@ import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
 
+/**
+ * Command for Arcade Drive.
+ */
 public class ArcadeDrive extends CommandBase {
 
     private final Drivetrain drivetrain;

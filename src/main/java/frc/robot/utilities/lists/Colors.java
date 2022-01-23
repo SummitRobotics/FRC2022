@@ -10,7 +10,7 @@ package frc.robot.utilities.lists;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
- * all the colors for the leds and status text to be
+ * all the colors for the LEDs and status text to be.
  */
 public class Colors {
     public static final Color8Bit OFF = new Color8Bit(0, 0, 0);

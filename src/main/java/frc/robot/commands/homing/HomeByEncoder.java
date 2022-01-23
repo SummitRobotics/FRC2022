@@ -7,6 +7,9 @@ package frc.robot.commands.homing;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.utilities.Homeable;
 
+/**
+ * Homes a subsystem with encoders.
+ */
 public class HomeByEncoder extends CommandBase {
 
     private final boolean limits;
@@ -18,6 +21,9 @@ public class HomeByEncoder extends CommandBase {
 
     private int loops;
 
+    /**
+     * Constructor.
+     */
     public HomeByEncoder(Homeable toHome, double homingPower, int minLoops) {
         this.toHome = toHome;
         this.homingPower = homingPower;
@@ -30,6 +36,9 @@ public class HomeByEncoder extends CommandBase {
         addRequirements(toHome.getSubsystemObject());
     }
 
+    /**
+     * Constructor.
+     */
     public HomeByEncoder(
             Homeable toHome,
             double homingPower,
@@ -53,7 +62,7 @@ public class HomeByEncoder extends CommandBase {
     @Override
     public void initialize() {
         loops = 0;
-        toHome.DisableSoftLimits();
+        toHome.disableSoftLimits();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -71,7 +80,7 @@ public class HomeByEncoder extends CommandBase {
             toHome.setHome(0);
             if (limits) {
                 toHome.setSoftLimits(reverseLimit, forwardLimit);
-                toHome.EnableSoftLimits();
+                toHome.enableSoftLimits();
             }
         }
     }

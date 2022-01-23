@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.subsystems.Drivetrain;
 
+/**
+ * Command to have drivetrain follow a trajectory.
+ */
 public class FollowTrajectory extends CommandBase {
 
     private final Drivetrain drivetrain;
@@ -14,6 +17,12 @@ public class FollowTrajectory extends CommandBase {
 
     private RamseteCommand command;
 
+    /**
+     * The command Constructor.
+     *
+     * @param drivetrain The robot's drivetrain
+     * @param trajectory The trajectory for the robot to follow.
+     */
     public FollowTrajectory(Drivetrain drivetrain, Trajectory trajectory) {
         super();
 
@@ -32,7 +41,7 @@ public class FollowTrajectory extends CommandBase {
                         trajectory,
                         drivetrain::getPose,
                         new RamseteController(2, 0.7),
-                        drivetrain.getFeedFoward(),
+                        drivetrain.getFeedForward(),
                         Drivetrain.DriveKinimatics,
                         drivetrain::getWheelSpeeds,
                         new PIDController(pid[0], pid[1], pid[2]),

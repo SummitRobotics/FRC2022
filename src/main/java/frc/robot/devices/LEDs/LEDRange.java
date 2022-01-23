@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
- * Options for LED range selection, that are avaliable to the wider robot. Used in the creation of
+ * Options for LED range selection, that are available to the wider robot. Used in the creation of
  * LED ranges.
  */
 public enum LEDRange {
@@ -19,7 +19,7 @@ public enum LEDRange {
     BothIntake(Atomic.LeftIntake, Atomic.RightIntake),
     All(Atomic.LeftClimb, Atomic.RightClimb, Atomic.Middle, Atomic.LeftIntake, Atomic.RightIntake);
 
-    private Atomic[] ranges;
+    private final Atomic[] ranges;
 
     LEDRange(Atomic... ranges) {
         this.ranges = ranges;
@@ -30,8 +30,9 @@ public enum LEDRange {
     }
 
     /**
-     * Atomic LED ranges, that make up the smallest segments of LED strip decomposition. They are the
-     * building blocks of LEDRanges, and they manage their own interal state to update LED colors.
+     * Atomic LED ranges, that make up the smallest segments of LED strip decomposition.
+     * They are the building blocks of LEDRanges,
+     * and they manage their own internal state to update LED colors.
      */
     protected enum Atomic {
         LeftClimb(34, 57),
@@ -40,14 +41,14 @@ public enum LEDRange {
         LeftIntake(58, 76),
         RightIntake(77, 95);
 
-        private int start;
-        private int end;
+        private final int start;
+        private final int end;
 
         private final Color8Bit defaultColor;
         private LEDCall call;
 
         /**
-         * Creates a new Atom
+         * Creates a new Atom.
          *
          * @param start the starting LED of the strip
          * @param end   the ending LED of the strip
@@ -61,15 +62,15 @@ public enum LEDRange {
         }
 
         /**
-         * Sets the Atom's active call to null
+         * Sets the Atom's active call to null.
          */
         public void refreshCalls() {
             call = null;
         }
 
         /**
-         * Attempts to replace the Atom's call with a new one. If the new call has higher priority, it
-         * is accepted.
+         * Attempts to replace the Atom's call with a new one.
+         * If the new call has higher priority, it is accepted.
          *
          * @param newCall the new call
          */

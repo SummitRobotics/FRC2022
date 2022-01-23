@@ -1,15 +1,23 @@
 package frc.robot.oi;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.util.ArrayList;
+import java.util.Objects;
 
+/**
+ * Class to make sequences of buttons presses do stuff.
+ */
 public class Konami {
 
     private static Konami instance = null;
 
+    /**
+     * Gets the current instance of Konami.
+     *
+     * @return The Konami instance
+     */
     public static Konami getInstance() {
         if (instance == null) {
             instance = new Konami();
@@ -18,6 +26,9 @@ public class Konami {
         return instance;
     }
 
+    /**
+     * STUFF THAT OWEN DID I HAVE NO IDEA WHAT THIS DOES.
+     */
     public static Command registeredButtonPress(String testString) {
         return new CommandBase() {
             @Override
@@ -27,6 +38,9 @@ public class Konami {
         };
     }
 
+    /**
+     * STUFF THAT OWEN DID I HAVE NO IDEA WHAT THIS DOES.
+     */
     public static Command nonRegisteredButtonPress() {
         return new CommandBase() {
             @Override
@@ -36,7 +50,7 @@ public class Konami {
         };
     }
 
-    private ArrayList<Sequence> sequences;
+    private final ArrayList<Sequence> sequences;
 
     private Konami() {
         sequences = new ArrayList<>();
@@ -58,9 +72,9 @@ public class Konami {
         sequences.add(new Sequence(code, command));
     }
 
-    private class Sequence {
-        private String[] code;
-        private Command command;
+    private static class Sequence {
+        private final String[] code;
+        private final Command command;
 
         private int count = 0;
 
@@ -70,7 +84,7 @@ public class Konami {
         }
 
         public void tryString(String testString) {
-            if (code[count] == testString) {
+            if (Objects.equals(code[count], testString)) {
                 count++;
 
                 if (count == code.length) {

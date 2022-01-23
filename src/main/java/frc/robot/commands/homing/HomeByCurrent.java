@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
 
+/**
+ * Class which allows a subsystem to home a mechanism by looking for current spikes.
+ */
 public class HomeByCurrent extends CommandBase {
 
     private final boolean limits;
@@ -36,6 +39,15 @@ public class HomeByCurrent extends CommandBase {
         addRequirements(toHome.getSubsystemObject());
     }
 
+    /**
+     * The Constructor.
+     *
+     * @param toHome TODO
+     * @param homingPower TODO
+     * @param currentThreshold TODO
+     * @param reversLimit TODO
+     * @param forwardLimit TODO
+     */
     public HomeByCurrent(
             Homeable toHome,
             double homingPower,
@@ -59,7 +71,7 @@ public class HomeByCurrent extends CommandBase {
         currentAverage.reset();
 
         // System.out.println("running");
-        toHome.DisableSoftLimits();
+        toHome.disableSoftLimits();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -84,7 +96,7 @@ public class HomeByCurrent extends CommandBase {
             toHome.setHome(0);
             if (limits) {
                 toHome.setSoftLimits(reverseLimit, forwardLimit);
-                toHome.EnableSoftLimits();
+                toHome.enableSoftLimits();
             }
         }
     }

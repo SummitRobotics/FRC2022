@@ -5,7 +5,7 @@ import frc.robot.oi.inputs.OIButton;
 import frc.robot.utilities.Functions;
 
 /**
- * Wrapper class for basic joystick functionality
+ * Wrapper class for basic joystick functionality.
  */
 public class JoystickDriver extends GenericDriver {
 
@@ -13,6 +13,11 @@ public class JoystickDriver extends GenericDriver {
     public OIAxis axisX, axisY, axisZ;
     private boolean assureZUp = false, assureZDown = false;
 
+    /**
+     * Constructor to make a basic joystick driver.
+     *
+     * @param port The port of the joystick. This is retrieved from the driver station
+     */
     public JoystickDriver(int port) {
         super(port);
 
@@ -60,7 +65,7 @@ public class JoystickDriver extends GenericDriver {
                 };
     }
 
-    public void ReEnableJoysticCalibrationCheck() {
+    public void reEnableJoystickCalibrationCheck() {
         assureZDown = false;
         assureZUp = false;
     }

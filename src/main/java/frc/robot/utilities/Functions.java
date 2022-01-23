@@ -1,5 +1,11 @@
 package frc.robot.utilities;
 
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.drivetrain.FollowTrajectoryThreaded;
+import frc.robot.subsystems.Drivetrain;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,20 +13,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.drivetrain.FollowTrajectoryThreaded;
-import frc.robot.subsystems.Drivetrain;
-
 /**
- * Contains various static utility functions for use throughout the program
+ * Contains various static utility functions for use throughout the program.
  */
 public class Functions {
 
     /**
-     * Clamps a double between two values
+     * Clamps a double between two values.
      *
      * @param in  the input value to clamp
      * @param max the maximum you want it to be
@@ -30,15 +29,13 @@ public class Functions {
     public static double clampDouble(double in, double max, double min) {
         if (in > max) {
             return max;
-        } else if (in < min) {
-            return min;
         } else {
-            return in;
+            return Math.max(in, min);
         }
     }
 
     /**
-     * returns input value with deadzone applyed
+     * returns input value with deadzone applied.
      *
      * @param deadRange the range in both directions to be dead
      * @param in        the input value to kill
@@ -53,7 +50,7 @@ public class Functions {
     }
 
     /**
-     * Tells if value is within a target range
+     * Tells if value is within a target range.
      *
      * @param toCompare the value to compare
      * @param target    the target value
@@ -65,23 +62,23 @@ public class Functions {
     }
 
     /**
-     * returns true if the abs of a is bigger than b
+     * returns true if the abs of A is bigger than B.
      *
-     * @param a reference value
-     * @param b comparing value
+     * @param inputA reference value
+     * @param inputB comparing value
      * @return true if abs of reference is bigger
      */
-    public static boolean absGreater(double a, double b) {
-        return Math.abs(a) > Math.abs(b);
+    public static boolean absGreater(double inputA, double inputB) {
+        return Math.abs(inputA) > Math.abs(inputB);
     }
 
     /**
-     * saves an object to a file
+     * saves an object to a file.
      *
      * @param <T>    the object type
      * @param object the object to save
-     * @param path   the path, including the file name, to save warning, this can fail and not save the
-     *               object!
+     * @param path   the path, including the file name, to save
+     * @apiNote WARNING,this can fail and not save the object!
      */
     public static <T> void saveObjectToFile(T object, String path) {
         try {
@@ -98,15 +95,15 @@ public class Functions {
     }
 
     /**
-     * reads an object out of a file
+     * reads an object out of a file.
      *
      * @param <T>  the object type
      * @param path the path where the object is
-     * @return the object read from thre file
+     * @return the object read from the file
      * @throws Exception throws an exception if the fie can not be read
      */
     @SuppressWarnings("unchecked")
-    public static <T> T RetriveObjectFromFile(String path) throws Exception {
+    public static <T> T retrieveObjectFromFile(String path) throws Exception {
         FileInputStream fis = new FileInputStream(path);
         ObjectInputStream ois = new ObjectInputStream(fis);
         T result = (T) ois.readObject();
@@ -115,7 +112,7 @@ public class Functions {
     }
 
     /**
-     * creates a trajectory command from a file name
+     * creates a trajectory command from a file name.
      *
      * @param drivetrain the drivetrain subsystem
      * @param fileName   the path to and name of the file
