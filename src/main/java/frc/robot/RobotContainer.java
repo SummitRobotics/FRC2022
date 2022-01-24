@@ -25,7 +25,6 @@ import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
 import frc.robot.oi.drivers.ShufhellboardDriver;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Shifter;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.Ports;
@@ -50,7 +49,6 @@ public class RobotContainer {
 	private JoystickDriver joystick;
 
 	private Drivetrain drivetrain;
-	private Shifter shifter;
 
 	private Lemonlight targetingLimelight, ballDetectionLimelight;
 	private PDP pdp;
@@ -79,14 +77,13 @@ public class RobotContainer {
 		// TODO: need to ensure that this name is set on the limelight as well.
 		ballDetectionLimelight = new Lemonlight("balldetect");
 
-		shifter = new Shifter();
-		drivetrain = new Drivetrain(gyro, () -> shifter.getShiftState());
+		drivetrain = new Drivetrain(gyro);
 
 		autoInit = new SequentialCommandGroup(
 				new InstantCommand(
 						() -> ShufhellboardDriver.statusDisplay.addStatus("auto", "robot in auto", Colors.Team,
 								StatusPriorities.enabled)),
-				new InstantCommand(shifter::highGear),
+				new InstantCommand(drivetrain::highGear),
 				new InstantCommand(() -> {
 					launchpad.bigLEDRed.set(false);
 					launchpad.bigLEDGreen.set(true);
@@ -112,7 +109,7 @@ public class RobotContainer {
 						() -> ShufhellboardDriver.statusDisplay.addStatus("enabled", "robot enabled", Colors.Team,
 								StatusPriorities.enabled)),
 				new InstantCommand(() -> joystick.ReEnableJoysticCalibrationCheck()),
-				new InstantCommand(shifter::highGear),
+				new InstantCommand(drivetrain::highGear),
 				new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
 				new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
 				new InstantCommand(() -> {
@@ -131,8 +128,7 @@ public class RobotContainer {
 				drivetrain,
 				controller1.rightTrigger,
 				controller1.leftTrigger,
-				controller1.leftX,
-				shifter::lowGear));
+				controller1.leftX));
 
 	}
 

@@ -6,8 +6,15 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 
 import java.util.function.BooleanSupplier;
@@ -65,7 +72,6 @@ public class Drivetrain extends SubsystemBase {
 
 	private DifferentialDriveOdometry odometry;
 
-	private BooleanSupplier shift;
 	private AHRS gyro;
 
 	public static DifferentialDriveKinematics DriveKinimatics = new DifferentialDriveKinematics(DriveWidth);
@@ -78,6 +84,18 @@ public class Drivetrain extends SubsystemBase {
 
 	public static DifferentialDriveVoltageConstraint LowVoltageConstraint = new DifferentialDriveVoltageConstraint(LowFeedFoward, DriveKinimatics, MaxOutputVoltage);
 
+	private Solenoid shift;
+
+	private boolean oldShift;
+
+	private LEDCall lowShift = new LEDCall(LEDPriorities.lowGear, LEDRange.All).sine(Colors.Red);
+
+	//for making robot distance consistant across shifts
+	private double leftDistanceAcum = 0;
+	private double rightDistanceAcum = 0;
+
+	private Timer odemetryTime = new Timer();
+	
 	/**
 	 * i am in PAIN wow this is BAD
 	 * 
@@ -87,10 +105,15 @@ public class Drivetrain extends SubsystemBase {
 	 *                   passing in the whole shift object in and using fake
 	 *                   callbacks from hell
 	 */
-	public Drivetrain(AHRS gyro, BooleanSupplier shiftState) {
+	public Drivetrain(AHRS gyro) {
 
 		this.gyro = gyro;
-		this.shift = shiftState;
+
+		shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
+
+		odemetryTime.reset();
+		odemetryTime.start();
+
 
 		odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
@@ -106,7 +129,7 @@ public class Drivetrain extends SubsystemBase {
 		right.setInverted(false);
 
 		// sets pid values
-		zeroEncoders();
+		zeroDistance();
 
 		// pid for position
 		leftPID.setP(0.05);
@@ -156,6 +179,36 @@ public class Drivetrain extends SubsystemBase {
 		rightMiddle.setIdleMode(IdleMode.kBrake);
 		rightBack.setIdleMode(IdleMode.kBrake);
 
+	}
+
+
+	public void highGear() {
+		lowShift.cancel();
+		oldShift = true;
+		updateDistanceAcum();
+		shift.set(true);
+	}
+
+	public void lowGear() {
+		lowShift.activate();
+		oldShift = false;
+		updateDistanceAcum();
+		shift.set(false);
+	}
+
+	private void updateDistanceAcum(){
+		leftDistanceAcum += getLeftDistance();
+		rightDistanceAcum += getRightDistance();
+		zeroEncoders();
+	}
+
+	/**
+	 * Gets the shift state
+	 * 
+	 * @return the shift state where true is high and false is low
+	 */
+	public boolean getShift() {
+		return oldShift;
 	}
 
 	/**
@@ -250,6 +303,14 @@ public class Drivetrain extends SubsystemBase {
 		rightPID.setReference(position, ControlType.kPosition);
 	}
 
+	//TODO test if this works
+	public double distToEncoder(double dist){
+		if (getShift()) {
+			return (dist/wheleCirconfranceInMeters) * HighGearRatio;
+		} else {
+			return (dist/wheleCirconfranceInMeters) * LowGearRatio;		}
+	}
+
 	/**
 	 * The position you want the left side to register when it is in the position it
 	 * is currently in
@@ -270,9 +331,22 @@ public class Drivetrain extends SubsystemBase {
 		rightEncoder.setPosition(position);
 	}
 
-	public synchronized void zeroEncoders() {
+	/**
+	 * probably NOT what you want
+	 * zeros the raw encoder values
+	 */
+	private synchronized void zeroEncoders(){
 		setRightEncoder(0);
 		setLeftEncoder(0);
+	}
+
+	/**
+	 * zeros the enocders and encoder acum, this is probably what you want
+	 */
+	public synchronized void zeroDistance() {
+		leftDistanceAcum = 0;
+		rightDistanceAcum = 0;
+		zeroEncoders();
 	}
 
 	/**
@@ -305,10 +379,10 @@ public class Drivetrain extends SubsystemBase {
 	 * @return the total distance in meters the side as travled sense the last reset
 	 */
 	public double getLeftDistance() {
-		if (shift.getAsBoolean()) {
-			return (getLeftEncoderPosition() / HighGearRatio) * wheleCirconfranceInMeters;
+		if (getShift()) {
+			return ((getLeftEncoderPosition() / HighGearRatio) * wheleCirconfranceInMeters) + leftDistanceAcum;
 		} else {
-			return (getLeftEncoderPosition() / LowGearRatio) * wheleCirconfranceInMeters;
+			return ((getLeftEncoderPosition() / LowGearRatio) * wheleCirconfranceInMeters) + leftDistanceAcum;
 		}
 	}
 
@@ -316,10 +390,10 @@ public class Drivetrain extends SubsystemBase {
 	 * @return the total distance in meters the side as travled sense the last reset
 	 */
 	public synchronized double getRightDistance() {
-		if (shift.getAsBoolean()) {
-			return (getRightEncoderPosition() / HighGearRatio) * wheleCirconfranceInMeters;
+		if (getShift()) {
+			return ((getRightEncoderPosition() / HighGearRatio) * wheleCirconfranceInMeters) + rightDistanceAcum;
 		} else {
-			return (getRightEncoderPosition() / LowGearRatio) * wheleCirconfranceInMeters;
+			return ((getRightEncoderPosition() / LowGearRatio) * wheleCirconfranceInMeters) + rightDistanceAcum;
 		}
 	}
 
@@ -327,7 +401,7 @@ public class Drivetrain extends SubsystemBase {
 	 * @return the linear speed of the side in meters per second
 	 */
 	public synchronized double getLeftSpeed() {
-		if (shift.getAsBoolean()) {
+		if (getShift()) {
 			return convertRpmToMetersPerSecond((getLeftRPM() / HighGearRatio));
 		} else {
 			return convertRpmToMetersPerSecond((getLeftRPM() / LowGearRatio));
@@ -338,7 +412,7 @@ public class Drivetrain extends SubsystemBase {
 	 * @return the linear speed of the side in meters per second
 	 */
 	public synchronized double getRightSpeed() {
-		if (shift.getAsBoolean()) {
+		if (getShift()) {
 			return convertRpmToMetersPerSecond((getRightRPM() / HighGearRatio));
 		} else {
 			return convertRpmToMetersPerSecond((getRightRPM() / LowGearRatio));
@@ -389,7 +463,7 @@ public class Drivetrain extends SubsystemBase {
 	 * @param pose the new pose
 	 */
 	public synchronized void setPose(Pose2d pose) {
-		zeroEncoders();
+		zeroDistance();
 		odometry.resetPosition(pose, gyro.getRotation2d());
 	}
 
@@ -403,7 +477,7 @@ public class Drivetrain extends SubsystemBase {
 	 * @return double array of p,i,d
 	 */
 	public double[] getPid() {
-		if (shift.getAsBoolean()) {
+		if (getShift()) {
 			double[] out = { HighP, HighI, HighD };
 			return out;
 
@@ -411,10 +485,6 @@ public class Drivetrain extends SubsystemBase {
 			double[] out = { LowP, LowI, LowD };
 			return out;
 		}
-	}
-
-	public boolean getShift() {
-		return shift.getAsBoolean();
 	}
 
 	public SimpleMotorFeedforward getFeedFoward() {
@@ -433,9 +503,16 @@ public class Drivetrain extends SubsystemBase {
 		}
 	}
 
+	//TODO run a check so we dont update at a unnessaryly fast rate beacuse its being updated by periodic and followSpline
 	public synchronized void updateOdometry() {
-		odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
+		//prevemts unnessarly fast updates to the odemetry (2 ms)
+		if(odemetryTime.get() > 0.002)
+		{
+			odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
+			odemetryTime.reset();
+		}
 	}
+
 
 	public void periodic() {
 		// Update the odometry in the periodic block
