@@ -28,8 +28,6 @@ public class ArcadeDrive extends CommandBase {
 
     private double max_change_rate = 0.05;
 
-    private Runnable shiftLow;
-
     private RollingAverage avgSpeed = new RollingAverage(2, true);
 
     private RollingAverage avgPower = new RollingAverage(2, true);
@@ -48,8 +46,7 @@ public class ArcadeDrive extends CommandBase {
         Drivetrain drivetrain, 
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
-        OIAxis turnAxis,
-        Runnable shiftLow)
+        OIAxis turnAxis)
     {
 
         this.drivetrain = drivetrain;
@@ -57,7 +54,6 @@ public class ArcadeDrive extends CommandBase {
         this.forwardPowerAxis = forwardPowerAxis;
         this.reversePowerAxis = reversePowerAxis;
         this.turnAxis = turnAxis;
-        this.shiftLow = shiftLow;
 
         limiter = new ChangeRateLimiter(max_change_rate);
 
@@ -77,15 +73,13 @@ public class ArcadeDrive extends CommandBase {
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis PowerAxis, 
-        OIAxis turnAxis,
-        Runnable shiftLow)
+        OIAxis turnAxis)
     {
 
         this.drivetrain = drivetrain;
 
         this.forwardPowerAxis = PowerAxis;
         this.turnAxis = turnAxis;
-        this.shiftLow = shiftLow;
 
         limiter = new ChangeRateLimiter(max_change_rate);
 
@@ -136,7 +130,7 @@ public class ArcadeDrive extends CommandBase {
 
         //shifts into low gear if drivetrain stalled
         if((avgPower.getAverage() > .5) && avgSpeed.getAverage() < 15){
-            shiftLow.run();
+            drivetrain.lowGear();
         }
 
         // calculates power to the motors
