@@ -509,6 +509,7 @@ public class Drivetrain extends SubsystemBase {
 		if(odemetryTime.get() > 0.002)
 		{
 			odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
+			odemetryTime.reset();
 		}
 	}
 
