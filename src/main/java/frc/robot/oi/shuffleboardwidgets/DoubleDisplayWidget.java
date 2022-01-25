@@ -1,4 +1,4 @@
-package frc.robot.oi.shufhellboardwidgets;
+package frc.robot.oi.shuffleboardwidgets;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.oi.shufhellboardwidgets;
+package frc.robot.oi.shuffleboardwidgets;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.util.Color8Bit;
