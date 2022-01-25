@@ -48,5 +48,4 @@ The code is divided into several packages, each responsible for a different aspe
 - hotfix_##### or hotfix_NAME - A branch for hotfixes
 - \#\#\#\#\# - Number in the format MonthDayIncrement (Ex. for the second cleanup branch on Jan 20 (clean_01202))
 
-#### *Using a modified version Google's Java Format
-#### *For exact linting rules goto .github/linters/linter.xml
+#### *Using a modified version Google's Java Format. For exact linting rules goto .github/linters/linter.xml
