@@ -18,12 +18,12 @@ import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.Lemonlight.LEDModes;
+import frc.robot.devices.PDP;
 import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Shifter;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
@@ -45,9 +45,9 @@ public class RobotContainer {
     private final JoystickDriver joystick;
 
     private final Drivetrain drivetrain;
-    private final Shifter shifter;
 
     private final Lemonlight targetingLimelight, ballDetectionLimelight;
+    private final PDP pdp;
     private final AHRS gyro;
 
     private final Command teleInit;
@@ -56,7 +56,6 @@ public class RobotContainer {
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
-    @SuppressWarnings("checkstyle:OperatorWrap")
     public RobotContainer() {
 
         scheduler = CommandScheduler.getInstance();
@@ -64,6 +63,7 @@ public class RobotContainer {
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
+        pdp = new PDP();
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
         ShuffleboardDriver.statusDisplay.addStatus(
@@ -74,24 +74,20 @@ public class RobotContainer {
         // TODO: need to ensure that this name is set on the limelight as well.
         ballDetectionLimelight = new Lemonlight("balldetect");
 
-        shifter = new Shifter();
-        drivetrain = new Drivetrain(gyro, shifter::getShiftState);
+        drivetrain = new Drivetrain(gyro);
 
-        autoInit =
-            new SequentialCommandGroup(
+        autoInit = new SequentialCommandGroup(
                 new InstantCommand(
-                    () ->
-                        ShuffleboardDriver.statusDisplay.addStatus(
+                        () -> ShuffleboardDriver.statusDisplay.addStatus(
                             "auto",
                             "robot in auto",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
-                new InstantCommand(shifter::highGear),
-                new InstantCommand(
-                    () -> {
-                        launchpad.bigLEDRed.set(false);
-                        launchpad.bigLEDGreen.set(true);
-                    }));
+                new InstantCommand(drivetrain::highGear),
+                new InstantCommand(() -> {
+                    launchpad.bigLEDRed.set(false);
+                    launchpad.bigLEDGreen.set(true);
+                }));
 
         teleInit =
             new SequentialCommandGroup(
@@ -108,7 +104,7 @@ public class RobotContainer {
                                         + "and joystick are connected to the driver-station");
                                 throw (new RuntimeException("not enough joysticks connected"));
                             }
-
+                            
                             if (!controller1.isXboxController()) {
                                 System.out.println("controller 0 is not the xbox controller");
                                 throw (new RuntimeException("incorrect joystick in port 0"));
@@ -117,18 +113,19 @@ public class RobotContainer {
                     }),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
-                    () ->
-                        ShuffleboardDriver.statusDisplay.addStatus(
-                            "enabled", "robot enabled", Colors.TEAM, StatusPriorities.ENABLED)),
-                new InstantCommand(joystick::reEnableJoystickCalibrationCheck),
-                new InstantCommand(shifter::highGear),
+                        () -> ShuffleboardDriver.statusDisplay.addStatus(
+                            "enabled",
+                            "robot enabled",
+                            Colors.TEAM,
+                            StatusPriorities.ENABLED)),
+                new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
+                new InstantCommand(drivetrain::highGear),
                 new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
-                new InstantCommand(
-                    () -> {
-                        launchpad.bigLEDRed.set(false);
-                        launchpad.bigLEDGreen.set(true);
-                    }));
+                new InstantCommand(() -> {
+                    launchpad.bigLEDRed.set(false);
+                    launchpad.bigLEDGreen.set(true);
+                }));
 
         // Configure the button bindings
         setDefaultCommands();
@@ -137,13 +134,11 @@ public class RobotContainer {
 
     private void setDefaultCommands() {
         // drive by controller
-        drivetrain.setDefaultCommand(
-            new ArcadeDrive(
-                drivetrain,
-                controller1.rightTrigger,
-                controller1.leftTrigger,
-                controller1.leftX,
-                shifter::lowGear));
+        drivetrain.setDefaultCommand(new ArcadeDrive(
+            drivetrain,
+            controller1.rightTrigger,
+            controller1.leftTrigger,
+            controller1.leftX));
     }
 
     /**
@@ -166,6 +161,13 @@ public class RobotContainer {
     }
 
     /**
+     * runs when the robot is powered on.
+     */
+    public void robotInit() {
+        ShuffleboardDriver.init();
+    }
+    
+    /**
      * runs once every ~20ms when in teleop.
      */
     public void teleopPeriodic() {
@@ -175,13 +177,6 @@ public class RobotContainer {
      * runs when robot is inited to teleop.
      */
     public void teleopInit() {
-    }
-
-    /**
-     * runs when the robot is powered on.
-     */
-    public void robotInit() {
-        ShuffleboardDriver.init();
     }
 
     /**

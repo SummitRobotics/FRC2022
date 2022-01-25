@@ -31,8 +31,6 @@ public class ArcadeDrive extends CommandBase {
 
     private static final double MAX_CHANGE_RATE = 0.05;
 
-    private final Runnable shiftLow;
-
     private final RollingAverage avgSpeed = new RollingAverage(2, true);
 
     private final RollingAverage avgPower = new RollingAverage(2, true);
@@ -48,18 +46,16 @@ public class ArcadeDrive extends CommandBase {
      * @param turnAxis         control axis for the drivetrain turn
      */
     public ArcadeDrive(
-            Drivetrain drivetrain,
-            OIAxis forwardPowerAxis,
-            OIAxis reversePowerAxis,
-            OIAxis turnAxis,
-            Runnable shiftLow) {
+        Drivetrain drivetrain, 
+        OIAxis forwardPowerAxis, 
+        OIAxis reversePowerAxis, 
+        OIAxis turnAxis) {
 
         this.drivetrain = drivetrain;
 
         this.forwardPowerAxis = forwardPowerAxis;
         this.reversePowerAxis = reversePowerAxis;
         this.turnAxis = turnAxis;
-        this.shiftLow = shiftLow;
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
@@ -71,21 +67,18 @@ public class ArcadeDrive extends CommandBase {
      * teleop driver control.
      *
      * @param drivetrain drivetrain instance
-     * @param shiftLow   shifter instance
      * @param powerAxis  control axis for the drivetrain power
      * @param turnAxis   control axis for the drivetrain turn
      */
     public ArcadeDrive(
-            Drivetrain drivetrain,
-            OIAxis powerAxis,
-            OIAxis turnAxis,
-            Runnable shiftLow) {
+        Drivetrain drivetrain, 
+        OIAxis powerAxis, 
+        OIAxis turnAxis) {
 
         this.drivetrain = drivetrain;
 
         this.forwardPowerAxis = powerAxis;
         this.turnAxis = turnAxis;
-        this.shiftLow = shiftLow;
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
@@ -128,9 +121,9 @@ public class ArcadeDrive extends CommandBase {
 
         avgSpeed.update(Math.abs(drivetrain.getRightRPM()) + Math.abs(drivetrain.getLeftRPM()));
 
-        // shifts into low gear if drivetrain stalled
+        //shifts into low gear if drivetrain stalled
         if ((avgPower.getAverage() > .5) && avgSpeed.getAverage() < 15) {
-            shiftLow.run();
+            drivetrain.lowGear();
         }
 
         double turn = Math.pow(turnAxis.get(), 3);

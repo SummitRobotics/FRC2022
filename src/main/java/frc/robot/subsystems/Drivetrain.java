@@ -13,10 +13,16 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
-import java.util.function.BooleanSupplier;
 
 /**
  * Subsystem to control the drivetrain of the robot.
@@ -24,40 +30,48 @@ import java.util.function.BooleanSupplier;
 public class Drivetrain extends SubsystemBase {
 
     // TODO re tune/calculate all these
-    public static final double LOW_P = 2.29,
-            LOW_I = 0.0,
-            LOW_D = 0.0,
-            LOW_KS = 0.177,
-            LOW_KV = 1.55,
-            LOW_KA = 0.133,
-            HIGH_P = 2.85,
-            HIGH_I = 0.0,
-            HIGH_D = 0.0,
-            HIGH_KS = 0.211,
-            HIGH_KV = 0.734,
-            HIGH_KA = 0.141,
-            HIGH_GEAR_RATIO = 9.1,
-            LOW_GEAR_RATIO = 19.65,
-            WHEEL_RADIUS_IN_METERS = 0.0762,
-            WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
-            MAX_OUTPUT_VOLTAGE = 11,
-            DRIVE_WIDTH = 0.7112;
+    public static final double 
+        LOW_P = 2.29,
+        LOW_I = 0.0,
+        LOW_D = 0.0,
+        LOW_KS = 0.177,
+        LOW_KV = 1.55,
+        LOW_KA = 0.133,
+        HIGH_P = 2.85,
+        HIGH_I = 0.0,
+        HIGH_D = 0.0,
+        HIGH_KS = 0.211,
+        HIGH_KV = 0.734,
+        HIGH_KA = 0.141,
+        HIGH_GEAR_RATIO = 9.1,
+        LOW_GEAR_RATIO = 19.65,
+        WHEEL_RADIUS_IN_METERS = 0.0762,
+        WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
+        MAX_OUTPUT_VOLTAGE = 11,
+        DRIVE_WIDTH = 0.7112;
+
 
     // left motors
     private final CANSparkMax left =
-            new CANSparkMax(Ports.LEFT_DRIVE_3, MotorType.kBrushless);
+        new CANSparkMax(Ports.LEFT_DRIVE_3, MotorType.kBrushless);
+
     private final CANSparkMax leftMiddle =
-            new CANSparkMax(Ports.LEFT_DRIVE_2, MotorType.kBrushless);
+        new CANSparkMax(Ports.LEFT_DRIVE_2, MotorType.kBrushless);
+
     private final CANSparkMax leftBack =
-            new CANSparkMax(Ports.LEFT_DRIVE_1, MotorType.kBrushless);
+        new CANSparkMax(Ports.LEFT_DRIVE_1, MotorType.kBrushless);
+
 
     // right motors
     private final CANSparkMax right =
-            new CANSparkMax(Ports.RIGHT_DRIVE_3, MotorType.kBrushless);
+        new CANSparkMax(Ports.RIGHT_DRIVE_3, MotorType.kBrushless);
+
     private final CANSparkMax rightMiddle =
-            new CANSparkMax(Ports.RIGHT_DRIVE_2, MotorType.kBrushless);
+        new CANSparkMax(Ports.RIGHT_DRIVE_2, MotorType.kBrushless);
+
     private final CANSparkMax rightBack =
-            new CANSparkMax(Ports.RIGHT_DRIVE_1, MotorType.kBrushless);
+        new CANSparkMax(Ports.RIGHT_DRIVE_1, MotorType.kBrushless);
+
 
     // pid controllers
     private final SparkMaxPIDController leftPID = left.getPIDController();
@@ -69,41 +83,49 @@ public class Drivetrain extends SubsystemBase {
 
     private final DifferentialDriveOdometry odometry;
 
-    private final BooleanSupplier shift;
     private final AHRS gyro;
 
     public static DifferentialDriveKinematics DriveKinimatics =
-            new DifferentialDriveKinematics(DRIVE_WIDTH);
+        new DifferentialDriveKinematics(DRIVE_WIDTH);
 
     public static SimpleMotorFeedforward HighFeedFoward =
-            new SimpleMotorFeedforward(HIGH_KS, HIGH_KV, HIGH_KA);
+        new SimpleMotorFeedforward(HIGH_KS, HIGH_KV, HIGH_KA);
 
     public static SimpleMotorFeedforward LowFeedFoward =
-            new SimpleMotorFeedforward(LOW_KS, LOW_KV, LOW_KA);
+        new SimpleMotorFeedforward(LOW_KS, LOW_KV, LOW_KA);
 
     public static DifferentialDriveVoltageConstraint HighVoltageConstraint =
-            new DifferentialDriveVoltageConstraint(
-                    HighFeedFoward,
-                    DriveKinimatics,
-                    MAX_OUTPUT_VOLTAGE);
+        new DifferentialDriveVoltageConstraint(HighFeedFoward, DriveKinimatics, MAX_OUTPUT_VOLTAGE);
 
     public static DifferentialDriveVoltageConstraint LowVoltageConstraint =
-            new DifferentialDriveVoltageConstraint(
-                    LowFeedFoward,
-                    DriveKinimatics,
-                    MAX_OUTPUT_VOLTAGE);
+        new DifferentialDriveVoltageConstraint(LowFeedFoward, DriveKinimatics, MAX_OUTPUT_VOLTAGE);
 
+    private Solenoid shift;
+
+    private boolean oldShift;
+
+    private LEDCall lowShift = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
+
+    //for making robot distance consistant across shifts
+    private double leftDistanceAcum = 0;
+    private double rightDistanceAcum = 0;
+
+    private Timer odemetryTime = new Timer();
+    
     /**
-     * I am in PAIN wow this is BAD.
+     * i am in PAIN wow this is BAD.
      *
-     * @param gyro       odometry is bad
-     * @param shiftState shifting was a mistake just be glad i am trying to limit my sins and am not
-     *                   passing in the whole shift object in and using fake callbacks from hell
+     * @param gyro       odimetry is bad
      */
-    public Drivetrain(AHRS gyro, BooleanSupplier shiftState) {
+    public Drivetrain(AHRS gyro) {
 
         this.gyro = gyro;
-        this.shift = shiftState;
+
+        shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
+
+        odemetryTime.reset();
+        odemetryTime.start();
+
 
         odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
@@ -119,7 +141,7 @@ public class Drivetrain extends SubsystemBase {
         right.setInverted(false);
 
         // sets pid values
-        zeroEncoders();
+        zeroDistance();
 
         // pid for position
         leftPID.setP(0.05);
@@ -168,6 +190,46 @@ public class Drivetrain extends SubsystemBase {
         right.setIdleMode(IdleMode.kBrake);
         rightMiddle.setIdleMode(IdleMode.kBrake);
         rightBack.setIdleMode(IdleMode.kBrake);
+
+    }
+
+
+    /**
+     * Shifts the robot into high gear.
+     */
+    public void highGear() {
+        lowShift.cancel();
+        oldShift = true;
+        updateDistanceAcum();
+        shift.set(true);
+    }
+
+    /**
+     * Shifts the robot into low gear.
+     */
+    public void lowGear() {
+        lowShift.activate();
+        oldShift = false;
+        updateDistanceAcum();
+        shift.set(false);
+    }
+
+    /**
+     * Updateds the distace acumulator.
+     */
+    private void updateDistanceAcum() {
+        leftDistanceAcum += getLeftDistance();
+        rightDistanceAcum += getRightDistance();
+        zeroEncoders();
+    }
+
+    /**
+     * Gets the shift state.
+     *
+     * @return the shift state where true is high and false is low
+     */
+    public boolean getShift() {
+        return oldShift;
     }
 
     /**
@@ -195,9 +257,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Sends a defined amount of volts to the left motors.
+     * Sets the voltage to the left motors.
      *
-     * @param volts amount of volts to send to the left motors.
+     * @param volts Amount of volts to send to left motors.
      */
     public void setLeftMotorVolts(double volts) {
         synchronized (left) {
@@ -206,9 +268,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Sends a defined amount of volts to the right motors.
+     * Sets the voltage to the right motors.
      *
-     * @param volts amount of volts to send to the right motors.
+     * @param volts Amount of volts to send to the right motors.
      */
     public void setRightMotorVolts(double volts) {
         synchronized (right) {
@@ -273,8 +335,23 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
+     * Convert distance to encoder values.
+     * TODO: STILL NEED TO TEST THIS
+     *
+     * @param dist the distance in meters.
+     * @return The converstion to encover values.
+     */
+    public double distToEncoder(double dist) {
+        if (getShift()) {
+            return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * HIGH_GEAR_RATIO;
+        } else {
+            return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
+        }
+    }
+
+    /**
      * The position you want the left side to register.
-     * when it is in the position it is currently in.
+     * When it is in the position it is currently in
      *
      * @param position the position for the encoder to register in rotations
      */
@@ -284,7 +361,7 @@ public class Drivetrain extends SubsystemBase {
 
     /**
      * The position you want the right side to register.
-     * when it is in the position it is currently in.
+     * When it is in the position it is currently in
      *
      * @param position the position for the encoder to register in rotations
      */
@@ -292,9 +369,26 @@ public class Drivetrain extends SubsystemBase {
         rightEncoder.setPosition(position);
     }
 
-    public synchronized void zeroEncoders() {
+    /**
+     * Zeros the raw encoder values (PROBABLY NOT WHAT YOU WANT).
+     *
+     * @apiNote This zeros the raw encoder values. This is provavly not what you want to do.
+     *     Instead use zeroEncoders().
+     */
+    private synchronized void zeroEncoders() {
         setRightEncoder(0);
         setLeftEncoder(0);
+    }
+
+    /**
+     * zeros the enocders and encoder acum. 
+     *
+     * @apiNote is probably what you want
+     */
+    public synchronized void zeroDistance() {
+        leftDistanceAcum = 0;
+        rightDistanceAcum = 0;
+        zeroEncoders();
     }
 
     /**
@@ -324,28 +418,32 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Gets the total distance in meters traveled by the left side.
+     * Gets the total distance the left side has traveled since its last reset.
      *
-     * @return the total distance in meters the side as traveled sense the last reset
+     * @return the total distance in meters the side as travled sense the last reset
      */
     public double getLeftDistance() {
-        if (shift.getAsBoolean()) {
-            return (getLeftEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
+        if (getShift()) {
+            return ((getLeftEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+                + leftDistanceAcum;
         } else {
-            return (getLeftEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
+            return ((getLeftEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+                + leftDistanceAcum;
         }
     }
 
     /**
-     * Gets the total distance in meters traveled by the right side.
+     * Gets the total distance the left side has traveled since its last reset.
      *
-     * @return the total distance in meters the side as traveled sense the last reset
+     * @return the total distance in meters the side as travled sense the last reset
      */
     public synchronized double getRightDistance() {
-        if (shift.getAsBoolean()) {
-            return (getRightEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
+        if (getShift()) {
+            return ((getRightEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+                + rightDistanceAcum;
         } else {
-            return (getRightEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS;
+            return ((getRightEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+                + rightDistanceAcum;
         }
     }
 
@@ -355,7 +453,7 @@ public class Drivetrain extends SubsystemBase {
      * @return the linear speed of the side in meters per second
      */
     public synchronized double getLeftSpeed() {
-        if (shift.getAsBoolean()) {
+        if (getShift()) {
             return convertRpmToMetersPerSecond((getLeftRPM() / HIGH_GEAR_RATIO));
         } else {
             return convertRpmToMetersPerSecond((getLeftRPM() / LOW_GEAR_RATIO));
@@ -368,7 +466,7 @@ public class Drivetrain extends SubsystemBase {
      * @return the linear speed of the side in meters per second
      */
     public synchronized double getRightSpeed() {
-        if (shift.getAsBoolean()) {
+        if (getShift()) {
             return convertRpmToMetersPerSecond((getRightRPM() / HIGH_GEAR_RATIO));
         } else {
             return convertRpmToMetersPerSecond((getRightRPM() / LOW_GEAR_RATIO));
@@ -413,12 +511,12 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * sets the current pos and RESETS ENCODERS TO 0.
+     * sets the curent pos and RESETS ENCODERS TO 0.
      *
      * @param pose the new pose
      */
     public synchronized void setPose(Pose2d pose) {
-        zeroEncoders();
+        zeroDistance();
         odometry.resetPosition(pose, gyro.getRotation2d());
     }
 
@@ -427,42 +525,34 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * gets the right pid values for the current shift state.
+     * gets the right pid values for the curent shift state.
      *
      * @return double array of p,i,d
      */
     public double[] getPid() {
-        if (shift.getAsBoolean()) {
-            double[] out = {HIGH_P, HIGH_I, HIGH_D};
+        if (getShift()) {
+            double[] out = { HIGH_P, HIGH_I, HIGH_D };
             return out;
 
         } else {
-            double[] out = {LOW_P, LOW_I, LOW_D};
+            double[] out = { LOW_P, LOW_I, LOW_D };
             return out;
         }
     }
 
-    public boolean getShift() {
-        return shift.getAsBoolean();
-    }
-
     /**
-     * Gets the motor FeedForwards.
-     *
-     * @return the FeedForward
+     * Gtes the feed foward.
      */
-    public SimpleMotorFeedforward getFeedForward() {
+    public SimpleMotorFeedforward getFeedFoward() {
         if (getShift()) {
             return HighFeedFoward;
         } else {
             return LowFeedFoward;
         }
     }
-
+    
     /**
-     * Gets the current voltage constraint on the drive-train motors.
-     *
-     * @return the current voltage constraint.
+     * Gets the current volate constaint placed on the drivetrain.
      */
     public DifferentialDriveVoltageConstraint getVoltageConstraint() {
         if (getShift()) {
@@ -472,12 +562,24 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
-    public synchronized void updateOdometry() {
-        odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
-    }
+    //TODO run a check so we dont update at a unnessaryly fast rate
+    //TODO CONT beacuse its being updated by periodic and followSpline
 
     /**
-     * Method that runs every ~20ms.
+     * Updates odometry.
+     * It only updates at a rate of 500hz maximum.
+     */
+    public synchronized void updateOdometry() {
+        //prevemts unnessarly fast updates to the odemetry (2 ms)
+        if (odemetryTime.get() > 0.002) {
+            odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
+            odemetryTime.reset();
+        }
+    }
+
+
+    /**
+     * Method that runs once per scheduler cycle.
      */
     public void periodic() {
         // Update the odometry in the periodic block

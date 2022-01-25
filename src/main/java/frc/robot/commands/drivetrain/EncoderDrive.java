@@ -26,7 +26,7 @@ public class EncoderDrive extends CommandBase {
      * @param left The number of motor rotations to move the left side
      * @param right The number of motor rotations to move the right side
      */
-    public EncoderDrive(Drivetrain drivetrain, double left, double right) {
+    public EncoderDrive(double left, double right, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
         this.left = left;
         this.right = right;
@@ -38,9 +38,10 @@ public class EncoderDrive extends CommandBase {
     @Override
     public void initialize() {
         drivetrain.stop();
-        drivetrain.zeroEncoders();
-        drivetrain.setLeftMotorTarget(left);
-        drivetrain.setRightMotorTarget(right);
+        drivetrain.zeroDistance();
+        // TODO test if this is acurate
+        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
+        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right));
     }
 
     @Override
@@ -57,7 +58,8 @@ public class EncoderDrive extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Math.abs(drivetrain.getLeftEncoderPosition() - left) < 1
-                && Math.abs(drivetrain.getRightEncoderPosition() - right) < 1;
+        return Math.abs(drivetrain.getLeftDistance() - left) < 1
+            && Math.abs(drivetrain.getRightDistance() - right) < 1;
+
     }
 }
