@@ -100,17 +100,18 @@ public class Drivetrain extends SubsystemBase {
     public static DifferentialDriveVoltageConstraint LowVoltageConstraint =
         new DifferentialDriveVoltageConstraint(LowFeedFoward, DriveKinimatics, MAX_OUTPUT_VOLTAGE);
 
-    private Solenoid shift;
+    private final Solenoid shift;
 
     private boolean oldShift;
 
-    private LEDCall lowShift = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
+    private final LEDCall lowShift =
+            new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
 
-    //for making robot distance consistant across shifts
+    //for making robot distance consistent across shifts
     private double leftDistanceAcum = 0;
     private double rightDistanceAcum = 0;
 
-    private Timer odemetryTime = new Timer();
+    private final Timer odometryTime = new Timer();
     
     /**
      * i am in PAIN wow this is BAD.
@@ -123,8 +124,8 @@ public class Drivetrain extends SubsystemBase {
 
         shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
 
-        odemetryTime.reset();
-        odemetryTime.start();
+        odometryTime.reset();
+        odometryTime.start();
 
 
         odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
@@ -543,7 +544,7 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Gtes the feed foward.
      */
-    public SimpleMotorFeedforward getFeedFoward() {
+    public SimpleMotorFeedforward getFeedForward() {
         if (getShift()) {
             return HighFeedFoward;
         } else {
@@ -552,7 +553,7 @@ public class Drivetrain extends SubsystemBase {
     }
     
     /**
-     * Gets the current volate constaint placed on the drivetrain.
+     * Gets the current volate constant placed on the drivetrain.
      */
     public DifferentialDriveVoltageConstraint getVoltageConstraint() {
         if (getShift()) {
@@ -571,9 +572,9 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized void updateOdometry() {
         //prevemts unnessarly fast updates to the odemetry (2 ms)
-        if (odemetryTime.get() > 0.002) {
+        if (odometryTime.get() > 0.002) {
             odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
-            odemetryTime.reset();
+            odometryTime.reset();
         }
     }
 
