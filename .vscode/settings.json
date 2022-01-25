@@ -25,5 +25,7 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests"
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "java.checkstyle.configuration": "${workspaceFolder}/.github/linters/linter.xml",
+  "java.checkstyle.version": "9.2.1"
 }

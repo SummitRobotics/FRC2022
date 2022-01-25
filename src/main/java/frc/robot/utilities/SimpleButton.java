@@ -7,40 +7,49 @@
 
 package frc.robot.utilities;
 
+import edu.wpi.first.wpilibj2.command.button.Button;
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj2.command.button.Button;
-
 /**
- * takes a button or boolean supplyer and makes a new button that is only true
- * on the rising edge of the press
+ * takes a button or boolean supplier and makes a new button.
+ * Which is only true on the rising edge of the press
  */
 public class SimpleButton extends Button {
 
-	private BooleanSupplier supplier;
-	private boolean last;
+    private final BooleanSupplier supplier;
+    private boolean last;
 
-	public SimpleButton(BooleanSupplier supplier) {
-		this.supplier = supplier;
+    /**
+     * Constructor to create a SimpleButton.
+     *
+     * @param supplier BooleanSupplier
+     */
+    public SimpleButton(BooleanSupplier supplier) {
+        this.supplier = supplier;
 
-		last = false;
-	}
+        last = false;
+    }
 
-	public SimpleButton(Button supplier) {
-		this.supplier = () -> supplier.get();
+    /**
+     * Creates a Simple Button from a Button.
+     *
+     * @param supplier A Button
+     */
+    public SimpleButton(Button supplier) {
+        this.supplier = supplier::get;
 
-		last = false;
-	}
+        last = false;
+    }
 
-	/**
-	 * Returns true only on the rising edge of a button press
-	 */
-	public boolean get() {
-		boolean current = supplier.getAsBoolean();
-		boolean output = !last && current;
+    /**
+     * Returns true only on the rising edge of a button press.
+     */
+    public boolean get() {
+        boolean current = supplier.getAsBoolean();
+        boolean output = !last && current;
 
-		last = current;
+        last = current;
 
-		return output;
-	}
+        return output;
+    }
 }

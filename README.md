@@ -1,6 +1,7 @@
 # FRC 2022
 
 [![CI](https://github.com/SummitRobotics/FRC2022/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SummitRobotics/FRC2022/actions/workflows/main.yml)
+[![GitHub Super-Linter](https://github.com/SummitRobotics/FRC2022/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 Team 5468's 2022 FRC robot code. This code is written in Java and is based off of WPILib's Java control system and utilizes a command based system.
 
@@ -9,7 +10,7 @@ The code is divided into several packages, each responsible for a different aspe
 ## Setup Instructions
 
 ### General
-1. Clone this repo
+1. Clone this repository
 1. Run `./gradlew` to download gradle and needed FRC/Vendor libraries
 1. Run `./gradlew tasks` to see available options
 1. Enjoy!
@@ -32,15 +33,19 @@ The code is divided into several packages, each responsible for a different aspe
 * Run `./gradlew build` to build the code.  Use the `--info` flag for more details
 * Run `./gradlew test` to run all of the JUnit tests
 
-## Variable Naming Conventions
+## Conventions
+
+### Variable Naming Conventions
 - CONSTANT_VARIABLE - Constant variables are all caps with underscores seperating names.
 - normalVariable - Most everything else uses cammelCase.
 - ClassName - All classes use Title Case per normal java convention.
 
-## Branch Naming Conventions
+### Branch Naming Conventions
 - a_branch_name - Generic branches. Mainly feature branches
 - clean_##### or clean_NAME - A branch for cleaning up code
 - dev_##### or dev_NAME - A branch for rapid development (Ex. At comps)
 - fix_##### or fix_NAME - A branch for making thoughout fixes
 - hotfix_##### or hotfix_NAME - A branch for hotfixes
 - \#\#\#\#\# - Number in the format MonthDayIncrement (Ex. for the second cleanup branch on Jan 20 (clean_01202))
+
+#### *Using a modified version Google's Java Format. For exact linting rules goto .github/linters/linter.xml
