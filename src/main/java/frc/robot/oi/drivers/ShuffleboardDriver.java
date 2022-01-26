@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.oi.inputs.ShuffleboardLEDButton;
 import frc.robot.oi.shuffleboardwidgets.DoubleDisplayWidget;
 import frc.robot.oi.shuffleboardwidgets.StatusDisplayWidget;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
