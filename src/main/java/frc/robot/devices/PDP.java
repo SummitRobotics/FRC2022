@@ -14,7 +14,6 @@ public class PDP implements Sendable {
 
     public PDP() {
         panel = new PowerDistribution();
-        SmartDashboard.putData("PDP", this);
     }
 
     public void clearStickyFaults() {
@@ -65,7 +64,7 @@ public class PDP implements Sendable {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PDP");
         builder.addDoubleProperty("temperature", this::getTemperature, null);
-        builder.addDoubleProperty("total current", this::getTotalCurrent, null);
+        builder.addDoubleProperty("totalCurrent", this::getTotalCurrent, null);
         builder.addDoubleProperty("voltage", this::getVoltage, null);
 
     }

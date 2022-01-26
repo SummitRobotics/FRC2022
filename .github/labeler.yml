@@ -1,24 +1,30 @@
 # Add Devices label to any edits to Devices
 Devices:
-- any: ['src/main/java/frc/robot/devices/*', 'src/main/java/frc/robot/devices/**/*']
+- src/main/java/frc/robot/devices/*
+- src/main/java/frc/robot/devices/**/*
 
 # Add OI label to any edits to OI
 OI:
-- any: ['src/main/java/frc/robot/oi/*', 'src/main/java/frc/robot/oi/**/*']
+- src/main/java/frc/robot/oi/*
+- src/main/java/frc/robot/oi/**/*
 
 # Add Utilities label to any edits to Utilities
 Utilities:
-- any: ['src/main/java/frc/robot/utilities/*', 'src/main/java/frc/robot/utilities/**/*']
+- src/main/java/frc/robot/utilities/*
+- src/main/java/frc/robot/utilities/**/*
 
 # Add Command label to any edits to a command
 Command:
-- any: ['src/main/java/frc/robot/commands/*', 'src/main/java/frc/robot/commands/**/*']
+- src/main/java/frc/robot/commands/*
+- src/main/java/frc/robot/commands/**/*
 
 # Add Subsystem label to any edits to a subsystem
 
 Subsystem:
-- any: ['src/main/java/frc/robot/subsystems/*', 'src/main/java/frc/robot/subsystems/*/**']
+- src/main/java/frc/robot/subsystems/*
+- src/main/java/frc/robot/subsystems/*/**
 
 # Add Drivetrain label to any edits to the drivetrain sybsystem or any of its commands
 Drivetrain:
-- any: ['src/main/java/frc/robot/subsystems/Drivetrain.java', 'src/main/java/frc/robot/commands/drivetrain/*']
+- src/main/java/frc/robot/subsystems/Drivetrain.java
+- src/main/java/frc/robot/commands/drivetrain/*

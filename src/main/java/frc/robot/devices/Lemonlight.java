@@ -3,6 +3,8 @@ package frc.robot.devices;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.utilities.RollingAverage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,7 @@ import java.util.Arrays;
 /**
  * Device driver for the limelight.
  */
-public class Lemonlight {
+public class Lemonlight implements Sendable {
 
     // TODO - make right
     public static final int X_OFFSET = 0;
@@ -163,9 +165,12 @@ public class Lemonlight {
      * gets a distance estimate of the target using the limelight and trig.
      * You need to check if the limelight has a target before running this
      *
-     * @return the distance estimate
+     * @return the distance estimate or -1 if no target found
      */
     public double getLimelightDistanceEstimateIN() {
+        if (!hasTarget()) {
+            return -1;
+        }
         return ((TARGET_HEIGHT - MOUNT_HEIGHT)
                 / Math.tan(((getVerticalOffset() + Lemonlight.MOUNT_ANGLE) * (Math.PI / 180))))
                 * 0.393701;
@@ -189,13 +194,38 @@ public class Lemonlight {
      *
      * @return custom vision data as an ArrayList of Integers
      */
-    public ArrayList<Integer> getCustomVisionData() {
+    public ArrayList<Double> getCustomVisionData() {
         ArrayList<Number> customVisionData = getCustomVisionDataNumbers();
 
-        ArrayList<Integer> output = new ArrayList<>();
+        ArrayList<Double> output = new ArrayList<>();
 
-        customVisionData.forEach(ele -> output.add(ele.intValue()));
+        customVisionData.forEach(ele -> output.add(ele.doubleValue()));
 
         return output;
+    }
+
+    /**
+     * Dumb method needed for telemetry.
+     *
+     * @return Data in a primitive double array.
+     */
+    private double[] getCustomVisionDataForTelemetry() {
+        ArrayList<Double> data = getCustomVisionData();
+        double[] out = new double[data.size()];
+
+        for (int i = 0; i < data.size(); i++) {
+            out[i] = data.get(i);
+        }
+
+        return out;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Lemonlight");
+        builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
+        builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
+        builder.addDoubleProperty("distanceEstimate", this::getLimelightDistanceEstimateIN, null);
+        builder.addDoubleArrayProperty("", this::getCustomVisionDataForTelemetry, null);
     }
 }

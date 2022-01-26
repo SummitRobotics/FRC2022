@@ -1,5 +1,7 @@
 package frc.robot.devices;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 import frc.robot.utilities.RollingAverage;
@@ -7,7 +9,7 @@ import frc.robot.utilities.RollingAverage;
 /**
  * Class for using the lidar v4.
  */
-public class LidarV4 implements Lidar {
+public class LidarV4 implements Lidar, Sendable {
 
     @SuppressWarnings("CheckStyle")
     private final I2C portI2C;
@@ -118,5 +120,12 @@ public class LidarV4 implements Lidar {
     public int getAverageDistance() {
         readDistance();
         return (int) rollingAverage.getAverage();
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("LidarV4");
+        builder.addDoubleProperty("avgDistance", this::getAverageDistance, null);
+        builder.addDoubleProperty("distance", this::getDistance, null);
     }
 }
