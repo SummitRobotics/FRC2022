@@ -480,7 +480,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Sets the rate at witch the motors ramp up and down in open loop control mode.
+     * Sets the rate at which the motors ramp up and down in open loop control mode.
      *
      * @param rate time in seconds to go from 0 to full power
      */
