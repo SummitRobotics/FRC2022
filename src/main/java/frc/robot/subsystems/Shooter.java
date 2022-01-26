@@ -19,7 +19,10 @@ public class Shooter extends SubsystemBase {
     public static final double
             P = 0,
             I = 0,
-            D = 0;
+            D = 0,
+            FF = 0,
+            IZ = 0,
+            MAX_RPM = 0;
 
     private final CANSparkMax shooterMotor = new CANSparkMax(
             Ports.SHOOTER_MOTOR,
@@ -47,6 +50,9 @@ public class Shooter extends SubsystemBase {
         shooterMotorPIDController.setP(P);
         shooterMotorPIDController.setI(I);
         shooterMotorPIDController.setD(D);
+        shooterMotorPIDController.setFF(FF);
+        shooterMotorPIDController.setIZone(IZ);
+        shooterMotorPIDController.setOutputRange(-1.0, 1.0);
     }
 
     /**
@@ -74,6 +80,7 @@ public class Shooter extends SubsystemBase {
      * @param speed The target speed in RPM.
      */
     public void setMotorTargetSpeed(double speed) {
+        speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
         shooterMotorPIDController.setReference(speed, CANSparkMax.ControlType.kVelocity);
     }
 
@@ -122,11 +129,22 @@ public class Shooter extends SubsystemBase {
 
     /**
      * Sets the ramp rate in a closed environment.
+     * EG. When under PID
      *
      * @param rate The rate to set it to.
      */
     public void setClosedRampRate(double rate) {
         shooterMotor.setClosedLoopRampRate(rate);
+    }
+
+    /**
+     * Sets the ramp rate in an open environment.
+     * EG. When setting the motor power
+     *
+     * @param rate The rate to set it to.
+     */
+    public void setOpenRampRate(double rate) {
+        shooterMotor.setOpenLoopRampRate(rate);
     }
 
     /**
