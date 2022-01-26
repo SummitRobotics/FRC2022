@@ -5,12 +5,17 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem to control the conveyor of the robot.
  */
 public class Conveyor extends SubsystemBase {
+
+    public static final double
+            FRONT_RATE = 0.01,
+            BACK_RATE = 0.01;
 
     // motors
     private final CANSparkMax front = new CANSparkMax(Ports.FRONT_CONVEYOR, MotorType.kBrushless);
@@ -19,6 +24,10 @@ public class Conveyor extends SubsystemBase {
     // encoders
     private final RelativeEncoder frontEncoder = front.getEncoder();
     private final RelativeEncoder backEncoder = back.getEncoder();
+
+    // rate limiters
+    private final ChangeRateLimiter frontRateLimiter = new ChangeRateLimiter(FRONT_RATE);
+    private final ChangeRateLimiter backRateLimiter = new ChangeRateLimiter(BACK_RATE);
 
     public Conveyor() {
         zeroEncoders();
@@ -30,7 +39,7 @@ public class Conveyor extends SubsystemBase {
      * @param power The power of the front motor (between 1 and -1).
      */
     public void setFrontMotorPower(double power) {
-        front.set(power);
+        front.set(frontRateLimiter.getRateLimitedValue(power));
     }
 
     /**
@@ -39,15 +48,15 @@ public class Conveyor extends SubsystemBase {
      * @param power The power of the back motor (between 1 and -1).
      */
     public void setBackMotorPower(double power) {
-        back.set(power);
+        back.set(backRateLimiter.getRateLimitedValue(power));
     }
 
     /**
      * Sets the power of both motors.
      */
     public void setMotorPower(double power) {
-        front.set(power);
-        back.set(power);
+        setBackMotorPower(power);
+        setFrontMotorPower(power);
     }
 
     /**
@@ -113,15 +122,11 @@ public class Conveyor extends SubsystemBase {
     }
 
     /**
-     * Sets how quickly the motors accelerate and decelerate. This is measured in
-     * the number of seconds it takes for the motor to ramp up to full speed.
-     *
-     * @param rate How quickly the motors accelerate and decelerate, measured in the number of
-     *      seconds it takes for the motor to ramp up to full speed.
+     * Resets the rate limiter.
+     * This should only be run when the motor is not moving.
      */
-    public void setOpenRampRate(double rate) {
-        front.setOpenLoopRampRate(rate);
-        back.setOpenLoopRampRate(rate);
+    public void resetRateLimiter() {
+        frontRateLimiter.resetOld();
     }
 
     /**
