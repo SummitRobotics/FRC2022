@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -588,5 +589,23 @@ public class Drivetrain extends SubsystemBase {
         // System.out.println(MPStoRPM(getRightSpeed()));
         // System.out.println(rightEncoder.getVelocity());
         // System.out.println("------------------------");
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Drivetrain");
+
+        builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
+        builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
+        builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
+        builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
+
+        builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
+        builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
+        builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
+        builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
+
+        builder.addBooleanProperty("shifterStatus", this::getShift, null);
+        builder.addDoubleArrayProperty("pidValues", this::getPid, null);
     }
 }

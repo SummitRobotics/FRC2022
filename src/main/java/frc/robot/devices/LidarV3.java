@@ -1,6 +1,8 @@
 package frc.robot.devices;
 
 import edu.wpi.first.hal.I2CJNI;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C.Port;
 import frc.robot.utilities.RollingAverage;
 import java.nio.ByteBuffer;
@@ -8,7 +10,7 @@ import java.nio.ByteBuffer;
 /**
  * Device to manage the Lidar3.
  */
-public class LidarV3 implements Lidar {
+public class LidarV3 implements Lidar, Sendable {
 
     private final RollingAverage rollingAverage;
 
@@ -93,5 +95,12 @@ public class LidarV3 implements Lidar {
         I2CJNI.i2CWrite(port, DEVICE_ADDRESS, byteBuffer, (byte) 1);
         I2CJNI.i2CRead(port, DEVICE_ADDRESS, byteBuffer, (byte) 2);
         return byteBuffer.getShort(0);
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("LidarV3");
+        builder.addDoubleProperty("avgDistance", this::getAverageDistance, null);
+        builder.addDoubleProperty("distance", this::getDistance, null);
     }
 }
