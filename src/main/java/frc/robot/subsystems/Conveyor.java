@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -29,21 +26,19 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Sets the power of the front motor.
-     * 
-     * @param power
+     *
+     * @param power The power of the front motor (between 1 and -1).
      */
     public void setFrontMotorPower(double power) {
-        power = Functions.clampDouble(power, 1.0, -1.0);
         front.set(power);
     }
 
     /**
      * Sets the power of the back motor.
-     * 
-     * @param power
+     *
+     * @param power The power of the back motor (between 1 and -1).
      */
     public void setBackMotorPower(double power) {
-        power = Functions.clampDouble(power, 1.0, -1.0);
         back.set(power);
     }
 
@@ -51,14 +46,13 @@ public class Conveyor extends SubsystemBase {
      * Sets the power of both motors.
      */
     public void setMotorPower(double power) {
-        power = Functions.clampDouble(power, 1.0, -1.0);
         front.set(power);
         back.set(power);
     }
 
     /**
      * Gets the encoder position of the front motor (in rotations).
-     * 
+     *
      * @return position
      */
     public double getFrontEncoderPosition() {
@@ -67,7 +61,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Gets the encoder position of the back motor (in rotations).
-     * 
+     *
      * @return position
      */
     public double getBackEncoderPosition() {
@@ -76,8 +70,8 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Manually sets the front encoder's position (in rotations).
-     * 
-     * @param position
+     *
+     * @param position The front encoder's position in rotations.
      */
     public void setFrontEncoder(double position) {
         frontEncoder.setPosition(position);
@@ -85,8 +79,8 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Manually sets the back encoder's position (in rotations).
-     * 
-     * @param position
+     *
+     * @param position The back encoder's position in rotations.
      */
     public void setBackEncoder(double position) {
         backEncoder.setPosition(position);
@@ -94,8 +88,8 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Gets the speed of the front motor (in RPM).
-     * 
-     * @return speed
+     *
+     * @return speed The speed of the front motor in RPM.
      */
     public double getFrontRPM() {
         return frontEncoder.getVelocity();
@@ -103,8 +97,8 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Gets the speed of the back motor (in RPM).
-     * 
-     * @return speed
+     *
+     * @return speed The speed of the back motor in RPM.
      */
     public double getBackRPM() {
         return backEncoder.getVelocity();
@@ -121,8 +115,9 @@ public class Conveyor extends SubsystemBase {
     /**
      * Sets how quickly the motors accelerate and decelerate. This is measured in
      * the number of seconds it takes for the motor to ramp up to full speed.
-     * 
-     * @param rate
+     *
+     * @param rate How quickly the motors accelerate and decelerate, measured in the number of
+     *      seconds it takes for the motor to ramp up to full speed.
      */
     public void setOpenRampRate(double rate) {
         front.setOpenLoopRampRate(rate);
