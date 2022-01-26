@@ -3,7 +3,6 @@ package frc.robot.devices;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Contains methods for interfacing with the PDP (Power Distribution Panel).
@@ -14,7 +13,6 @@ public class PDP implements Sendable {
 
     public PDP() {
         panel = new PowerDistribution();
-        SmartDashboard.putData("PDP", this);
     }
 
     public void clearStickyFaults() {
