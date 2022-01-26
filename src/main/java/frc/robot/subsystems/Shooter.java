@@ -7,6 +7,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
@@ -28,11 +29,10 @@ public class Shooter extends SubsystemBase {
             Ports.SHOOTER_MOTOR,
             CANSparkMaxLowLevel.MotorType.kBrushless);
 
-    private final DoubleSolenoid hood = new DoubleSolenoid(
+    private final Solenoid hood = new Solenoid(
             Ports.PCM_1,
             PneumaticsModuleType.REVPH,
-            Ports.HOOD_SOLENOID_DOWN,
-            Ports.HOOD_SOLENOID_UP);
+            Ports.HOOD_SOLENOID);
 
     // Pid controller
     private final SparkMaxPIDController shooterMotorPIDController = shooterMotor.getPIDController();
@@ -113,15 +113,6 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * Gets the current shooter position in rotations.
-     *
-     * @return The current shooter position
-     */
-    public double getShooterPosition() {
-        return shooterEncoder.getPosition();
-    }
-
-    /**
      * Gets the current shooter velocity in RPM.
      *
      * @return the shooter velocity in RPM
@@ -164,7 +155,7 @@ public class Shooter extends SubsystemBase {
      */
     public void extendHood() {
         hoodPos = true;
-        hood.set(DoubleSolenoid.Value.kForward);
+        hood.set(true);
     }
 
     /**
@@ -172,7 +163,7 @@ public class Shooter extends SubsystemBase {
      */
     public void retractHood() {
         hoodPos = false;
-        hood.set(DoubleSolenoid.Value.kReverse);
+        hood.set(false);
     }
 
     /**
@@ -187,16 +178,28 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
+     * Sets the hoods position.
+     * True - Hood is extended
+     * False - Hood is retracted
+     *
+     * @param hoodPos The position to set the hood to
+     */
+    public void setHoodPos(boolean hoodPos) {
+        this.hoodPos = hoodPos;
+        hood.set(hoodPos);
+    }
+
+    /**
      * Toggles the hoods position.
      * If the hood was retracted it will extend it and vice versa.
      */
     public void toggleHoodPos() {
         if (hoodPos) {
             hoodPos = false;
-            hood.set(DoubleSolenoid.Value.kReverse);
+            hood.set(false);
         } else {
             hoodPos = true;
-            hood.set(DoubleSolenoid.Value.kForward);
+            hood.set(true);
         }
     }
 }
