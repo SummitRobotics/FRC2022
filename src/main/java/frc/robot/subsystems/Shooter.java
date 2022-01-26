@@ -53,6 +53,8 @@ public class Shooter extends SubsystemBase {
         shooterMotorPIDController.setFF(FF);
         shooterMotorPIDController.setIZone(IZ);
         shooterMotorPIDController.setOutputRange(-1.0, 1.0);
+        
+        zeroEncoders();
     }
 
     /**
@@ -103,9 +105,10 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * Zeros the shooter encoder.
+     * Zeros the shooter encoder(s).
+     * Used the plural version of encoder for consistancy throughout the program.
      */
-    public void zeroEncoder() {
+    public void zeroEncoders() {
         setEncoderValue(0);
     }
 
