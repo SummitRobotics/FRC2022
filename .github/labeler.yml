@@ -24,7 +24,7 @@ Subsystem:
 - src/main/java/frc/robot/subsystems/*
 - src/main/java/frc/robot/subsystems/*/**
 
-# Add Drivetrain label to any edits to the drivetrain sybsystem or any of its commands
+# Add Drivetrain label to any edits to the drivetrain subsystem or any of its commands
 Drivetrain:
 - src/main/java/frc/robot/subsystems/Drivetrain.java
 - src/main/java/frc/robot/commands/drivetrain/*
