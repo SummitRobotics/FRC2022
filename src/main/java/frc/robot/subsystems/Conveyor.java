@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
@@ -22,10 +23,13 @@ public class Conveyor extends SubsystemBase {
     private final RelativeEncoder frontEncoder = front.getEncoder();
     private final RelativeEncoder backEncoder = back.getEncoder();
 
-    public Conveyor() {}
-    
+    public Conveyor() {
+        zeroEncoders();
+    }
+
     /**
      * Sets the power of the front motor.
+     * 
      * @param power
      */
     public void setFrontMotorPower(double power) {
@@ -35,6 +39,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Sets the power of the back motor.
+     * 
      * @param power
      */
     public void setBackMotorPower(double power) {
@@ -50,9 +55,10 @@ public class Conveyor extends SubsystemBase {
         front.set(power);
         back.set(power);
     }
-    
+
     /**
      * Gets the encoder position of the front motor (in rotations).
+     * 
      * @return position
      */
     public double getFrontEncoderPosition() {
@@ -61,6 +67,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Gets the encoder position of the back motor (in rotations).
+     * 
      * @return position
      */
     public double getBackEncoderPosition() {
@@ -69,6 +76,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Manually sets the front encoder's position (in rotations).
+     * 
      * @param position
      */
     public void setFrontEncoder(double position) {
@@ -77,6 +85,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Manually sets the back encoder's position (in rotations).
+     * 
      * @param position
      */
     public void setBackEncoder(double position) {
@@ -85,6 +94,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Gets the speed of the front motor (in RPM).
+     * 
      * @return speed
      */
     public double getFrontRPM() {
@@ -93,6 +103,7 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Gets the speed of the back motor (in RPM).
+     * 
      * @return speed
      */
     public double getBackRPM() {
@@ -108,13 +119,14 @@ public class Conveyor extends SubsystemBase {
     }
 
     /**
-     * Sets how quickly the motors accelerate and decelerate.
-     * This is measured in the number of seconds it takes for the motor to ramp up to full speed.
+     * Sets how quickly the motors accelerate and decelerate. This is measured in
+     * the number of seconds it takes for the motor to ramp up to full speed.
+     * 
      * @param rate
      */
-    public void setClosedRampRate(double rate) {
-        front.setClosedLoopRampRate(rate);
-        back.setClosedLoopRampRate(rate);
+    public void setOpenRampRate(double rate) {
+        front.setOpenLoopRampRate(rate);
+        back.setOpenLoopRampRate(rate);
     }
 
     /**
