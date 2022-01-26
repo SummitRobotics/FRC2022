@@ -8,6 +8,8 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -130,6 +132,9 @@ public class RobotContainer {
         // Configure the button bindings
         setDefaultCommands();
         configureButtonBindings();
+
+        // Init Telemetry
+        initTelemetry();
     }
 
     private void setDefaultCommands() {
@@ -148,6 +153,16 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+    }
+
+    /**
+     * Use this method to init all the subsystems' telemetry stuff.
+     */
+    private void initTelemetry() {
+        SmartDashboard.putData("PDP", pdp);
+        SmartDashboard.putData("Drivetrain", drivetrain);
+        SmartDashboard.putData("Lemonlight", targetingLimelight);
+        SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
     }
 
     /**

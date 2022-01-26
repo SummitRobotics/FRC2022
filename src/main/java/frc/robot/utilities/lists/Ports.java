@@ -31,6 +31,10 @@ public final class Ports {
             SHIFT_SOLENOID_UP = 0,
             SHIFT_SOLENOID_DOWN = 0,
 
+            // shooter
+            SHOOTER_MOTOR = 0,
+            HOOD_SOLENOID = 0,
+
             // LEDs
             LED_PORT = 0,
             LED_LENGTH = 0,
