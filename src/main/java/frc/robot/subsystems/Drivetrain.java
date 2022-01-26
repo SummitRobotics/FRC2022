@@ -542,7 +542,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Gtes the feed foward.
+     * Gets the feed foward.
      */
     public SimpleMotorFeedforward getFeedForward() {
         if (getShift()) {
