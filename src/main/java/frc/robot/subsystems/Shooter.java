@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -201,5 +202,14 @@ public class Shooter extends SubsystemBase {
             hoodPos = true;
             hood.set(true);
         }
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Shooter");
+
+        builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
+        builder.addDoubleProperty("shooterVelocity", this::getShooterVelocity, null);
+        builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
     }
 }
