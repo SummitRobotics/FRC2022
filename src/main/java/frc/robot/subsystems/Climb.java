@@ -272,6 +272,11 @@ public class Climb extends SubsystemBase {
         setRightDetachPos(pos);
         setLeftDetachPos(pos);
     }
+    
+    public void stop() {
+        setLeftMotorPower(0);
+        setRightMotorPower(0);
+    }
 
     /**
      * Function to init telemetry for the climb subsystem.
