@@ -25,7 +25,9 @@ import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
 import frc.robot.oi.drivers.ShuffleboardDriver;
+import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Colors;
@@ -50,6 +52,8 @@ public class RobotContainer {
     // Subsystems
     private final Drivetrain drivetrain;
     private final Shooter shooter;
+    private final Conveyor conveyor;
+    private final Intake intake;
 
     private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PDP pdp;
@@ -82,6 +86,8 @@ public class RobotContainer {
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
         shooter = new Shooter();
+        conveyor = new Conveyor();
+        intake = new Intake();
 
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -169,6 +175,8 @@ public class RobotContainer {
         SmartDashboard.putData("Lemonlight", targetingLimelight);
         SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         SmartDashboard.putData("Shooter", shooter);
+        SmartDashboard.putData("Conveyor", conveyor);
+        SmartDashboard.putData("Intake", intake);
     }
 
     /**
