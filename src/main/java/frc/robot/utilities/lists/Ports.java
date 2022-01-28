@@ -45,5 +45,9 @@ public final class Ports {
 
             // conveyor
             FRONT_CONVEYOR = 0,
-            BACK_CONVEYOR = 0;
+            BACK_CONVEYOR = 0,
+
+            // intake
+            INTAKE_MOTOR = 0,
+            INTAKE_SOLENOID = 0;
 }
