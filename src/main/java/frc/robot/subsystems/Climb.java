@@ -274,7 +274,7 @@ public class Climb extends SubsystemBase {
     }
     
     /**
-     * Stops the motors
+     * Stops the motors.
      */
     public void stop() {
         setLeftMotorPower(0);
