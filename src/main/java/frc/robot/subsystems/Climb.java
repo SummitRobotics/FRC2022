@@ -273,6 +273,9 @@ public class Climb extends SubsystemBase {
         setLeftDetachPos(pos);
     }
     
+    /**
+     * Stops the motors
+     */
     public void stop() {
         setLeftMotorPower(0);
         setRightMotorPower(0);
