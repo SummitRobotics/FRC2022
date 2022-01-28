@@ -54,6 +54,8 @@ public class StatusDisplayWidget extends SubsystemBase {
      *               data is encoded
      * @param color  the css compatible color string to display it in for example #ff0000 or red are
      *               both valid and would be the same
+     * @param name Status name.
+     * @param priority priority of the status message.
      */
     public void addStatus(String name, String status, String color, int priority) {
         changed = true;
@@ -71,6 +73,8 @@ public class StatusDisplayWidget extends SubsystemBase {
      * @param status the message to display. NOTE: status cannot contain any :'s because of the way
      *               data is encoded
      * @param color  the color8bit to display it in
+     * @param name Status name.
+     * @param priority priority of the status message.
      */
     public void addStatus(String name, String status, Color8Bit color, int priority) {
         changed = true;
@@ -83,6 +87,8 @@ public class StatusDisplayWidget extends SubsystemBase {
      * @param status the message to display. NOTE: status cannot contain any :'s because of the way
      *               data is encoded the takes no color and instead uses the color set with {@link
      *               #setDefaultColor(Color8Bit color)}
+     * @param name Status name.
+     * @param priority priority of the status message.
      */
     public void addStatus(String name, String status, int priority) {
         changed = true;

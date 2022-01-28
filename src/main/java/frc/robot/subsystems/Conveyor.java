@@ -44,6 +44,8 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Sets the power of both motors.
+     *
+     * @param power the power to set the motor.
      */
     public void setMotorPower(double power) {
         front.set(power);

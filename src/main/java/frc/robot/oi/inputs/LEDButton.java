@@ -21,6 +21,9 @@ public class LEDButton extends OIButton {
 
     /**
      * Constructor to create a LED Button.
+     *
+     * @param getter a boolean supplier.
+     * @param led the LED for the button.
      */
     public LEDButton(BooleanSupplier getter, LED led) {
         super(getter);

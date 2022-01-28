@@ -28,6 +28,9 @@ public class Konami {
 
     /**
      * STUFF THAT OWEN DID I HAVE NO IDEA WHAT THIS DOES.
+     *
+     * @param testString OWEN DID THIS IDK
+     * @return OWEN DID THIS IDK
      */
     public static Command registeredButtonPress(String testString) {
         return new CommandBase() {
@@ -40,6 +43,8 @@ public class Konami {
 
     /**
      * STUFF THAT OWEN DID I HAVE NO IDEA WHAT THIS DOES.
+     *
+     * @return OWEN DID THIS IDK
      */
     public static Command nonRegisteredButtonPress() {
         return new CommandBase() {

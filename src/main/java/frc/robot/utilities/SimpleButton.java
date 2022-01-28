@@ -43,6 +43,8 @@ public class SimpleButton extends Button {
 
     /**
      * Returns true only on the rising edge of a button press.
+     *
+     * @return only true on the rising edge.
      */
     public boolean get() {
         boolean current = supplier.getAsBoolean();

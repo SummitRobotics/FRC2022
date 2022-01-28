@@ -15,6 +15,8 @@ public class ShuffleboardLEDButton extends LEDButton {
 
     /**
      * Constructor.
+     *
+     * @param entry A network table entry.
      */
     public ShuffleboardLEDButton(NetworkTableEntry entry) {
         this.entry = entry;

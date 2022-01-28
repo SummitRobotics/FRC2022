@@ -23,6 +23,10 @@ public class HomeByEncoder extends CommandBase {
 
     /**
      * Constructor.
+     *
+     * @param toHome subsystem to home.
+     * @param homingPower power to home with.
+     * @param minLoops IDK
      */
     public HomeByEncoder(Homeable toHome, double homingPower, int minLoops) {
         this.toHome = toHome;
@@ -38,6 +42,12 @@ public class HomeByEncoder extends CommandBase {
 
     /**
      * Constructor.
+     *
+     * @param toHome subsystem to home.
+     * @param homingPower power to home with.
+     * @param minLoops IDK
+     * @param reverseLimit IDK
+     * @param forwardLimit IDK
      */
     public HomeByEncoder(
             Homeable toHome,

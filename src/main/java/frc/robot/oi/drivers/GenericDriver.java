@@ -96,8 +96,11 @@ public abstract class GenericDriver {
         return new OIAxis(getAxisGetter(port));
     }
 
+
     /**
      * gets if the joystick is connected to the driver station.
+     *
+     * @return whether the joystick is connected.
      */
     public boolean isConnected() {
         return DriverStation.isJoystickConnected(this.port);
