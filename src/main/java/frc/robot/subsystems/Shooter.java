@@ -67,6 +67,13 @@ public class Shooter extends SubsystemBase {
         power = Functions.clampDouble(power, 1.0, -1.0);
         shooterMotor.set(power);
     }
+    
+    /**
+     * Stops the motor.
+     */
+    public void stop() {
+        setMotorPower(0);
+    }
 
     /**
      * Sets the motor to run at a specific voltage.
