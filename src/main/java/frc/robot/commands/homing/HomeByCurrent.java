@@ -28,6 +28,11 @@ public class HomeByCurrent extends CommandBase {
 
     /**
      * Creates a new HomeByCurrent.
+     *
+     * @param toHome subsystem to home.
+     * @param homingPower power to home with.
+     * @param currentThreshold Amount of current till it is determined
+     *                         that it has reached the hard stop.
      */
     public HomeByCurrent(Homeable toHome, double homingPower, double currentThreshold) {
         this.toHome = toHome;

@@ -47,6 +47,9 @@
     </module>
 
     <module name="TreeWalker">
+        <module name="JavadocMethod">
+            <property name="accessModifiers" value="public"/>
+        </module>
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>

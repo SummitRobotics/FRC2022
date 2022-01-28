@@ -543,7 +543,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Gets the feed foward.
+     * Gets the feed forward.
+     *
+     * @return The motors feed forward.
      */
     public SimpleMotorFeedforward getFeedForward() {
         if (getShift()) {
@@ -554,7 +556,9 @@ public class Drivetrain extends SubsystemBase {
     }
     
     /**
-     * Gets the current volate constant placed on the drivetrain.
+     * Gets the current voltage constant placed on the drivetrain.
+     *
+     * @return the current voltage constraint.
      */
     public DifferentialDriveVoltageConstraint getVoltageConstraint() {
         if (getShift()) {

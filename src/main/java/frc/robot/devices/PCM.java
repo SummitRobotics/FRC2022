@@ -72,6 +72,8 @@ public class PCM {
 
     /**
      * Gets solenoid values.
+     *
+     * @return the solenoids.
      */
     public int getSolenoids() {
         return hub.getSolenoids();
@@ -79,6 +81,8 @@ public class PCM {
 
     /**
      * Gets the module number (useful for initializing Solenoids and DoubleSolenoids).
+     *
+     * @return the module number.
      */
     public int getModuleNumber() {
         return hub.getModuleNumber();

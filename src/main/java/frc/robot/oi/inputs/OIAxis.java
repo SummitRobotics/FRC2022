@@ -23,6 +23,9 @@ public class OIAxis implements Usable {
 
     /**
      * Creates an OI axes this is used for better management.
+     *
+     * @param getter A double supplier
+     * @param deadzone deadzone for the axis.
      */
     public OIAxis(DoubleSupplier getter, double deadzone) {
         this.getter = getter;
