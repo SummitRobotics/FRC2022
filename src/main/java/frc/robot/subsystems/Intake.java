@@ -15,7 +15,20 @@ import frc.robot.utilities.lists.Ports;
  */
 public class Intake extends SubsystemBase {
 
-    public static final double INTAKE_RATE = 0.01;
+    /**
+     * Enum for Intake States.
+     */
+    public enum States {
+        UP,
+        DOWN,
+        UNKNOWN
+    }
+
+    public States state;
+
+    public static final double
+            INTAKE_RATE = 0.01,
+            INTAKE_MOTOR_SPEED = 1;
 
     // motor
     private final CANSparkMax intakeMotor =
@@ -37,6 +50,7 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         zeroEncoder();
+        state = States.UNKNOWN;
     }
 
     /**
@@ -121,6 +135,24 @@ public class Intake extends SubsystemBase {
      */
     public boolean getIntakeSolenoid() {
         return intakeSolenoidPosition;
+    }
+
+    /**
+     * Gets the current state of the intake.
+     *
+     * @return The current intake state.
+     */
+    public States getState() {
+        return state;
+    }
+
+    /**
+     * Sets the state of the intake.
+     *
+     * @param state The state the intake is in.
+     */
+    public void setState(States state) {
+        this.state = state;
     }
 
     @Override
