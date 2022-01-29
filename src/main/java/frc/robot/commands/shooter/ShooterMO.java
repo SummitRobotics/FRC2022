@@ -49,7 +49,7 @@ public class ShooterMO extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setMotorPower(controlAxis.get());
+        shooter.setMotorPower(prioritizedControlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();
         }

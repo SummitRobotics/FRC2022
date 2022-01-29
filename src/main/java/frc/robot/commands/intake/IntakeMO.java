@@ -49,7 +49,7 @@ public class IntakeMO extends CommandBase {
 
     @Override
     public void execute() {
-        intake.setIntakeMotorPower(controlAxis.get());
+        intake.setIntakeMotorPower(prioritizedControlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             intake.toggleIntakeSolenoid();
         }
