@@ -80,7 +80,56 @@ public class ClimbMO extends MOCommand {
         simpleDetachButton = new SimpleButton(detachButton::get);
         simpleLeftDetachButton = new SimpleButton(leftDetachButton::get);
         simpleRightDetachButton = new SimpleButton(rightDetachButton::get);
+
+        this.climb = climb;
+        this.controlAxis = controlAxis;
+        this.simplePivotButton = simplePivotButton;
+        this.simpleDetachButton = simpleDetachButton;
+        this.simpleLeftDetachButton = simpleLeftDetachButton;
+        this.simpleRightDetachButton = simpleRightDetachButton;
         
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        climb.stop();
+    }
+
+    @Override
+    public void execute() {
+        if (leftArmButton.get()) {
+            climb.setLeftMotorPower(controlAxis.get());
+        } else if (rightArmButton.get()) {
+            climb.setRightMotorPower(controlAxis.get());
+        } else {
+            climb.setLeftMotorPower(controlAxis.get());
+            climb.setRightMotorPower(controlAxis.get());
+        }
+
+        if (simplePivotButton.get()) {
+            climb.togglePivotPos();
+        }
+
+        if (simpleDetachButton.get()) {
+            climb.toggleLeftDetachPos();
+            climb.toggleRightDetachPos();
+        } else if (simpleLeftDetachButton.get()) {
+            climb.toggleLeftDetachPos();
+        } else if (simpleRightDetachButton.get()) {
+            climb.toggleRightDetachPos();
+        }
+    }
+
+    @Override 
+    public void end(final boolean interrupted) {
+        super.end(interrupted);
+        climb.stop();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
     }
 }
 
