@@ -9,6 +9,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
@@ -23,7 +24,8 @@ public class Shooter extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            MAX_RPM = 0;
+            MAX_RPM = 0,
+            RATE = 0.05;
 
     private final CANSparkMax shooterMotor = new CANSparkMax(
             Ports.SHOOTER_MOTOR,
@@ -42,6 +44,9 @@ public class Shooter extends SubsystemBase {
 
     // Hood position false - Piston not extended : true - Piston extended
     private boolean hoodPos = false;
+
+    // Rate Limiter
+    private ChangeRateLimiter motorRateLimiter = new ChangeRateLimiter(RATE);
 
     /**
      * Creates a new shooter instance.
@@ -63,8 +68,7 @@ public class Shooter extends SubsystemBase {
      * @param power speed to set the motor to
      */
     public void setMotorPower(double power) {
-        power = Functions.clampDouble(power, 1.0, -1.0);
-        shooterMotor.set(power);
+        shooterMotor.set(motorRateLimiter.getRateLimitedValue(power));
     }
     
     /**
@@ -126,26 +130,6 @@ public class Shooter extends SubsystemBase {
      */
     public double getShooterVelocity() {
         return shooterEncoder.getVelocity();
-    }
-
-    /**
-     * Sets the ramp rate in a closed environment.
-     * EG. When under PID
-     *
-     * @param rate The rate to set it to.
-     */
-    public void setClosedRampRate(double rate) {
-        shooterMotor.setClosedLoopRampRate(rate);
-    }
-
-    /**
-     * Sets the ramp rate in an open environment.
-     * EG. When setting the motor power
-     *
-     * @param rate The rate to set it to.
-     */
-    public void setOpenRampRate(double rate) {
-        shooterMotor.setOpenLoopRampRate(rate);
     }
 
     /**
