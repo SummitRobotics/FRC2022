@@ -281,6 +281,10 @@ public class Climb extends SubsystemBase {
         setRightMotorPower(0);
     }
 
+    public double[] getPID() {
+        return new double[] {P, I, D, FF, IZ};
+    }
+
     /**
      * Function to init telemetry for the climb subsystem.
      */

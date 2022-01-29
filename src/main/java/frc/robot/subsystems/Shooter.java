@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,7 +63,7 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * Sets the motor speed from -1 > value > 1.
+     * Sets the motor speed from -1 < value < 1.
      *
      * @param power speed to set the motor to
      */
@@ -139,7 +138,7 @@ public class Shooter extends SubsystemBase {
      * @return the pid values as an array of doubles.
      */
     public double[] getPID() {
-        return new double[] {P, I, D};
+        return new double[] {P, I, D, FF, IZ};
     }
 
     /**
@@ -186,13 +185,7 @@ public class Shooter extends SubsystemBase {
      * If the hood was retracted it will extend it and vice versa.
      */
     public void toggleHoodPos() {
-        if (hoodPos) {
-            hoodPos = false;
-            hood.set(false);
-        } else {
-            hoodPos = true;
-            hood.set(true);
-        }
+        setHoodPos(!hoodPos);
     }
 
     @Override
