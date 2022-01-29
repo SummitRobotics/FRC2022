@@ -20,7 +20,7 @@ public final class Ports {
             LAUNCHPAD_PORT = 1,
             JOYSTICK_PORT = 2,
 
-            // drivetrain
+            // Drivetrain
             // TODO: Set ports
             LEFT_DRIVE_1 = 0,
             LEFT_DRIVE_2 = 0,
@@ -31,9 +31,16 @@ public final class Ports {
             SHIFT_SOLENOID_UP = 0,
             SHIFT_SOLENOID_DOWN = 0,
 
-            // shooter
+            // Shooter
             SHOOTER_MOTOR = 0,
             HOOD_SOLENOID = 0,
+
+            // Climb
+            LEFT_CLIMB_MOTOR = 0,
+            RIGHT_CLIMB_MOTOR = 0,
+            PIVOT_CLIMB_SOLENOID = 0,
+            LEFT_DETACH_SOLENOID = 0,
+            RIGHT_DETACH_SOLENOID = 0,
 
             // LEDs
             LED_PORT = 0,
