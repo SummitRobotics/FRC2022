@@ -226,8 +226,7 @@ public class Climb extends SubsystemBase {
      * Toggles the position of the pivot.
      */
     public void togglePivotPos() {
-        pivotPos = !pivotPos;
-        setPivotPos(pivotPos);
+        setPivotPos(!pivotPos);
     }
 
     /**
@@ -244,8 +243,7 @@ public class Climb extends SubsystemBase {
      * Toggles the position of the left detach piston.
      */
     public void toggleLeftDetachPos() {
-        leftDetachPos = !leftDetachPos;
-        setLeftDetachPos(leftDetachPos);
+        setLeftDetachPos(!leftDetachPos);
     }
 
     /**
@@ -262,8 +260,7 @@ public class Climb extends SubsystemBase {
      * Toggles the position of the right detach piston.
      */
     public void toggleRightDetachPos() {
-        rightDetachPos = !rightDetachPos;
-        setRightDetachPos(rightDetachPos);
+        setRightDetachPos(!rightDetachPos);
     }
 
     /**
@@ -282,6 +279,10 @@ public class Climb extends SubsystemBase {
     public void stop() {
         setLeftMotorPower(0);
         setRightMotorPower(0);
+    }
+
+    public double[] getPID() {
+        return new double[] {P, I, D, FF, IZ};
     }
 
     /**

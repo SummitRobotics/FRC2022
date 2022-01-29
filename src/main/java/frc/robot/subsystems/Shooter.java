@@ -138,7 +138,7 @@ public class Shooter extends SubsystemBase {
      * @return the pid values as an array of doubles.
      */
     public double[] getPID() {
-        return new double[] {P, I, D};
+        return new double[] {P, I, D, FF, IZ};
     }
 
     /**
@@ -185,8 +185,7 @@ public class Shooter extends SubsystemBase {
      * If the hood was retracted it will extend it and vice versa.
      */
     public void toggleHoodPos() {
-        hoodPos = !hoodPos;
-        hood.toggle();
+        setHoodPos(!hoodPos);
     }
 
     @Override
