@@ -13,18 +13,6 @@ import java.util.Arrays;
  * Device driver for the limelight.
  */
 public class Lemonlight implements Sendable {
-
-    // TODO - make right
-    public static final int X_OFFSET = 0;
-
-    // TODO - set mountAngle and mountHeight
-    public static final double MOUNT_ANGLE = 0;
-
-    // in cm
-    public static final double MOUNT_HEIGHT = 0;
-
-    private static final double TARGET_HEIGHT = 0;
-
     private final NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline, llpython;
 
     private final RollingAverage horizontalSmoothed;
@@ -165,14 +153,19 @@ public class Lemonlight implements Sendable {
      * gets a distance estimate of the target using the limelight and trig.
      * You need to check if the limelight has a target before running this
      *
+     * @param mountAngle Mounting angle of the limelight
+     * @param mountHeight Mounting height of the limelight
+     * @param targetHeight Target Height.
      * @return the distance estimate or -1 if no target found
      */
-    public double getLimelightDistanceEstimateIN() {
+    public double getLimelightDistanceEstimateIN(
+            double mountAngle, double mountHeight, double targetHeight
+    ) {
         if (!hasTarget()) {
             return -1;
         }
-        return ((TARGET_HEIGHT - MOUNT_HEIGHT)
-                / Math.tan(((getVerticalOffset() + Lemonlight.MOUNT_ANGLE) * (Math.PI / 180))))
+        return ((targetHeight - mountHeight)
+                / Math.tan(((getVerticalOffset() + mountAngle) * (Math.PI / 180))))
                 * 0.393701;
     }
 
@@ -205,6 +198,22 @@ public class Lemonlight implements Sendable {
     }
 
     /**
+     * Parses the custom vision data and wraps it into a data class.
+     *
+     * @param data The custom vision data.
+     * @return The custom vision data wrapped in a data class.
+     */
+    public static ArrayList<CustomVisionData> parseVisionData(ArrayList<Double> data) {
+        ArrayList<CustomVisionData> out = new ArrayList<>();
+
+        data.forEach((value) -> {
+            out.add(new CustomVisionData(value));
+        });
+
+        return out;
+    }
+
+    /**
      * Dumb method needed for telemetry.
      *
      * @return Data in a primitive double array.
@@ -225,7 +234,42 @@ public class Lemonlight implements Sendable {
         builder.setSmartDashboardType("Lemonlight");
         builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
         builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
-        builder.addDoubleProperty("distanceEstimate", this::getLimelightDistanceEstimateIN, null);
         builder.addDoubleArrayProperty("", this::getCustomVisionDataForTelemetry, null);
+    }
+
+    /**
+     * Dataclass for Custom Vision Data.
+     */
+    public static class CustomVisionData {
+        private double xAngle;
+        private double yAngle;
+        private Colors color;
+
+        /**
+         * Enum for Ball colors.
+         */
+        public enum Colors {
+            BLUE,
+            RED
+        }
+
+        //TODO STILL NEED TO IMPLEMENT THIS.
+        private CustomVisionData(double data) {
+            xAngle = 0.0;
+            yAngle = 0.0;
+            color = Colors.BLUE;
+        }
+
+        public double getXAngle() {
+            return xAngle;
+        }
+
+        public double getYAngle() {
+            return yAngle;
+        }
+
+        public Colors isBlue() {
+            return color;
+        }
     }
 }
