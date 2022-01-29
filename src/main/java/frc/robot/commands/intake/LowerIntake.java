@@ -8,7 +8,7 @@ import frc.robot.subsystems.Intake;
  */
 public class LowerIntake extends InstantCommand {
 
-    Intake intake;
+    private final Intake intake;
 
     LowerIntake(Intake intake) {
         this.intake = intake;
