@@ -1,35 +1,35 @@
-package frc.robot.commands.shooter;
+package frc.robot.commands.intake;
 
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Intake;
 import frc.robot.utilities.MOCommand;
 import frc.robot.utilities.SimpleButton;
 
 /**
- * Manual override for the shooter.
+ * Manual override for the intake.
  */
-public class ShooterMO extends MOCommand {
-
-    Shooter shooter;
+public class IntakeMO extends MOCommand {
+    
+    Intake intake;
     OIAxis controlAxis;
     OIButton controlButton;
     SimpleButton sb;
 
     /**
-     * Manual override for the shooter.
+     * Manual override for the intake.
      *
-     * @param shooter the shooter subsystem
-     * @param controlAxis the controller axis used to control flywheel speed
-     * @param controlButton the controller button used to control hood position
+     * @param intake the intake subsystem
+     * @param controlAxis the control axis used to control the intake motor
+     * @param controlButton the control button used to control the up/down position of the intake
      * @param sb the SimpleButton
      */
-    public ShooterMO(Shooter shooter, OIAxis controlAxis, OIButton controlButton, SimpleButton sb) {
-        addRequirements(shooter);
+    public IntakeMO(Intake intake, OIAxis controlAxis, OIButton controlButton, SimpleButton sb) {
+        addRequirements(intake);
         addUsed(controlAxis, controlButton);
         sb = new SimpleButton(controlButton::get);
 
-        this.shooter = shooter;
+        this.intake = intake;
         this.controlAxis = controlAxis;
         this.sb = sb;
     }
@@ -37,21 +37,21 @@ public class ShooterMO extends MOCommand {
     @Override
     public void initialize() {
         super.initialize();
-        shooter.stop();
+        intake.stop();
     }
 
     @Override
     public void execute() {
-        shooter.setMotorPower(controlAxis.get());
+        intake.setIntakeMotorPower(controlAxis.get());
         if (sb.get()) {
-            shooter.toggleHoodPos();
+            intake.toggleIntakeSolenoid();
         }
     }
 
     @Override
     public void end(final boolean interrupted) {
         super.end(interrupted);
-        shooter.stop();
+        intake.stop();
     }
 
     @Override
