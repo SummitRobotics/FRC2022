@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.LidarV3;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
 
@@ -29,8 +30,21 @@ public class Conveyor extends SubsystemBase {
     private final ChangeRateLimiter frontRateLimiter = new ChangeRateLimiter(FRONT_RATE);
     private final ChangeRateLimiter backRateLimiter = new ChangeRateLimiter(BACK_RATE);
 
+    // sensors
+    private final LidarV3 lidar = new LidarV3();
+
+    /**
+     * An enum representing the different possible states of a given position in the conveyor.
+     */
+    public enum BallStates {
+        NONE,
+        BLUE,
+        RED
+    }
+
     public Conveyor() {
         zeroEncoders();
+        lidar.startMeasuring();
     }
 
     /**
@@ -137,6 +151,11 @@ public class Conveyor extends SubsystemBase {
     public void stop() {
         front.stopMotor();
         back.stopMotor();
+    }
+
+    @Override
+    public void periodic() {
+
     }
 
     @Override
