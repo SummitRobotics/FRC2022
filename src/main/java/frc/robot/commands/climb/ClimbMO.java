@@ -1,130 +1,113 @@
 package frc.robot.commands.climb;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
-import frc.robot.utilities.MOCommand;
 import frc.robot.utilities.SimpleButton;
+import frc.robot.utilities.lists.AxisPriorities;
 
 /**
  * Manual override for the climber.
  */
-public class ClimbMO extends MOCommand {
+public class ClimbMO extends CommandBase {
 
     // the climb subsystem
     Climb climb;
+
     // control axis for raising and lowering arms
     OIAxis controlAxis;
+    OIAxis.PrioritizedAxis prioritizedControlAxis;
+
     // button for the pivot solenoid
     OIButton pivotButton;
-    // button for both detach solenoids
-    OIButton detachButton;
+    OIButton.PrioritizedButton prioritizedPivotButton;
+
     // button for only the left detach solenoid
     OIButton leftDetachButton;
+    OIButton.PrioritizedButton prioritizedLeftDetachButton;
+
     // button for only the right detach solenoid
     OIButton rightDetachButton;
-    // button to change joystick to only control the left arm
-    OIButton leftArmButton;
-    // button to change the joystick to only control the right arm
-    OIButton rightArmButton;
-    // SimpleButton for pivotButton
-    SimpleButton simplePivotButton;
-    // SimpleButton for detachButton
-    SimpleButton simpleDetachButton;
-    // SimpleButton for leftDetachButton
-    SimpleButton simpleLeftDetachButton;
-    // SimpleButton for rigthDetachButton
-    SimpleButton simpleRightDetachButton;
+    OIButton.PrioritizedButton prioritizedRightDetachButton;
+
+    // button for LeftMotorPower
+    OIButton leftMotorButton;
+    OIButton.PrioritizedButton prioritizedLeftMotorButton;
+
+    // button for rightMotorPower
+    OIButton rightMotorButton;
+    OIButton.PrioritizedButton prioritizedRightMotorButton;
 
     /**
      * Manual override for the climber. Many parameters!
      *
      * @param climb the climb subsystem
      * @param controlAxis control axis for raising and lowering arms
+     * @param leftMotorButton Button to make the axis control the left motor.
+     * @param rightMotorButton Button to make the axis control the right motor.
      * @param pivotButton button for the pivot solenoid
-     * @param detachButton button for both detach solenoids
      * @param leftDetachButton button for only the left detach solenoid
      * @param rightDetachButton button for only the right detach solenoid
-     * @param leftArmButton button to change joystick to only control the left arm
-     * @param rightArmButton button to change the joystick to only control the right arm
-     * @param simplePivotButton SimpleButton for pivotButton
-     * @param simpleDetachButton SimpleButton for detachButton
-     * @param simpleLeftDetachButton SimpleButton for leftDetachButton
-     * @param simpleRightDetachButton SimpleButton for rigthDetachButton
      */
     public ClimbMO(
         Climb climb,
         OIAxis controlAxis,
+        OIButton leftMotorButton,
+        OIButton rightMotorButton,
         OIButton pivotButton,
-        OIButton detachButton,
         OIButton leftDetachButton,
-        OIButton rightDetachButton,
-        OIButton leftArmButton,
-        OIButton rightArmButton,
-        SimpleButton simplePivotButton,
-        SimpleButton simpleDetachButton,
-        SimpleButton simpleLeftDetachButton,
-        SimpleButton simpleRightDetachButton
+        OIButton rightDetachButton
     ) {
         addRequirements(climb);
-        addUsed(
-            controlAxis,
-            pivotButton,
-            detachButton,
-            leftDetachButton,
-            rightDetachButton,
-            leftArmButton,
-            rightArmButton
-        );
-        simplePivotButton = new SimpleButton(pivotButton::get);
-        simpleDetachButton = new SimpleButton(detachButton::get);
-        simpleLeftDetachButton = new SimpleButton(leftDetachButton::get);
-        simpleRightDetachButton = new SimpleButton(rightDetachButton::get);
-
         this.climb = climb;
         this.controlAxis = controlAxis;
-        this.simplePivotButton = simplePivotButton;
-        this.simpleDetachButton = simpleDetachButton;
-        this.simpleLeftDetachButton = simpleLeftDetachButton;
-        this.simpleRightDetachButton = simpleRightDetachButton;
-        
+        this.leftMotorButton = leftMotorButton;
+        this.rightMotorButton = rightMotorButton;
+        this.pivotButton = pivotButton;
+        this.leftDetachButton = leftDetachButton;
+        this.rightDetachButton = rightDetachButton;
     }
 
     @Override
     public void initialize() {
-        super.initialize();
+        prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+
         climb.stop();
     }
 
     @Override
     public void execute() {
-        if (leftArmButton.get()) {
-            climb.setLeftMotorPower(controlAxis.get());
-        } else if (rightArmButton.get()) {
-            climb.setRightMotorPower(controlAxis.get());
+        if (prioritizedLeftMotorButton.get() && prioritizedRightMotorButton.get()) {
+            climb.setMotorPower(prioritizedControlAxis.get());
+        } else if (prioritizedLeftMotorButton.get()) {
+            climb.setLeftMotorPower(prioritizedControlAxis.get());
+        } else if (prioritizedRightMotorButton.get()) {
+            climb.setRightMotorPower(prioritizedControlAxis.get());
         } else {
-            climb.setLeftMotorPower(controlAxis.get());
-            climb.setRightMotorPower(controlAxis.get());
+            climb.setMotorPower(prioritizedControlAxis.get());
         }
 
-        if (simplePivotButton.get()) {
-            climb.togglePivotPos();
-        }
-
-        if (simpleDetachButton.get()) {
-            climb.toggleLeftDetachPos();
-            climb.toggleRightDetachPos();
-        } else if (simpleLeftDetachButton.get()) {
-            climb.toggleLeftDetachPos();
-        } else if (simpleRightDetachButton.get()) {
-            climb.toggleRightDetachPos();
-        }
+        climb.setPivotPos(prioritizedPivotButton.get());
+        climb.setLeftDetachPos(prioritizedLeftDetachButton.get());
+        climb.setRightDetachPos(prioritizedRightDetachButton.get());
     }
 
-    @Override 
+    @Override
     public void end(final boolean interrupted) {
-        super.end(interrupted);
         climb.stop();
+
+        prioritizedControlAxis.destroy();
+        prioritizedLeftMotorButton.destroy();
+        prioritizedRightMotorButton.destroy();
+        prioritizedPivotButton.destroy();
+        prioritizedLeftDetachButton.destroy();
+        prioritizedRightDetachButton.destroy();
     }
 
     @Override
