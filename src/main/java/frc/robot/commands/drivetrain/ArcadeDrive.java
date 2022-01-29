@@ -37,8 +37,6 @@ public class ArcadeDrive extends CommandBase {
 
     private final boolean isSingleAxis;
 
-    private OIAxis.PrioritizedAxis abc;
-
     /**
      * teleop driver control.
      *
