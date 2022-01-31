@@ -5,6 +5,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.ColorSensor;
+import frc.robot.devices.LidarV3;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
 
@@ -16,6 +18,15 @@ public class Conveyor extends SubsystemBase {
     public static final double
             FRONT_RATE = 0.01,
             BACK_RATE = 0.01;
+
+     /**
+     * Enum tracking what could be in the front or back of the conveyor.
+     */
+    public enum ConveyorState {
+        NONE,
+        BLUE,
+        RED
+    }
 
     // motors
     private final CANSparkMax front = new CANSparkMax(Ports.FRONT_CONVEYOR, MotorType.kBrushless);
@@ -29,8 +40,36 @@ public class Conveyor extends SubsystemBase {
     private final ChangeRateLimiter frontRateLimiter = new ChangeRateLimiter(FRONT_RATE);
     private final ChangeRateLimiter backRateLimiter = new ChangeRateLimiter(BACK_RATE);
 
-    public Conveyor() {
+    // sensors
+    private final ColorSensor colorSensor;
+    private final LidarV3 lidar;
+
+    // tracker variables
+    private ConveyorState frontState;
+    private ConveyorState backState;
+    private String previousColorSensorMeasurement;
+    private String colorSensorMeasurement;
+    private double lidarDistance;
+    private static final double
+        MIN_LIDAR_DISTANCE = 0,
+        MAX_LIDAR_DISTANCE = 0;
+
+    /**
+     * Subsystem to control the conveyor of the robot.
+     *
+     * @param colorSensor the color sensor
+     * @param lidar the lidar
+     */
+    public Conveyor(ColorSensor colorSensor, LidarV3 lidar) {
+        this.colorSensor = colorSensor;
+        this.lidar = lidar;
         zeroEncoders();
+
+        frontState = ConveyorState.NONE;
+        backState = ConveyorState.NONE;
+        previousColorSensorMeasurement = "Unknown";
+        colorSensorMeasurement = "Unknown";
+        lidarDistance = -1.0;
     }
 
     /**
@@ -137,6 +176,35 @@ public class Conveyor extends SubsystemBase {
     public void stop() {
         front.stopMotor();
         back.stopMotor();
+    }
+
+    @Override
+    public void periodic() {
+        previousColorSensorMeasurement = colorSensorMeasurement;
+        colorSensorMeasurement = colorSensor.getColorString();
+        lidarDistance = lidar.getDistance();
+
+        if (colorSensorMeasurement != previousColorSensorMeasurement) {
+            if (MIN_LIDAR_DISTANCE <= lidarDistance && lidarDistance <= MAX_LIDAR_DISTANCE) {
+                backState = frontState;
+
+                if (colorSensor.getColorString() == "Blue") {
+                    frontState = ConveyorState.BLUE;
+                } else if (colorSensor.getColorString() == "Red") {
+                    frontState = ConveyorState.RED;
+                } else {
+                    frontState = ConveyorState.NONE;
+                }
+            }
+        }
+    }
+
+    public ConveyorState getFront() {
+        return frontState;
+    }
+
+    public ConveyorState getBack() {
+        return backState;
     }
 
     @Override

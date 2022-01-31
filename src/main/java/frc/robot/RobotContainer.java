@@ -92,7 +92,7 @@ public class RobotContainer {
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
         shooter = new Shooter();
-        conveyor = new Conveyor();
+        conveyor = new Conveyor(colorSensor, lidarV3);
         intake = new Intake();
 
         autoInit = new SequentialCommandGroup(
