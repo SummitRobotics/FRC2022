@@ -45,6 +45,24 @@ public class ColorSensor implements Sendable {
     }
 
     /**
+     * Returns the raw infrared value detected by the sensor.
+     *
+     * @return IR the raw infrared value detected by the sensor
+     */
+    public double getIR() {
+        return colorSensor.getIR();
+    }
+
+    /**
+     * Returns the raw proximity value detected by the sensor.
+     *
+     * @return proximity the raw proximity value detected by the sensor
+     */
+    public double getProximity() {
+        return colorSensor.getProximity();
+    }
+
+    /**
      * Gets the red value detected by the sensor.
      *
      * @return red the red value detected by the sensor
@@ -115,5 +133,7 @@ public class ColorSensor implements Sendable {
         builder.addDoubleProperty("blue", this::getBlue, null);
         builder.addStringProperty("detected_color", this::getColorString, null);
         builder.addDoubleProperty("confidence", this::getConfidence, null);
+        builder.addDoubleProperty("infrared", this::getIR, null);
+        builder.addDoubleProperty("proximity", this::getProximity, null);
     }
 }
