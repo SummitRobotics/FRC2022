@@ -19,9 +19,9 @@ public class Conveyor extends SubsystemBase {
             FRONT_RATE = 0.01,
             BACK_RATE = 0.01;
 
-     /**
-     * Enum tracking what could be in the front or back of the conveyor.
-     */
+    /**
+    * Enum tracking what could be in the front or back of the conveyor.
+    */
     public enum ConveyorState {
         NONE,
         BLUE,
@@ -50,9 +50,15 @@ public class Conveyor extends SubsystemBase {
     private String previousColorSensorMeasurement;
     private String colorSensorMeasurement;
     private double lidarDistance;
+
+    // Constants storing acceptable distance data
     private static final double
-        MIN_LIDAR_DISTANCE = 0,
-        MAX_LIDAR_DISTANCE = 0;
+        MIN_EXISTS_LIDAR_DISTANCE = 0,
+        MAX_EXISTS_LIDAR_DISTANCE = 0,
+        MIN_QUEUED_LIDAR_DISTANCE = 0,
+        MAX_QUEUED_LIDAR_DISTANCE = 0,
+        MIN_COLOR_SENSOR_DISTANCE = 0,
+        MAX_COLOR_SENSOR_DISTANCE = 0;
 
     /**
      * Subsystem to control the conveyor of the robot.
@@ -182,29 +188,77 @@ public class Conveyor extends SubsystemBase {
     public void periodic() {
         previousColorSensorMeasurement = colorSensorMeasurement;
         colorSensorMeasurement = colorSensor.getColorString();
-        lidarDistance = lidar.getDistance();
+        lidarDistance = lidar.getAverageDistance();
 
         if (colorSensorMeasurement != previousColorSensorMeasurement) {
-            if (MIN_LIDAR_DISTANCE <= lidarDistance && lidarDistance <= MAX_LIDAR_DISTANCE) {
-                backState = frontState;
+            if (colorSensor.getColorString() == "Blue"
+                && MIN_COLOR_SENSOR_DISTANCE <= lidarDistance
+                && lidarDistance <= MAX_COLOR_SENSOR_DISTANCE) {
 
-                if (colorSensor.getColorString() == "Blue") {
-                    frontState = ConveyorState.BLUE;
-                } else if (colorSensor.getColorString() == "Red") {
-                    frontState = ConveyorState.RED;
-                } else {
-                    frontState = ConveyorState.NONE;
-                }
+                backState = frontState;
+                frontState = ConveyorState.BLUE;
+
+            } else if (colorSensor.getColorString() == "Red"
+                && MIN_COLOR_SENSOR_DISTANCE <= lidarDistance
+                && lidarDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+
+                backState = frontState;
+                frontState = ConveyorState.RED;
+
+            } else if (!isBallQueued()) {
+
+                backState = frontState;
+                frontState = ConveyorState.NONE;
             }
         }
     }
 
+    /**
+     * Returns the type of ball present in the position closer to the intake.
+     *
+     * @return the type of ball present in the position closer to the intake
+     */
     public ConveyorState getFront() {
         return frontState;
     }
 
+    /**
+     * Returns the type of ball present in the position further away from the intake.
+     *
+     * @return the type of ball present in the position further away from the intake
+     */
     public ConveyorState getBack() {
         return backState;
+    }
+
+    /**
+     * Returns whether or not there is a ball ready to be fired.
+     * This should be checked by the shooter.
+     *
+     * @return whether or not there is a ball ready to be fired
+     */
+    public boolean isBallQueued() {
+        if (MIN_QUEUED_LIDAR_DISTANCE <= lidarDistance
+            && lidarDistance <= MAX_QUEUED_LIDAR_DISTANCE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns whether or not there is a single ball in the conveyor.
+     * This should be checked by the shooter.
+     *
+     * @return whether or not there is a single ball in the conveyor
+     */
+    public boolean doesBallExist() {
+        if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance
+            && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
