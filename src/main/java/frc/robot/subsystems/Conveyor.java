@@ -45,11 +45,12 @@ public class Conveyor extends SubsystemBase {
     private final LidarV3 lidar;
 
     // tracker variables
-    private ConveyorState frontState;
-    private ConveyorState backState;
-    private String previousColorSensorMeasurement;
-    private String colorSensorMeasurement;
-    private double lidarDistance;
+    private ConveyorState frontState = ConveyorState.NONE;
+    private ConveyorState backState = ConveyorState.NONE;
+    private String previousColorSensorMeasurement = "Unknown";
+    private String colorSensorMeasurement = "Unknown";
+    private double lidarDistance = -1.0;
+    private double colorSensorDistance;
 
     // Constants storing acceptable distance data
     private static final double
@@ -70,12 +71,6 @@ public class Conveyor extends SubsystemBase {
         this.colorSensor = colorSensor;
         this.lidar = lidar;
         zeroEncoders();
-
-        frontState = ConveyorState.NONE;
-        backState = ConveyorState.NONE;
-        previousColorSensorMeasurement = "Unknown";
-        colorSensorMeasurement = "Unknown";
-        lidarDistance = -1.0;
     }
 
     /**
@@ -189,18 +184,25 @@ public class Conveyor extends SubsystemBase {
         previousColorSensorMeasurement = colorSensorMeasurement;
         colorSensorMeasurement = colorSensor.getColorString();
         lidarDistance = lidar.getAverageDistance();
+        colorSensorDistance = colorSensor.getProximity();
 
-        if (colorSensorMeasurement != previousColorSensorMeasurement) {
+        if (lidarDistance >= MAX_EXISTS_LIDAR_DISTANCE) {
+
+            frontState = ConveyorState.NONE;
+            backState = ConveyorState.NONE;
+
+        } else if (colorSensorMeasurement != previousColorSensorMeasurement) {
+
             if (colorSensor.getColorString() == "Blue"
-                && MIN_COLOR_SENSOR_DISTANCE <= lidarDistance
-                && lidarDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
 
                 backState = frontState;
                 frontState = ConveyorState.BLUE;
 
             } else if (colorSensor.getColorString() == "Red"
-                && MIN_COLOR_SENSOR_DISTANCE <= lidarDistance
-                && lidarDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
 
                 backState = frontState;
                 frontState = ConveyorState.RED;
