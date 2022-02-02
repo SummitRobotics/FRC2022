@@ -45,11 +45,11 @@ public class Conveyor extends SubsystemBase {
     private final LidarV3 lidar;
 
     // tracker variables
-    private ConveyorState frontState = ConveyorState.NONE;
-    private ConveyorState backState = ConveyorState.NONE;
-    private String previousColorSensorMeasurement = "Unknown";
-    private String colorSensorMeasurement = "Unknown";
-    private double lidarDistance = -1.0;
+    private ConveyorState frontState;
+    private ConveyorState backState;
+    private String previousColorSensorMeasurement;
+    private String colorSensorMeasurement;
+    private double lidarDistance;
     private double colorSensorDistance;
 
     // Constants storing acceptable distance data
@@ -71,6 +71,12 @@ public class Conveyor extends SubsystemBase {
         this.colorSensor = colorSensor;
         this.lidar = lidar;
         zeroEncoders();
+
+        frontState = ConveyorState.NONE;
+        backState = ConveyorState.NONE;
+        previousColorSensorMeasurement = "Unknown";
+        colorSensorMeasurement = "Unknown";
+        lidarDistance = -1.0;
     }
 
     /**
