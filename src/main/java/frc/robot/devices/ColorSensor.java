@@ -19,6 +19,17 @@ public class ColorSensor implements Sendable {
     private final Color blueTarget;
     private final Color redTarget;
 
+    // The target RGB values for the specific shades of blue and red used for the balls.
+    // We may need to re-adjust these later.
+    private static final double
+        BLUE_TARGET_RED = 0.13989,
+        BLUE_TARGET_GREEN = 0.3818,
+        BLUE_TARGET_BLUE = 0.4787,
+        RED_TARGET_RED = 0.5510,
+        RED_TARGET_GREEN = 0.33178,
+        RED_TARGET_BLUE = 0.1176;
+
+
     /**
      * Creates a new ColorSensor object.
      */
@@ -26,11 +37,29 @@ public class ColorSensor implements Sendable {
         colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
         colorMatcher = new ColorMatch();
 
-        blueTarget = new Color(0.13989, 0.3818, 0.4787);
-        redTarget = new Color(0.5510, 0.33178, 0.1176);
+        blueTarget = new Color(BLUE_TARGET_RED, BLUE_TARGET_GREEN, BLUE_TARGET_BLUE);
+        redTarget = new Color(RED_TARGET_RED, RED_TARGET_GREEN, RED_TARGET_BLUE);
 
         colorMatcher.addColorMatch(blueTarget);
         colorMatcher.addColorMatch(redTarget);
+    }
+
+    /**
+     * Returns the raw infrared value detected by the sensor.
+     *
+     * @return IR the raw infrared value detected by the sensor
+     */
+    public double getIR() {
+        return colorSensor.getIR();
+    }
+
+    /**
+     * Returns the raw proximity value detected by the sensor.
+     *
+     * @return proximity the raw proximity value detected by the sensor
+     */
+    public double getProximity() {
+        return colorSensor.getProximity();
     }
 
     /**
@@ -104,5 +133,7 @@ public class ColorSensor implements Sendable {
         builder.addDoubleProperty("blue", this::getBlue, null);
         builder.addStringProperty("detected_color", this::getColorString, null);
         builder.addDoubleProperty("confidence", this::getConfidence, null);
+        builder.addDoubleProperty("infrared", this::getIR, null);
+        builder.addDoubleProperty("proximity", this::getProximity, null);
     }
 }
