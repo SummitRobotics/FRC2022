@@ -46,4 +46,4 @@ Conveyor:
 # the climb subsystem or any of its commands.
 Climb:
   - src/main/java/frc/robot/subsystems/Climb.java
-  - - src/main/java/frc/robot/commands/climb/*
+  - src/main/java/frc/robot/commands/climb/*
