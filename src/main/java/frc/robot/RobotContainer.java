@@ -163,7 +163,7 @@ public class RobotContainer {
             controller1.leftTrigger,
             controller1.leftX));
 
-        intake.setDefaultCommand(new DefaultIntake(intake));
+        intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
     }
 
     /**
