@@ -192,7 +192,7 @@ public class Conveyor extends SubsystemBase {
         lidarDistance = lidar.getAverageDistance();
         colorSensorDistance = colorSensor.getProximity();
 
-        if (lidarDistance >= MAX_EXISTS_LIDAR_DISTANCE) {
+        if (!doesBallExist()) {
 
             frontState = ConveyorState.NONE;
             backState = ConveyorState.NONE;
@@ -217,7 +217,13 @@ public class Conveyor extends SubsystemBase {
 
                 backState = frontState;
                 frontState = ConveyorState.NONE;
+
             }
+
+        } else if (!isBallQueued()) {
+
+            backState = frontState;
+            frontState = ConveyorState.NONE;
         }
     }
 
