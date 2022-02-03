@@ -19,12 +19,12 @@ public class Intake extends SubsystemBase {
      * Enum for Intake States.
      */
     public enum States {
-        UP,
-        DOWN,
-        UNKNOWN
+        UP(),
+        DOWN(),
+        UNKNOWN();
     }
 
-    public States state;
+    private States state;
 
     public static final double
             INTAKE_RATE = 0.01,
