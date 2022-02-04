@@ -16,32 +16,32 @@ public class ConveyorMO extends CommandBase {
     OIAxis controlAxis;
     OIAxis.PrioritizedAxis prioritizedControlAxis;
 
-    OIButton frontMotor;
-    OIButton.PrioritizedButton prioritizedFrontButton;
+    OIButton beltMotor;
+    OIButton.PrioritizedButton prioritizedBeltButton;
 
-    OIButton backMotor;
-    OIButton.PrioritizedButton prioritizedBackButton;
+    OIButton indexMotor;
+    OIButton.PrioritizedButton prioritizedIndexButton;
 
     /**
      * Manual override for the conveyor.
      *
      * @param conveyor the conveyor subsystem
      * @param controlAxis the controller axis used to manually control the conveyor
-     * @param frontMotor the button to only move the front motor.
-     * @param backMotor the button to only move the rear motor.
+     * @param beltMotor the button to only move the belt motor.
+     * @param indexMotor the button to only move the index motor.
      */
     public ConveyorMO(
             Conveyor conveyor,
             OIAxis controlAxis,
-            OIButton frontMotor,
-            OIButton backMotor
+            OIButton beltMotor,
+            OIButton indexMotor
     ) {
         addRequirements(conveyor);
 
         this.conveyor = conveyor;
         this.controlAxis = controlAxis;
-        this.frontMotor = frontMotor;
-        this.backMotor = backMotor;
+        this.beltMotor = beltMotor;
+        this.indexMotor = indexMotor;
     }
 
     @Override
@@ -49,18 +49,18 @@ public class ConveyorMO extends CommandBase {
         conveyor.stop();
 
         prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedBackButton = backMotor.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedFrontButton = frontMotor.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedBeltButton = beltMotor.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedIndexButton = indexMotor.prioritize(AxisPriorities.MANUAL_OVERRIDE);
     }
 
     @Override
     public void execute() {
-        if (prioritizedFrontButton.get() && prioritizedBackButton.get()) {
+        if (prioritizedBeltButton.get() && prioritizedIndexButton.get()) {
             conveyor.setMotorPower(prioritizedControlAxis.get());
-        } else if (prioritizedFrontButton.get()) {
-            conveyor.setFrontMotorPower(prioritizedControlAxis.get());
-        } else if (prioritizedBackButton.get()) {
-            conveyor.setBackMotorPower(prioritizedControlAxis.get());
+        } else if (prioritizedBeltButton.get()) {
+            conveyor.setBeltMotorPower(prioritizedControlAxis.get());
+        } else if (prioritizedIndexButton.get()) {
+            conveyor.setIndexMotorPower(prioritizedControlAxis.get());
         } else {
             conveyor.setMotorPower(prioritizedControlAxis.get());
         }
@@ -71,8 +71,8 @@ public class ConveyorMO extends CommandBase {
         conveyor.stop();
 
         prioritizedControlAxis.destroy();
-        prioritizedFrontButton.destroy();
-        prioritizedBackButton.destroy();
+        prioritizedBeltButton.destroy();
+        prioritizedIndexButton.destroy();
     }
 
     @Override

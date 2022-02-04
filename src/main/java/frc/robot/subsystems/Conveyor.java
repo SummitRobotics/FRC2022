@@ -16,8 +16,8 @@ import frc.robot.utilities.lists.Ports;
 public class Conveyor extends SubsystemBase {
 
     public static final double
-            FRONT_RATE = 0.01,
-            BACK_RATE = 0.01;
+            BELT_RATE = 0.01,
+            INDEX_RATE = 0.01;
 
     /**
     * Enum tracking what could be in the front or back of the conveyor.
@@ -29,24 +29,24 @@ public class Conveyor extends SubsystemBase {
     }
 
     // motors
-    private final CANSparkMax front = new CANSparkMax(Ports.FRONT_CONVEYOR, MotorType.kBrushless);
-    private final CANSparkMax back = new CANSparkMax(Ports.BACK_CONVEYOR, MotorType.kBrushless);
+    private final CANSparkMax belt = new CANSparkMax(Ports.FRONT_CONVEYOR, MotorType.kBrushless);
+    private final CANSparkMax index = new CANSparkMax(Ports.BACK_CONVEYOR, MotorType.kBrushless);
 
     // encoders
-    private final RelativeEncoder frontEncoder = front.getEncoder();
-    private final RelativeEncoder backEncoder = back.getEncoder();
+    private final RelativeEncoder beltEncoder = belt.getEncoder();
+    private final RelativeEncoder indexEncoder = index.getEncoder();
 
     // rate limiters
-    private final ChangeRateLimiter frontRateLimiter = new ChangeRateLimiter(FRONT_RATE);
-    private final ChangeRateLimiter backRateLimiter = new ChangeRateLimiter(BACK_RATE);
+    private final ChangeRateLimiter beltRateLimiter = new ChangeRateLimiter(BELT_RATE);
+    private final ChangeRateLimiter indexRateLimiter = new ChangeRateLimiter(INDEX_RATE);
 
     // sensors
     private final ColorSensor colorSensor;
     private final LidarV3 lidar;
 
     // tracker variables
-    private ConveyorState frontState;
-    private ConveyorState backState;
+    private ConveyorState beltState;
+    private ConveyorState indexState;
     private String previousColorSensorMeasurement;
     private String colorSensorMeasurement;
     private double lidarDistance;
@@ -56,8 +56,8 @@ public class Conveyor extends SubsystemBase {
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 0,
         MAX_EXISTS_LIDAR_DISTANCE = 0,
-        MIN_QUEUED_LIDAR_DISTANCE = 0,
-        MAX_QUEUED_LIDAR_DISTANCE = 0,
+        MAX_INDEXED_LIDAR_DISTANCE = 0,
+        MIN_INDEXED_LIDAR_DISTANCE = 0,
         MIN_COLOR_SENSOR_DISTANCE = 0,
         MAX_COLOR_SENSOR_DISTANCE = 0;
 
@@ -72,29 +72,29 @@ public class Conveyor extends SubsystemBase {
         this.lidar = lidar;
         zeroEncoders();
 
-        frontState = ConveyorState.NONE;
-        backState = ConveyorState.NONE;
+        beltState = ConveyorState.NONE;
+        indexState = ConveyorState.NONE;
         previousColorSensorMeasurement = "Unknown";
         colorSensorMeasurement = "Unknown";
         lidarDistance = -1.0;
     }
 
     /**
-     * Sets the power of the front motor.
+     * Sets the power of the belt motor.
      *
-     * @param power The power of the front motor (between 1 and -1).
+     * @param power The power of the belt motor (between 1 and -1).
      */
-    public void setFrontMotorPower(double power) {
-        front.set(frontRateLimiter.getRateLimitedValue(power));
+    public void setBeltMotorPower(double power) {
+        belt.set(beltRateLimiter.getRateLimitedValue(power));
     }
 
     /**
-     * Sets the power of the back motor.
+     * Sets the power of the index motor.
      *
-     * @param power The power of the back motor (between 1 and -1).
+     * @param power The power of the index motor (between 1 and -1).
      */
-    public void setBackMotorPower(double power) {
-        back.set(backRateLimiter.getRateLimitedValue(power));
+    public void setIndexMotorPower(double power) {
+        index.set(indexRateLimiter.getRateLimitedValue(power));
     }
 
     /**
@@ -103,86 +103,87 @@ public class Conveyor extends SubsystemBase {
      * @param power the power to set the motor.
      */
     public void setMotorPower(double power) {
-        setBackMotorPower(power);
-        setFrontMotorPower(power);
+        setIndexMotorPower(power);
+        setBeltMotorPower(power);
     }
 
     /**
-     * Gets the encoder position of the front motor (in rotations).
+     * Gets the encoder position of the belt motor (in rotations).
      *
      * @return position
      */
-    public double getFrontEncoderPosition() {
-        return frontEncoder.getPosition();
+    public double getBeltEncoderPosition() {
+        return beltEncoder.getPosition();
     }
 
     /**
-     * Gets the encoder position of the back motor (in rotations).
+     * Gets the encoder position of the index motor (in rotations).
      *
      * @return position
      */
-    public double getBackEncoderPosition() {
-        return backEncoder.getPosition();
+    public double getIndexEncoderPosition() {
+        return indexEncoder.getPosition();
     }
 
     /**
-     * Manually sets the front encoder's position (in rotations).
+     * Manually sets the belt encoder's position (in rotations).
      *
-     * @param position The front encoder's position in rotations.
+     * @param position The belt encoder's position in rotations.
      */
-    public void setFrontEncoder(double position) {
-        frontEncoder.setPosition(position);
+    public void setBeltEncoder(double position) {
+        beltEncoder.setPosition(position);
     }
 
     /**
-     * Manually sets the back encoder's position (in rotations).
+     * Manually sets the index encoder's position (in rotations).
      *
-     * @param position The back encoder's position in rotations.
+     * @param position The index encoder's position in rotations.
      */
-    public void setBackEncoder(double position) {
-        backEncoder.setPosition(position);
+    public void setIndexEncoder(double position) {
+        indexEncoder.setPosition(position);
     }
 
     /**
-     * Gets the speed of the front motor (in RPM).
+     * Gets the speed of the belt motor (in RPM).
      *
      * @return speed The speed of the front motor in RPM.
      */
-    public double getFrontRPM() {
-        return frontEncoder.getVelocity();
+    public double getBeltRPM() {
+        return beltEncoder.getVelocity();
     }
 
     /**
-     * Gets the speed of the back motor (in RPM).
+     * Gets the speed of the index motor (in RPM).
      *
      * @return speed The speed of the back motor in RPM.
      */
-    public double getBackRPM() {
-        return backEncoder.getVelocity();
+    public double getIndexRPM() {
+        return indexEncoder.getVelocity();
     }
 
     /**
      * Resets the encoder values to 0.
      */
     public void zeroEncoders() {
-        setFrontEncoder(0);
-        setBackEncoder(0);
+        setBeltEncoder(0);
+        setIndexEncoder(0);
     }
 
     /**
-     * Resets the rate limiter.
-     * This should only be run when the motor is not moving.
+     * Resets the rate limiters.
+     * This should only be run when the motors are not moving.
      */
     public void resetRateLimiter() {
-        frontRateLimiter.resetOld();
+        beltRateLimiter.resetOld();
+        indexRateLimiter.resetOld();
     }
 
     /**
      * Stops both motors.
      */
     public void stop() {
-        front.stopMotor();
-        back.stopMotor();
+        belt.stopMotor();
+        index.stopMotor();
     }
 
     @Override
@@ -192,38 +193,40 @@ public class Conveyor extends SubsystemBase {
         lidarDistance = lidar.getAverageDistance();
         colorSensorDistance = colorSensor.getProximity();
 
-        if (!doesBallExist()) {
+        if (getBeltRPM() > 0 || getIndexRPM() > 0) {
+            if (!doesBallExist()) {
 
-            frontState = ConveyorState.NONE;
-            backState = ConveyorState.NONE;
+                beltState = ConveyorState.NONE;
+                indexState = ConveyorState.NONE;
 
-        } else if (colorSensorMeasurement != previousColorSensorMeasurement) {
+            } else if (colorSensorMeasurement != previousColorSensorMeasurement) {
 
-            if (colorSensor.getColorString() == "Blue"
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                if (colorSensor.getColorString() == "Blue"
+                    && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                    && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
 
-                backState = frontState;
-                frontState = ConveyorState.BLUE;
+                    indexState = beltState;
+                    beltState = ConveyorState.BLUE;
 
-            } else if (colorSensor.getColorString() == "Red"
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                } else if (colorSensor.getColorString() == "Red"
+                    && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                    && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
 
-                backState = frontState;
-                frontState = ConveyorState.RED;
+                    indexState = beltState;
+                    beltState = ConveyorState.RED;
 
-            } else if (!isBallQueued()) {
+                } else if (!isBallIndexed()) {
 
-                backState = frontState;
-                frontState = ConveyorState.NONE;
+                    indexState = beltState;
+                    beltState = ConveyorState.NONE;
 
+                }
+
+            } else if (!isBallIndexed()) {
+
+                indexState = beltState;
+                beltState = ConveyorState.NONE;
             }
-
-        } else if (!isBallQueued()) {
-
-            backState = frontState;
-            frontState = ConveyorState.NONE;
         }
     }
 
@@ -232,8 +235,8 @@ public class Conveyor extends SubsystemBase {
      *
      * @return the type of ball present in the position closer to the intake
      */
-    public ConveyorState getFront() {
-        return frontState;
+    public ConveyorState getBeltState() {
+        return beltState;
     }
 
     /**
@@ -241,8 +244,8 @@ public class Conveyor extends SubsystemBase {
      *
      * @return the type of ball present in the position further away from the intake
      */
-    public ConveyorState getBack() {
-        return backState;
+    public ConveyorState getIndexState() {
+        return indexState;
     }
 
     /**
@@ -251,9 +254,9 @@ public class Conveyor extends SubsystemBase {
      *
      * @return whether or not there is a ball ready to be fired
      */
-    public boolean isBallQueued() {
-        if (MIN_QUEUED_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_QUEUED_LIDAR_DISTANCE) {
+    public boolean isBallIndexed() {
+        if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
+            && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
             return true;
         } else {
             return false;
@@ -278,9 +281,11 @@ public class Conveyor extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("conveyor");
-        builder.addDoubleProperty("front_motor_position", this::getFrontEncoderPosition, null);
-        builder.addDoubleProperty("back_motor_position", this::getBackEncoderPosition, null);
-        builder.addDoubleProperty("front_motor_speed", this::getFrontRPM, null);
-        builder.addDoubleProperty("back_motor_speed", this::getBackRPM, null);
+        builder.addDoubleProperty("belt_motor_position", this::getBeltEncoderPosition, null);
+        builder.addDoubleProperty("index_motor_position", this::getIndexEncoderPosition, null);
+        builder.addDoubleProperty("belt_motor_speed", this::getBeltRPM, null);
+        builder.addDoubleProperty("index_motor_speed", this::getIndexRPM, null);
+        builder.addStringProperty("beltState", () -> this.getBeltState().toString(), null);
+        builder.addStringProperty("indexState", () -> this.getIndexState().toString(), null);
     }
 }
