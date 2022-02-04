@@ -1,7 +1,6 @@
 package frc.robot.utilities;
 
 import frc.robot.devices.Lemonlight;
-
 import java.util.ArrayList;
 
 /**
@@ -145,7 +144,7 @@ public class CustomVisionData {
     public static CustomVisionData calculateBestBall(ArrayList<CustomVisionData> data) {
         CustomVisionData best = data.get(0);
         for (CustomVisionData ele : data) {
-            if (best.getDistance() > ele.getDistance()) {
+            if (ele.isValid && best.getDistance() > ele.getDistance()) {
                 best = ele;
             }
         }
