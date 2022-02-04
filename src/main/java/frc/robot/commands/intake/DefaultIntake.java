@@ -1,8 +1,6 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Intake;
@@ -34,21 +32,15 @@ public class DefaultIntake extends CommandBase {
     @Override
     public void execute() {
         switch (intake.getState()) {
-            case UP:
-                intake.setIntakeMotorPower(0);
-                return;
             case DOWN:
-                intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
-                if ((conveyor.getFront() == ConveyorState.BLUE 
-                    || conveyor.getFront() == ConveyorState.RED)
-                    && (conveyor.getBack() == ConveyorState.BLUE
-                    || conveyor.getBack() == ConveyorState.RED)) {
-                    CommandScheduler.getInstance().schedule(new RaiseIntake(intake));
+                if (!(conveyor.getFront() == ConveyorState.NONE)
+                    && !(conveyor.getBack() == ConveyorState.NONE)) {
+                    intake.setIntakeMotorPower(-1.0);
+                } else {
+                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
                 }
                 break;
-            case UNKNOWN:
             default:
-                CommandScheduler.getInstance().schedule(new RaiseIntake(intake));
                 break;
         }
     }

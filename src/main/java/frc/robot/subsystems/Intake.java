@@ -21,7 +21,6 @@ public class Intake extends SubsystemBase {
     public enum States {
         UP,
         DOWN,
-        UNKNOWN
     }
 
     public States state;
@@ -50,7 +49,7 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         zeroEncoder();
-        state = States.UNKNOWN;
+        state = States.UP;
     }
 
     /**
