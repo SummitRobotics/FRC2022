@@ -193,13 +193,14 @@ public class Conveyor extends SubsystemBase {
         lidarDistance = lidar.getAverageDistance();
         colorSensorDistance = colorSensor.getProximity();
 
-        if (getBeltRPM() > 0 || getIndexRPM() > 0) {
-            if (!doesBallExist()) {
+        if (!doesBallExist()) {
 
-                beltState = ConveyorState.NONE;
-                indexState = ConveyorState.NONE;
+            beltState = ConveyorState.NONE;
+            indexState = ConveyorState.NONE;
 
-            } else if (colorSensorMeasurement != previousColorSensorMeasurement) {
+        } else if (getBeltRPM() > 0 || getIndexRPM() > 0) {
+
+            if (colorSensorMeasurement != previousColorSensorMeasurement) {
 
                 if (colorSensor.getColorString() == "Blue"
                     && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
@@ -227,6 +228,30 @@ public class Conveyor extends SubsystemBase {
                 indexState = beltState;
                 beltState = ConveyorState.NONE;
             }
+
+        } else if (getBeltRPM() < 0) {
+
+            // Code run if the belt is moving backwards.
+            if ((colorSensorMeasurement != previousColorSensorMeasurement)
+                && (MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE)
+                && ((colorSensor.getColorString() == "Blue"
+                && (beltState == ConveyorState.BLUE
+                || (indexState == ConveyorState.BLUE
+                && !isBallIndexed())))
+                || (colorSensor.getColorString() == "Red"
+                && (beltState == ConveyorState.RED
+                || (indexState == ConveyorState.RED
+                && !isBallIndexed()))))) {
+
+                beltState = ConveyorState.NONE;
+
+                if (!isBallIndexed()) {
+
+                    indexState = ConveyorState.NONE;
+
+                }
+            }
         }
     }
 
@@ -241,10 +266,13 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Returns the type of ball present in the position further away from the intake.
+     * Note: To keep the logic simple, the conveyor code automatically assigns the
+     * furthest-along ball to the indexed state, even if it has not gotten off the conveyor yet.
+     * Check isBallIndexed to see if the ball is actually ready.
      *
      * @return the type of ball present in the position further away from the intake
      */
-    public ConveyorState getIndexState() {
+    public ConveyorState getWillBeIndexedState() {
         return indexState;
     }
 
@@ -285,7 +313,8 @@ public class Conveyor extends SubsystemBase {
         builder.addDoubleProperty("index_motor_position", this::getIndexEncoderPosition, null);
         builder.addDoubleProperty("belt_motor_speed", this::getBeltRPM, null);
         builder.addDoubleProperty("index_motor_speed", this::getIndexRPM, null);
-        builder.addStringProperty("beltState", () -> this.getBeltState().toString(), null);
-        builder.addStringProperty("indexState", () -> this.getIndexState().toString(), null);
+        builder.addStringProperty("belt_ball", () -> this.getBeltState().toString(), null);
+        builder.addStringProperty("will_be_indexed_ball",
+            () -> this.getWillBeIndexedState().toString(), null);
     }
 }
