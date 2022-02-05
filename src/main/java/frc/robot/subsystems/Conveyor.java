@@ -51,6 +51,11 @@ public class Conveyor extends SubsystemBase {
     private String colorSensorMeasurement;
     private double lidarDistance;
     private double colorSensorDistance;
+    private boolean isBallIndexed;
+    private boolean wasBallIndexed;
+    private boolean doesBallExist;
+    private double beltRPM;
+    private double indexRPM;
 
     // Constants storing acceptable distance data
     private static final double
@@ -77,6 +82,11 @@ public class Conveyor extends SubsystemBase {
         previousColorSensorMeasurement = "Unknown";
         colorSensorMeasurement = "Unknown";
         lidarDistance = -1.0;
+        wasBallIndexed = false;
+        isBallIndexed = getIsBallIndexed();
+        doesBallExist = getDoesBallExist();
+        beltRPM = getBeltRPM();
+        indexRPM = getIndexRPM();
     }
 
     /**
@@ -188,69 +198,119 @@ public class Conveyor extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        // Set tracker variables to prevent weird stuff from happening
+        // if measurements change mid-cycle.
         previousColorSensorMeasurement = colorSensorMeasurement;
         colorSensorMeasurement = colorSensor.getColorString();
         lidarDistance = lidar.getAverageDistance();
         colorSensorDistance = colorSensor.getProximity();
+        wasBallIndexed = isBallIndexed;
+        isBallIndexed = getIsBallIndexed();
+        doesBallExist = getDoesBallExist();
+        beltRPM = getBeltRPM();
+        indexRPM = getIndexRPM();
 
-        if (!doesBallExist()) {
+        if (!doesBallExist) {
 
+            // If no balls are detected, both states are set to none.
             beltState = ConveyorState.NONE;
             indexState = ConveyorState.NONE;
 
-        } else if (getBeltRPM() > 0 || getIndexRPM() > 0) {
+        } else if (beltRPM > 0) {
+            // If the belt is moving forwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement
+                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                // If we detect a different measurement and it seems valid...
 
-                if (colorSensor.getColorString() == "Blue"
-                    && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                    && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                if (colorSensor.getColorString() == "Blue") {
+                    // If the measurement is blue...
+                    
+                    // Update the states based on what they currently are.
+                    if (indexState == ConveyorState.NONE) {
+                        indexState = beltState;
+                        beltState = ConveyorState.BLUE;
+                    } else {
+                        beltState = ConveyorState.BLUE;
+                    }
 
-                    indexState = beltState;
-                    beltState = ConveyorState.BLUE;
+                } else if (colorSensor.getColorString() == "Red") {
+                    // If the measurement is red...
 
-                } else if (colorSensor.getColorString() == "Red"
-                    && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                    && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
-
-                    indexState = beltState;
-                    beltState = ConveyorState.RED;
-
-                } else if (!isBallIndexed()) {
-
-                    indexState = beltState;
-                    beltState = ConveyorState.NONE;
-
+                    // Update the states based on what they currently are.
+                    if (indexState == ConveyorState.NONE) {
+                        indexState = beltState;
+                        beltState = ConveyorState.RED;
+                    } else {
+                        beltState = ConveyorState.RED;
+                    }
                 }
+            }
+            
+            if (indexRPM > 0
+                && indexState != ConveyorState.NONE
+                && wasBallIndexed
+                && !isBallIndexed) {
+                // If we probably fired the indexed ball...
 
-            } else if (!isBallIndexed()) {
-
+                // Update the ball states.
                 indexState = beltState;
                 beltState = ConveyorState.NONE;
             }
 
-        } else if (getBeltRPM() < 0) {
+        } else if (beltRPM < 0) {
+            // If the belt was manually overridden to run backwards...
 
-            // Code run if the belt is moving backwards.
-            if ((colorSensorMeasurement != previousColorSensorMeasurement)
-                && (MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE)
-                && ((colorSensor.getColorString() == "Blue"
-                && (beltState == ConveyorState.BLUE
-                || (indexState == ConveyorState.BLUE
-                && !isBallIndexed())))
-                || (colorSensor.getColorString() == "Red"
-                && (beltState == ConveyorState.RED
-                || (indexState == ConveyorState.RED
-                && !isBallIndexed()))))) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement
+                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                // If we detect a different measurement and it seems valid...
 
-                beltState = ConveyorState.NONE;
+                if ((colorSensorMeasurement == "Blue"
+                    && beltState == ConveyorState.BLUE)
+                    || (colorSensorMeasurement == "Red"
+                    && beltState == ConveyorState.RED)) {
+                    // If that measurement matches beltState...
 
-                if (!isBallIndexed()) {
+                    beltState = ConveyorState.NONE;
+
+                } else if (beltState == ConveyorState.NONE
+                    && ((colorSensorMeasurement == "Red"
+                    && indexState == ConveyorState.RED
+                    && !isBallIndexed)
+                    || (colorSensorMeasurement == "Blue"
+                    && indexState == ConveyorState.BLUE
+                    && !isBallIndexed))) {
+                    // If that measurement matches indexState, the ball is not yet indexed, and
+                    // beltState is currently empty...
 
                     indexState = ConveyorState.NONE;
 
                 }
+            }
+            
+            if (indexRPM > 0
+                && indexState != ConveyorState.NONE
+                && wasBallIndexed
+                && !isBallIndexed) {
+                // If we probably fired the indexed ball...
+
+                indexState = ConveyorState.NONE;
+
+            }
+
+        } else {
+
+            if (indexRPM > 0
+                && indexState != ConveyorState.NONE
+                && wasBallIndexed
+                && !isBallIndexed) {
+                // If the belt is stationary, but we probably still fired the indexed ball...
+
+                indexState = ConveyorState.NONE;
+
             }
         }
     }
@@ -282,7 +342,7 @@ public class Conveyor extends SubsystemBase {
      *
      * @return whether or not there is a ball ready to be fired
      */
-    public boolean isBallIndexed() {
+    public boolean getIsBallIndexed() {
         if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
             && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
             return true;
@@ -297,7 +357,7 @@ public class Conveyor extends SubsystemBase {
      *
      * @return whether or not there is a single ball in the conveyor
      */
-    public boolean doesBallExist() {
+    public boolean getDoesBallExist() {
         if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance
             && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
             return true;
