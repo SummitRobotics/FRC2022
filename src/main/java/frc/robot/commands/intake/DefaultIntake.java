@@ -16,8 +16,8 @@ public class DefaultIntake extends CommandBase {
     /**
      * Default command for Intake.
      *
-     * @param intake the intake
-     * @param conveyor the conveyor
+     * @param intake The intake
+     * @param conveyor The conveyor
      */
     public DefaultIntake(Intake intake, Conveyor conveyor) {
         addRequirements(intake, conveyor);
@@ -33,8 +33,8 @@ public class DefaultIntake extends CommandBase {
     public void execute() {
         switch (intake.getState()) {
             case DOWN:
-                if (!(conveyor.getFront() == ConveyorState.NONE)
-                    && !(conveyor.getBack() == ConveyorState.NONE)) {
+                if (conveyor.getFront() != ConveyorState.NONE
+                    && conveyor.getBack() != ConveyorState.NONE) {
                     intake.setIntakeMotorPower(-1.0);
                 } else {
                     intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
