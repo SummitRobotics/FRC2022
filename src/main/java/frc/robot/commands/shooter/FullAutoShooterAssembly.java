@@ -1,19 +1,20 @@
 package frc.robot.commands.shooter;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
+import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import java.lang.Math;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.subsystems.Conveyor.ConveyorState;
 
 
 
@@ -34,11 +35,10 @@ public class FullAutoShooterAssembly extends CommandBase {
     private NetworkTableEntry hood;
     private boolean hoodAngle;
     private double motorPower;
+    private double motorSpeed;
     private NetworkTable limTable;
-    // devices
-    private Lemonlight limelight;
-
-
+    private ConveyorState indexState;
+    private boolean isBallIndexed;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -55,32 +55,32 @@ public class FullAutoShooterAssembly extends CommandBase {
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;
+        this.limelight = limelight;
         addRequirements(shooter);
     }
+
     // constants
-    private final double TARGET_MOTOR_SPEED = 0;
+    private static final double TARGET_MOTOR_SPEED = 0;
 
     // devices
     private Lemonlight limelight = new Lemonlight("Shooter");
 
     /**
      * Finds the distance between the limelight and the target.
-     *
-     * @param tx The angle, in degrees of the camera.
-     * @return distance The distance between the limelight and the target, in feet.
      */
     @Override
-    public void initialize(){
+    public void initialize() {
         hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
         speedTable = NetworkTableInstance.getDefault().getTable("RPM");
         shooter.stop();
-        if (DriverStation.getAlliance().toString() == "kRed"){
+        if (DriverStation.getAlliance().toString() == "kRed") {
             teamClrIsBlue = ConveyorState.RED;
-        }else{
+        } else {
             teamClrIsBlue = ConveyorState.BLUE;
         }
         
     }
+
     @Override
     public void execute() {        
         motorSpeed = shooter.getShooterVelocity();
@@ -92,8 +92,8 @@ public class FullAutoShooterAssembly extends CommandBase {
         motorPower = speed.getDouble(0);
         indexState = conveyor.getWillBeIndexedState();
         isBallIndexed = conveyor.getIsBallIndexed();
-        if (isBallIndexed && indexState == teamClrIsBlue)
-        if (motorSpeed != motorPower){
+        if (isBallIndexed && indexState == teamClrIsBlue) { /* */ }
+        if (motorSpeed != motorPower) {
             shooter.setMotorTargetSpeed(motorPower);
         }
         if (hoodAngle != shooter.getHoodPos()) {
