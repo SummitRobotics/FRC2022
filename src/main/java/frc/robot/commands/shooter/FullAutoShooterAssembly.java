@@ -10,23 +10,36 @@ import frc.robot.subsystems.Drivetrain;
 import java.lang.Math;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import edu.wpi.first.wpilibj.DriverStation;
+
 
 /**
  * Command for running the shooter in full auto mode.
  */
 public class FullAutoShooterAssembly extends CommandBase {
-
+    private DriverStation driverStation;
     private Shooter shooter;
     private Conveyor conveyor;
+    private boolean teamClrIsBlue;
     /**
      * Command for running the shooter in full auto mode.
      *
      * @param shooter The shooter subsystem.
      */
-    public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor) {
+    public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor, DriverStation driverStation) {
         this.shooter = shooter;
         this.conveyor = conveyor;
-        addRequirements(shooter);
+        this.driverStation = driverStation;
+        
+        if (driverStation.getAlliance().toString() == "kRed"){
+            teamClrIsBlue = false;
+        }else{
+            teamClrIsBlue = true;
+        }
+        this.teamClrIsBlue = teamClrIsBlue;
+        addRequirements(shooter, conveyor);
+        
+
     }
 
     public double distanceFinder(double tx){
@@ -39,7 +52,6 @@ public class FullAutoShooterAssembly extends CommandBase {
     }
     @Override
     public void execute() {
-        
         double distance;
         NetworkTable limTable = NetworkTableInstance.getDefault().getTable("limelight");
         NetworkTable hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
@@ -54,6 +66,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         double motorPower = speed.getDouble(0);
         shooter.setHoodPos(HoodAngle);
         shooter.setMotorPower(motorPower);
+        
         
 
     
