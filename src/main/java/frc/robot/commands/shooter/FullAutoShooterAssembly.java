@@ -1,12 +1,13 @@
 package frc.robot.commands.shooter;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Shooter;
 import java.lang.Math;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -16,12 +17,26 @@ import java.util.ArrayList;
  */
 public class FullAutoShooterAssembly extends CommandBase {
 
+    // subsystems
     private Shooter shooter;
     private Conveyor conveyor;
+
+    // other variables
+    private NetworkTable hoodTable;
+    private NetworkTable speedTable;
+    private NetworkTableEntry tx;
+    private double distance;
+    private NetworkTableEntry speed;
+    private NetworkTableEntry hood;
+    private boolean hoodAngle;
+    private double motorPower;
+
+
     /**
      * Command for running the shooter in full auto mode.
      *
      * @param shooter The shooter subsystem.
+     * @param conveyor The conveyor subsystem.
      */
     public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor) {
         this.shooter = shooter;
@@ -29,7 +44,13 @@ public class FullAutoShooterAssembly extends CommandBase {
         addRequirements(shooter);
     }
 
-    public double distanceFinder(double tx){
+    /**
+     * Finds the distance between the limelight and the target.
+     *
+     * @param tx The angle, in degrees of the camera.
+     * @return distance The distance between the limelight and the target, in feet.
+     */
+    public double distanceFinder(double tx) {
         double startingAngle = 40;
         startingAngle += tx;
         double distance = Math.tan(startingAngle);
@@ -37,22 +58,22 @@ public class FullAutoShooterAssembly extends CommandBase {
 
         return distance;
     }
+
     @Override
     public void execute() {
         
-        double distance;
         NetworkTable limTable = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTable hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
-        NetworkTable speedTable = NetworkTableInstance.getDefault().getTable("RPM");
-        NetworkTableEntry tx = limTable.getEntry("tx");
+        hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
+        speedTable = NetworkTableInstance.getDefault().getTable("RPM");
+        tx = limTable.getEntry("tx");
         distance = tx.getDouble(0);
         distance = distanceFinder(distance);
         distance = Math.round(distance);
-        NetworkTableEntry Hood = hoodTable.getEntry(Double.toString(distance));
-        NetworkTableEntry speed = speedTable.getEntry(Double.toString(distance));
-        boolean HoodAngle = Hood.getBoolean(false);
-        double motorPower = speed.getDouble(0);
-        shooter.setHoodPos(HoodAngle);
+        hood = hoodTable.getEntry(Double.toString(distance));
+        speed = speedTable.getEntry(Double.toString(distance));
+        hoodAngle = hood.getBoolean(false);
+        motorPower = speed.getDouble(0);
+        shooter.setHoodPos(hoodAngle);
         shooter.setMotorPower(motorPower);
         
 

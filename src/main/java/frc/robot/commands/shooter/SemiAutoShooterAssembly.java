@@ -12,7 +12,7 @@ import frc.robot.utilities.lists.AxisPriorities;
 /**
  * Command for running the shooter in full auto mode.
  */
-public class SemiAutoShooterAssembly extends CommandBase {
+public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
     private enum TargetState {
         LOOKING_FOR_TARGET,
@@ -22,9 +22,6 @@ public class SemiAutoShooterAssembly extends CommandBase {
     // subsystems
     private Shooter shooter;
     private Conveyor conveyor;
-
-    // devices
-    private Lemonlight targetingLimelight;
 
     // OI
     OIButton shootButton;
@@ -41,12 +38,11 @@ public class SemiAutoShooterAssembly extends CommandBase {
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
      * @param shootButton The button to enable the shooter.
-     * @param targetingLimelight The limelight used for finding the targets
      */
     public SemiAutoShooterAssembly(Shooter shooter,
         Conveyor conveyor,
-        OIButton shootButton,
-        Lemonlight targetingLimelight) {
+        OIButton shootButton) {
+        super(shooter, conveyor);
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.shootButton = shootButton;
@@ -73,7 +69,7 @@ public class SemiAutoShooterAssembly extends CommandBase {
             && indexState != ConveyorState.NONE
             && isBallIndexed) {
 
-            
+            // Insert more logic here.
 
         }
     }
