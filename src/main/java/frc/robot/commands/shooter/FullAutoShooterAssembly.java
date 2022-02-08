@@ -10,7 +10,7 @@ import frc.robot.devices.Lemonlight;
 import java.lang.Math;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.Conveyor.ConveyorState;
-
+import frc.robot.commands.drivetrain.TurnByEncoder;
 
 
 /**
@@ -34,6 +34,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     private boolean isBallIndexed;
     private ShooterStates motorState;
     private ShooterStates hoodState;
+    private double horizontalOffset;
+    private TurnByEncoder tEncoder;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -58,7 +60,6 @@ public class FullAutoShooterAssembly extends CommandBase {
 
     // devices
     private Lemonlight limelight = new Lemonlight("Shooter");
-
     /**
      * Initializing variables
      */
@@ -75,6 +76,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         motorState = ShooterStates.IDLE;
         hoodState = ShooterStates.UNKNOWN;
     }
+
     @Override
     public void execute() { 
         // Checking Variable       
@@ -88,7 +90,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         indexState = conveyor.getWillBeIndexedState();
         isBallIndexed = conveyor.getIsBallIndexed();
         //Checking to make sure we have a ball and it is the same color as our team
-        if (isBallIndexed && indexState == teamClrIsBlue){
+        if (isBallIndexed && indexState == teamClrIsBlue && distance > 0){
             if (motorSpeed != motorPower){
                 shooter.setMotorTargetSpeed(motorPower);
                 motorState = ShooterStates.REVVING;
@@ -102,7 +104,13 @@ public class FullAutoShooterAssembly extends CommandBase {
                 hoodState = ShooterStates.READY;
             }
             if (motorState == ShooterStates.READY && hoodState == ShooterStates.READY){
-                //TODO Add Code to actually shoot, check offset
+                horizontalOffset = limelight.getSmoothedHorizontalOffset();
+                if (Math.round(horizontalOffset) != 0){
+                    tEncoder = new TurnByEncoder(horizontalOffset, drivetrain);
+                }else{
+                    //shoot
+                }
+
             }
 
         }
