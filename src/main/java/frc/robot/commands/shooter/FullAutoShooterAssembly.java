@@ -9,8 +9,6 @@ import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-
-
 import java.lang.Math;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -45,6 +43,8 @@ public class FullAutoShooterAssembly extends CommandBase {
      *
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
+     * @param drivetrain The drivetrain subsystem.
+     * @param limelight The limelight device.
      */
     public FullAutoShooterAssembly(Shooter shooter,
         Conveyor conveyor,
