@@ -5,10 +5,12 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-import frc.robot.devices.Lemonlight;
+
+
 import java.lang.Math;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -35,16 +37,21 @@ public class FullAutoShooterAssembly extends CommandBase {
     private boolean hoodAngle;
     private double motorPower;
     private NetworkTable limTable;
-    private double motorSpeed;
-    private ConveyorState indexState;
-    private boolean isBallIndexed;
+    // devices
+    private Lemonlight limelight;
+
+
+
     /**
      * Command for running the shooter in full auto mode.
      *
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
      */
-    public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor, Drivetrain drivetrain) {
+    public FullAutoShooterAssembly(Shooter shooter,
+        Conveyor conveyor,
+        Drivetrain drivetrain,
+        Lemonlight limelight) {
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;

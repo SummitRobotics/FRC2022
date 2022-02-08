@@ -50,13 +50,15 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
      * @param drivetrain The drivetrain subsystem.
+     * @param limelight The limelight device.
      * @param shootButton The button to enable the shooter.
      */
     public SemiAutoShooterAssembly(Shooter shooter,
         Conveyor conveyor,
         Drivetrain drivetrain,
+        Lemonlight limelight,
         OIButton shootButton) {
-        super(shooter, conveyor, drivetrain);
+        super(shooter, conveyor, drivetrain, limelight);
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.shootButton = shootButton;
@@ -87,7 +89,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
             && isBallIndexed) {
 
             if (motorSpeed < TARGET_MOTOR_SPEED) {
-                if limTable.get
+
             } else {
                 shooter.setMotorTargetSpeed(TARGET_MOTOR_SPEED);
             }
