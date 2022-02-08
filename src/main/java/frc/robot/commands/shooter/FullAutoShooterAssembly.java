@@ -20,6 +20,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     // subsystems
     private Shooter shooter;
     private Conveyor conveyor;
+    private Drivetrain drivetrain;
 
     // other variables
     private NetworkTable hoodTable;
@@ -30,6 +31,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     private NetworkTableEntry hood;
     private boolean hoodAngle;
     private double motorPower;
+    private NetworkTable limTable;
 
 
     /**
@@ -38,9 +40,10 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
      */
-    public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor) {
+    public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor, Drivetrain drivetrain) {
         this.shooter = shooter;
         this.conveyor = conveyor;
+        this.drivetrain = drivetrain;
         addRequirements(shooter);
     }
 
@@ -62,7 +65,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     @Override
     public void execute() {
         
-        NetworkTable limTable = NetworkTableInstance.getDefault().getTable("limelight");
+        limTable = NetworkTableInstance.getDefault().getTable("limelight");
         hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
         speedTable = NetworkTableInstance.getDefault().getTable("RPM");
         tx = limTable.getEntry("tx");
