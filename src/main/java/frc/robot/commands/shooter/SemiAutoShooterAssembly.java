@@ -12,6 +12,7 @@ import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.AxisPriorities;
 
 
@@ -35,15 +36,20 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private double motorSpeed;
     private double limelightDistanceEstimate;
     private boolean limelightHasTarget;
-
+    private ConveyorState teamColor;
+    private double smoothedHorizontalOffset;
+    private boolean hoodPos;
+    private double targetMotorSpeed;
 
     // constants
     private static final double
-        TARGET_MOTOR_SPEED = 0,
         TURN_DEGREES_PER_CYCLE = 1.0,
         MOVE_FORWARD_PER_CYCLE = 1.0,
         SHOOTER_RANGE = 10.0,
-        TARGET_HORIZONTAL_ACCURACY = 3;
+        HOOD_UP_RANGE = 5,
+        TARGET_HORIZONTAL_ACCURACY = 3,
+        TARGET_WRONG_COLOR_MISS = 45,
+        TARGET_MOTOR_SPEED_ACCURACY = 3;
 
 
     // devices
@@ -87,43 +93,79 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         motorSpeed = shooter.getShooterVelocity();
         limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
         limelightHasTarget = limelight.hasTarget();
+        teamColor = getTeamColor();
+        smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
+        hoodPos = shooter.getHoodPos();
 
 
         if (prioritizedShootButton.get()
             && indexState != ConveyorState.NONE
             && isBallIndexed) {
 
-            if (motorSpeed < TARGET_MOTOR_SPEED) {
+            if (limelightHasTarget) {
 
-                if (limelightHasTarget) {
+                if (limelightDistanceEstimate < SHOOTER_RANGE) {
 
-                    if (limelightDistanceEstimate < SHOOTER_RANGE) {
+                    if (limelightDistanceEstimate < HOOD_UP_RANGE) {
+                        shooter.setHoodPos(true);
+                        targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, true);
+                    } else {
+                        shooter.setHoodPos(false);
+                        targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, false);
+                    }
 
-                        if (indexState == ConveyorState.RED) {
+                    if (Functions.isWithin(
+                        motorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
 
-                            // Insert further logic here
+                        if (indexState == teamColor) {
 
-                        } else if (indexState == ConveyorState.BLUE) {
+                            if (smoothedHorizontalOffset > TARGET_HORIZONTAL_ACCURACY) {
 
-                            // Insert further logic here
+                                CommandScheduler.getInstance().schedule(
+                                    new TurnByEncoder(-TURN_DEGREES_PER_CYCLE, drivetrain));
 
+                            } else if (smoothedHorizontalOffset < -TARGET_HORIZONTAL_ACCURACY) {
+
+                                CommandScheduler.getInstance().schedule(
+                                    new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                            } else {
+                                // Continue logic here
+                            }
+
+                        } else if (indexState != teamColor) {
+
+                            if (smoothedHorizontalOffset
+                                > TARGET_HORIZONTAL_ACCURACY + TARGET_WRONG_COLOR_MISS) {
+
+                                CommandScheduler.getInstance().schedule(
+                                    new TurnByEncoder(-TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                            } else if (smoothedHorizontalOffset
+                                < -TARGET_HORIZONTAL_ACCURACY + TARGET_WRONG_COLOR_MISS) {
+
+                                CommandScheduler.getInstance().schedule(
+                                    new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                            } else {
+                                // Continue logic here
+                            }
                         }
 
                     } else {
-
-                        CommandScheduler.getInstance().schedule(new EncoderDrive(
-                            MOVE_FORWARD_PER_CYCLE, MOVE_FORWARD_PER_CYCLE, drivetrain));
+                        shooter.setMotorTargetSpeed(targetMotorSpeed);
                     }
 
                 } else {
 
-                    CommandScheduler.getInstance().schedule(
-                        new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+                    CommandScheduler.getInstance().schedule(new EncoderDrive(
+                        MOVE_FORWARD_PER_CYCLE, MOVE_FORWARD_PER_CYCLE, drivetrain));
                 }
 
             } else {
 
-                shooter.setMotorTargetSpeed(TARGET_MOTOR_SPEED);
+                CommandScheduler.getInstance().schedule(
+                    new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
             }
         }
     }

@@ -81,6 +81,43 @@ public class FullAutoShooterAssembly extends CommandBase {
         
     }
 
+    /**
+     * Returns the team color as a ConveyorState.
+     *
+     * @return color The team color as a ConveyorState.
+     */
+    public ConveyorState getTeamColor() {
+        if (DriverStation.getAlliance().toString() == "kRed") {
+            return ConveyorState.RED;
+        } else {
+            return ConveyorState.BLUE;
+        }
+    }
+
+    /**
+     * Returns the desired motor speed based on the distance from the target and the hood position.
+     *
+     * @param distance The distance from the target.
+     * @param hoodPos The hood position.
+     * @return motorSpeed The desired motor speed
+     */
+    public double solveMotorSpeed(double distance, boolean hoodPos) {
+        // Annoyingly, exponent notation requires importing a math library.
+        // So, for simplicity, we do not use it.
+        // TODO: Test the shooter and do a cubic regression to find the right formula.
+        if (hoodPos) {
+            return 0 * distance * distance * distance
+                + 0 * distance * distance
+                + 0 * distance
+                + 0;
+        } else {
+            return 0 * distance * distance * distance
+                + 0 * distance * distance
+                + 0 * distance
+                + 0;
+        }
+    }
+
     @Override
     public void execute() {        
         motorSpeed = shooter.getShooterVelocity();
