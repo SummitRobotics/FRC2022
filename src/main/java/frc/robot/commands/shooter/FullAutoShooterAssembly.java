@@ -3,6 +3,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
@@ -34,8 +36,10 @@ public class FullAutoShooterAssembly extends CommandBase {
     private boolean isBallIndexed;
     private ShooterStates motorState;
     private ShooterStates hoodState;
+    private ShooterStates drivStates;
+    private ShooterStates convState;
     private double horizontalOffset;
-    private TurnByEncoder tEncoder;
+    private static final double ROBOT_RADIUS = 15;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -75,6 +79,8 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
         motorState = ShooterStates.IDLE;
         hoodState = ShooterStates.UNKNOWN;
+        drivStates = ShooterStates.IDLE;
+        convState = ShooterStates.REVVING;
     }
 
     @Override
@@ -106,9 +112,34 @@ public class FullAutoShooterAssembly extends CommandBase {
             if (motorState == ShooterStates.READY && hoodState == ShooterStates.READY){
                 horizontalOffset = limelight.getSmoothedHorizontalOffset();
                 if (Math.round(horizontalOffset) != 0){
-                    tEncoder = new TurnByEncoder(horizontalOffset, drivetrain);
+                    double radians = Math.PI / 180;
+                    double dst = ROBOT_RADIUS * radians;
+                    if (drivStates == ShooterStates.IDLE){
+                        drivetrain.stop();
+                        drivetrain.zeroDistance();
+                        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(dst));
+                        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(-dst));
+                        drivStates = ShooterStates.MISALIGNED;
+                    }
+                    
                 }else{
-                    //shoot
+                    drivetrain.stop();
+                    drivStates = ShooterStates.IDLE;
+                    if (convState == ShooterStates.IDLE){
+                        conveyor.setIndexEncoder(0);
+                        conveyor.setIndexMotorPower(.5);
+                        convState = ShooterStates.REVVING;
+                         
+                    }else{
+                        if (conveyor.getIndexEncoderPosition() > 2) {
+                            conveyor.setIndexMotorPower(0);
+                            convState = ShooterStates.IDLE;
+                        }
+                        
+
+                    }
+
+
                 }
 
             }
