@@ -17,7 +17,7 @@ import frc.robot.utilities.lists.AxisPriorities;
 
 
 /**
- * Command for running the shooter in full auto mode.
+ * Command for running the shooter in semi auto mode.
  */
 public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
@@ -56,7 +56,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private Lemonlight limelight;
     
     /**
-     * Command for running the shooter in full auto mode.
+     * Command for running the shooter in semi auto mode.
      *
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
@@ -130,7 +130,13 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                                     new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
 
                             } else {
-                                // Continue logic here
+                                // Trigger the index motor
+                                conveyor.setIndexEncoder(0);
+                                while (conveyor.getIndexEncoderPosition() > 5) {
+                                    conveyor.setIndexMotorPower(1);
+                                }
+                                conveyor.setIndexMotorPower(0);
+                                conveyor.setIndexEncoder(0);
                             }
 
                         } else if (indexState != teamColor) {
@@ -148,7 +154,13 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                                     new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
 
                             } else {
-                                // Continue logic here
+                                // Trigger the index motor
+                                conveyor.setIndexEncoder(0);
+                                while (conveyor.getIndexEncoderPosition() > 5) {
+                                    conveyor.setIndexMotorPower(1);
+                                }
+                                conveyor.setIndexMotorPower(0);
+                                conveyor.setIndexEncoder(0);
                             }
                         }
 
@@ -157,9 +169,22 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                     }
 
                 } else {
+                    // align with target before moving towards it
+                    if (smoothedHorizontalOffset > TARGET_HORIZONTAL_ACCURACY) {
 
-                    CommandScheduler.getInstance().schedule(new EncoderDrive(
-                        MOVE_FORWARD_PER_CYCLE, MOVE_FORWARD_PER_CYCLE, drivetrain));
+                        CommandScheduler.getInstance().schedule(
+                            new TurnByEncoder(-TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                    } else if (smoothedHorizontalOffset < -TARGET_HORIZONTAL_ACCURACY) {
+
+                        CommandScheduler.getInstance().schedule(
+                            new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                    } else {
+
+                        CommandScheduler.getInstance().schedule(new EncoderDrive(
+                            MOVE_FORWARD_PER_CYCLE, MOVE_FORWARD_PER_CYCLE, drivetrain));
+                    }
                 }
 
             } else {
