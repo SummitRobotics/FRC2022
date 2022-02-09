@@ -217,7 +217,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Updateds the distace acumulator.
+     * Updateds the distance acumulator.
      */
     private void updateDistanceAcum() {
         leftDistanceAcum += getLeftDistance();

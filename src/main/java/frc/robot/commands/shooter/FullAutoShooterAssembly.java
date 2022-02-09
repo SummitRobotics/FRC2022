@@ -1,11 +1,16 @@
 package frc.robot.commands.shooter;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.subsystems.Conveyor;
+import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.devices.Lemonlight;
@@ -46,11 +51,14 @@ public class FullAutoShooterAssembly extends CommandBase {
      *
      * @param shooter The shooter subsystem.
      * @param conveyor The conveyor subsystem.
+     * @param drivetrain The drivetrain subsystem.
+     * @param limelight The limelight device.
      */
     public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor, Drivetrain drivetrain) {
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;
+        this.limelight = limelight;
         addRequirements(shooter);
     }
     // Enum for setting state
@@ -64,23 +72,57 @@ public class FullAutoShooterAssembly extends CommandBase {
 
     // devices
     private Lemonlight limelight = new Lemonlight("Shooter");
-    /**
-     * Initializing variables
-     */
     @Override
-    public void initialize(){
+    public void initialize() {
         hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
         speedTable = NetworkTableInstance.getDefault().getTable("RPM");
         shooter.stop();
-        if (DriverStation.getAlliance().toString() == "kRed"){
+        if (DriverStation.getAlliance().toString() == "kRed") {
             teamClrIsBlue = ConveyorState.RED;
-        }else{
+        } else {
             teamClrIsBlue = ConveyorState.BLUE;
         }
         motorState = ShooterStates.IDLE;
         hoodState = ShooterStates.UNKNOWN;
         drivStates = ShooterStates.IDLE;
         convState = ShooterStates.REVVING;
+    }
+
+    /**
+     * Returns the team color as a ConveyorState.
+     *
+     * @return color The team color as a ConveyorState.
+     */
+    public ConveyorState getTeamColor() {
+        if (DriverStation.getAlliance().toString() == "kRed") {
+            return ConveyorState.RED;
+        } else {
+            return ConveyorState.BLUE;
+        }
+    }
+
+    /**
+     * Returns the desired motor speed based on the distance from the target and the hood position.
+     *
+     * @param distance The distance from the target.
+     * @param hoodPos The hood position.
+     * @return motorSpeed The desired motor speed
+     */
+    public double solveMotorSpeed(double distance, boolean hoodPos) {
+        // Annoyingly, exponent notation requires importing a math library.
+        // So, for simplicity, we do not use it.
+        // TODO: Test the shooter and do a cubic regression to find the right formula.
+        if (hoodPos) {
+            return 0 * distance * distance * distance
+                + 0 * distance * distance
+                + 0 * distance
+                + 0;
+        } else {
+            return 0 * distance * distance * distance
+                + 0 * distance * distance
+                + 0 * distance
+                + 0;
+        }
     }
 
     @Override

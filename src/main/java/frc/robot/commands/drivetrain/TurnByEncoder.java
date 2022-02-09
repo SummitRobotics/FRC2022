@@ -8,7 +8,7 @@ import frc.robot.subsystems.Drivetrain;
  */
 public class TurnByEncoder extends ParallelCommandGroup {
 
-    //TODO check acuracy
+    //TODO check accuracy
     private static final double ROBOT_RADIUS = 15;
 
     /**
