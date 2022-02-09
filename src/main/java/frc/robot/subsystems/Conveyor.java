@@ -7,17 +7,12 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LidarV3;
-import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem to control the conveyor of the robot.
  */
 public class Conveyor extends SubsystemBase {
-
-    public static final double
-            BELT_RATE = 0.01,
-            INDEX_RATE = 0.01;
 
     /**
     * Enum tracking what could be in the front or back of the conveyor.
@@ -35,10 +30,6 @@ public class Conveyor extends SubsystemBase {
     // encoders
     private final RelativeEncoder beltEncoder = belt.getEncoder();
     private final RelativeEncoder indexEncoder = index.getEncoder();
-
-    // rate limiters
-    private final ChangeRateLimiter beltRateLimiter = new ChangeRateLimiter(BELT_RATE);
-    private final ChangeRateLimiter indexRateLimiter = new ChangeRateLimiter(INDEX_RATE);
 
     // sensors
     private final ColorSensor colorSensor;
@@ -85,36 +76,26 @@ public class Conveyor extends SubsystemBase {
         wasBallIndexed = false;
         isBallIndexed = getIsBallIndexed();
         doesBallExist = getDoesBallExist();
-        beltRPM = getBeltRPM();
-        indexRPM = getIndexRPM();
+        beltRPM = 0;
+        indexRPM = 0;
     }
 
     /**
      * Sets the power of the belt motor.
      *
-     * @param power The power of the belt motor (between 1 and -1).
+     * @param power The rate-limited power of the belt motor (between 1 and -1).
      */
     public void setBeltMotorPower(double power) {
-        belt.set(beltRateLimiter.getRateLimitedValue(power));
+        belt.set(power);
     }
 
     /**
      * Sets the power of the index motor.
      *
-     * @param power The power of the index motor (between 1 and -1).
+     * @param power The rate-limited power of the index motor (between 1 and -1).
      */
     public void setIndexMotorPower(double power) {
-        index.set(indexRateLimiter.getRateLimitedValue(power));
-    }
-
-    /**
-     * Sets the power of both motors.
-     *
-     * @param power the power to set the motor.
-     */
-    public void setMotorPower(double power) {
-        setIndexMotorPower(power);
-        setBeltMotorPower(power);
+        index.set(power);
     }
 
     /**
@@ -177,15 +158,6 @@ public class Conveyor extends SubsystemBase {
     public void zeroEncoders() {
         setBeltEncoder(0);
         setIndexEncoder(0);
-    }
-
-    /**
-     * Resets the rate limiters.
-     * This should only be run when the motors are not moving.
-     */
-    public void resetRateLimiter() {
-        beltRateLimiter.resetOld();
-        indexRateLimiter.resetOld();
     }
 
     /**
@@ -364,6 +336,10 @@ public class Conveyor extends SubsystemBase {
         } else {
             return false;
         }
+    }
+
+    public double getLidarDistance() {
+        return lidar.getAverageDistance();
     }
 
     @Override
