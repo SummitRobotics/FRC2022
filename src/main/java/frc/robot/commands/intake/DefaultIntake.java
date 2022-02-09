@@ -12,6 +12,7 @@ public class DefaultIntake extends CommandBase {
 
     private final Intake intake;
     private final Conveyor conveyor;
+    private double loopCount;
 
     /**
      * Default command for Intake.
@@ -27,6 +28,7 @@ public class DefaultIntake extends CommandBase {
 
     @Override
     public void initialize() {
+        loopCount = 0;
     }
 
     @Override
@@ -35,9 +37,19 @@ public class DefaultIntake extends CommandBase {
             case DOWN:
                 if (conveyor.getFront() != ConveyorState.NONE
                     && conveyor.getBack() != ConveyorState.NONE) {
-                    intake.setIntakeMotorPower(-1.0);
+
+                    if (loopCount < 50) {
+                        intake.setIntakeMotorPower(-Intake.INTAKE_MOTOR_SPEED);
+                        loopCount++;
+                    } else {
+                        intake.stop();
+                    }
+
                 } else {
                     intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                    if (loopCount != 0) {
+                        loopCount = 0;
+                    }
                 }
                 break;
             default:
