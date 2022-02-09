@@ -7,29 +7,26 @@ import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import java.lang.Math;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
-
 
 /**
  * Command for running the shooter in full auto mode.
  */
 public class FullAutoShooterAssembly extends CommandBase {
+    // Variables for various things, names are pretty explanitory
     private Shooter shooter;
     private Conveyor conveyor;
     private ConveyorState teamClrIsBlue;
     private Drivetrain drivetrain;
-    // other variables
     private NetworkTable hoodTable;
     private NetworkTable speedTable;
-    private NetworkTableEntry tx;
     private double distance;
     private NetworkTableEntry speed;
     private NetworkTableEntry hood;
@@ -39,6 +36,12 @@ public class FullAutoShooterAssembly extends CommandBase {
     private NetworkTable limTable;
     private ConveyorState indexState;
     private boolean isBallIndexed;
+    private ShooterStates motorState;
+    private ShooterStates hoodState;
+    private ShooterStates drivStates;
+    private ShooterStates convState;
+    private double horizontalOffset;
+    private static final double ROBOT_RADIUS = 15;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -52,6 +55,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         Conveyor conveyor,
         Drivetrain drivetrain,
         Lemonlight limelight) {
+
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;
@@ -61,12 +65,23 @@ public class FullAutoShooterAssembly extends CommandBase {
 
     // constants
     private static final double TARGET_MOTOR_SPEED = 0;
+    
+    /**
+     * Enum for setting states.
+     */
+    public enum ShooterStates {
+        IDLE,
+        REVVING,
+        READY,
+        MISALIGNED, 
+        UNKNOWN
+    }
 
     // devices
     private Lemonlight limelight = new Lemonlight("Shooter");
 
     /**
-     * Finds the distance between the limelight and the target.
+     * Initializing variables.
      */
     @Override
     public void initialize() {
@@ -78,7 +93,10 @@ public class FullAutoShooterAssembly extends CommandBase {
         } else {
             teamClrIsBlue = ConveyorState.BLUE;
         }
-        
+        motorState = ShooterStates.IDLE;
+        hoodState = ShooterStates.UNKNOWN;
+        drivStates = ShooterStates.IDLE;
+        convState = ShooterStates.REVVING;
     }
 
     /**
@@ -119,7 +137,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     }
 
     @Override
-    public void execute() {        
+    public void execute() { 
+        // Checking Variable       
         motorSpeed = shooter.getShooterVelocity();
         distance = limelight.getLimelightDistanceEstimateIN();
         distance = Math.round(distance);
@@ -129,17 +148,56 @@ public class FullAutoShooterAssembly extends CommandBase {
         motorPower = speed.getDouble(0);
         indexState = conveyor.getWillBeIndexedState();
         isBallIndexed = conveyor.getIsBallIndexed();
-        if (isBallIndexed && indexState == teamClrIsBlue) { /* */ }
-        if (motorSpeed != motorPower) {
-            shooter.setMotorTargetSpeed(motorPower);
-        }
-        if (hoodAngle != shooter.getHoodPos()) {
-            shooter.setHoodPos(hoodAngle);
-        }
-        
-        
-        
 
-    
+        //Checking to make sure we have a ball and it is the same color as our team
+        if (isBallIndexed && indexState == teamClrIsBlue && distance > 0) {
+            if (motorSpeed != motorPower) {
+                shooter.setMotorTargetSpeed(motorPower);
+                motorState = ShooterStates.REVVING;
+            } else {
+                motorState = ShooterStates.READY;
+            }
+            if (hoodAngle != shooter.getHoodPos()) {
+                shooter.setHoodPos(hoodAngle);
+                hoodState = ShooterStates.MISALIGNED;
+            } else {
+                hoodState = ShooterStates.READY;
+            }
+            if (motorState == ShooterStates.READY && hoodState == ShooterStates.READY) {
+                horizontalOffset = limelight.getSmoothedHorizontalOffset();
+                if (Math.round(horizontalOffset) != 0) {
+                    double radians = Math.PI / 180;
+                    double dst = ROBOT_RADIUS * radians;
+                    if (drivStates == ShooterStates.IDLE) {
+                        drivetrain.stop();
+                        drivetrain.zeroDistance();
+                        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(dst));
+                        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(-dst));
+                        drivStates = ShooterStates.MISALIGNED;
+                    }
+                    
+                } else {
+                    drivetrain.stop();
+                    drivStates = ShooterStates.IDLE;
+                    if (convState == ShooterStates.IDLE) {
+                        conveyor.setIndexEncoder(0);
+                        conveyor.setIndexMotorPower(.5);
+                        convState = ShooterStates.REVVING;
+                         
+                    } else {
+                        if (conveyor.getIndexEncoderPosition() > 2) {
+                            conveyor.setIndexMotorPower(0);
+                            convState = ShooterStates.IDLE;
+                        }
+                        
+
+                    }
+
+
+                }
+
+            }
+
+        }
     }
 }
