@@ -17,7 +17,8 @@ public class Conveyor extends SubsystemBase {
 
     public static final double
             BELT_RATE = 0.01,
-            INDEX_RATE = 0.01;
+            INDEX_RATE = 0.01,
+            INDEX_MOTOR_POWER = 1.0;
 
     /**
     * Enum tracking what could be in the front or back of the conveyor.

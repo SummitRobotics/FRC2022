@@ -1,8 +1,5 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.EncoderDrive;
 import frc.robot.commands.drivetrain.TurnByEncoder;
@@ -38,7 +35,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private boolean limelightHasTarget;
     private ConveyorState teamColor;
     private double smoothedHorizontalOffset;
-    private boolean hoodPos;
     private double targetMotorSpeed;
 
     // constants
@@ -95,7 +91,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         limelightHasTarget = limelight.hasTarget();
         teamColor = getTeamColor();
         smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
-        hoodPos = shooter.getHoodPos();
 
 
         if (prioritizedShootButton.get()
@@ -130,13 +125,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                                     new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
 
                             } else {
-                                // Trigger the index motor
-                                conveyor.setIndexEncoder(0);
-                                while (conveyor.getIndexEncoderPosition() > 5) {
-                                    conveyor.setIndexMotorPower(1);
-                                }
-                                conveyor.setIndexMotorPower(0);
-                                conveyor.setIndexEncoder(0);
+                                // Everything seems in order, so trigger the index motor.
+                                conveyor.setIndexMotorPower(Conveyor.INDEX_MOTOR_POWER);
                             }
 
                         } else if (indexState != teamColor) {
@@ -154,13 +144,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                                     new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
 
                             } else {
-                                // Trigger the index motor
-                                conveyor.setIndexEncoder(0);
-                                while (conveyor.getIndexEncoderPosition() > 5) {
-                                    conveyor.setIndexMotorPower(1);
-                                }
-                                conveyor.setIndexMotorPower(0);
-                                conveyor.setIndexEncoder(0);
+                                // Everything seems in order, so trigger the index motor.
+                                conveyor.setIndexMotorPower(Conveyor.INDEX_MOTOR_POWER);
                             }
                         }
 
@@ -169,7 +154,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                     }
 
                 } else {
-                    // align with target before moving towards it
+                    // Align with target before moving towards it
                     if (smoothedHorizontalOffset > TARGET_HORIZONTAL_ACCURACY) {
 
                         CommandScheduler.getInstance().schedule(
