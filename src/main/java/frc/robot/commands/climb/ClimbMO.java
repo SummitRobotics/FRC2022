@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
-import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
 
 /**
@@ -19,9 +18,13 @@ public class ClimbMO extends CommandBase {
     OIAxis controlAxis;
     OIAxis.PrioritizedAxis prioritizedControlAxis;
 
-    // button for the pivot solenoid
-    OIButton pivotButton;
-    OIButton.PrioritizedButton prioritizedPivotButton;
+    // button for the left pivot solenoid
+    OIButton leftPivotButton;
+    OIButton.PrioritizedButton prioritizedLeftPivotButton;
+
+    // button for the right pivot solenoid
+    OIButton rightPivotButton;
+    OIButton.PrioritizedButton prioritizedRightPivotButton;
 
     // button for only the left detach solenoid
     OIButton leftDetachButton;
@@ -55,7 +58,8 @@ public class ClimbMO extends CommandBase {
         OIAxis controlAxis,
         OIButton leftMotorButton,
         OIButton rightMotorButton,
-        OIButton pivotButton,
+        OIButton leftPivotButton,
+        OIButton rightPivotButton,
         OIButton leftDetachButton,
         OIButton rightDetachButton
     ) {
@@ -64,7 +68,8 @@ public class ClimbMO extends CommandBase {
         this.controlAxis = controlAxis;
         this.leftMotorButton = leftMotorButton;
         this.rightMotorButton = rightMotorButton;
-        this.pivotButton = pivotButton;
+        this.leftPivotButton = leftPivotButton;
+        this.rightPivotButton = rightPivotButton;
         this.leftDetachButton = leftDetachButton;
         this.rightDetachButton = rightDetachButton;
     }
@@ -74,7 +79,8 @@ public class ClimbMO extends CommandBase {
         prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedLeftPivotButton = leftPivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedRightPivotButton = rightPivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
 
@@ -93,7 +99,8 @@ public class ClimbMO extends CommandBase {
             climb.setMotorPower(prioritizedControlAxis.get());
         }
 
-        climb.setPivotPos(prioritizedPivotButton.get());
+        climb.setPivotPosLeft(prioritizedLeftPivotButton.get());
+        climb.setPivotPosRight(prioritizedRightPivotButton.get());
         climb.setLeftDetachPos(prioritizedLeftDetachButton.get());
         climb.setRightDetachPos(prioritizedRightDetachButton.get());
     }
@@ -105,7 +112,8 @@ public class ClimbMO extends CommandBase {
         prioritizedControlAxis.destroy();
         prioritizedLeftMotorButton.destroy();
         prioritizedRightMotorButton.destroy();
-        prioritizedPivotButton.destroy();
+        prioritizedLeftPivotButton.destroy();
+        prioritizedRightPivotButton.destroy();
         prioritizedLeftDetachButton.destroy();
         prioritizedRightDetachButton.destroy();
     }

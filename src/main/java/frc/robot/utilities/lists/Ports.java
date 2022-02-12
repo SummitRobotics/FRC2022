@@ -38,7 +38,8 @@ public final class Ports {
             // Climb
             LEFT_CLIMB_MOTOR = 0,
             RIGHT_CLIMB_MOTOR = 0,
-            PIVOT_CLIMB_SOLENOID = 0,
+            PIVOT_CLIMB_SOLENOID_LEFT = 0,
+            PIVOT_CLIMB_SOLENOID_RIGHT = 0,
             LEFT_DETACH_SOLENOID = 0,
             RIGHT_DETACH_SOLENOID = 0,
 
