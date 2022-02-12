@@ -1,5 +1,6 @@
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -22,7 +23,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     // Variables for various things, names are pretty explanitory
     private Shooter shooter;
     private Conveyor conveyor;
-    private ConveyorState teamClrIsBlue;
+    private ConveyorState teamClr;
     private Drivetrain drivetrain;
     private NetworkTable hoodTable;
     private NetworkTable speedTable;
@@ -39,7 +40,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     private ShooterStates drivStates;
     private ShooterStates convState;
     private double horizontalOffset;
-    private static final double ROBOT_RADIUS = 15;
+    private PIDController pid;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -58,11 +59,20 @@ public class FullAutoShooterAssembly extends CommandBase {
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;
         this.limelight = limelight;
-        addRequirements(shooter);
+
+        pid = new PIDController(P, I, D);
+        pid.setTolerance(1, 2);
+
+        addRequirements(shooter, drivetrain);
     }
     
     // constants
-    private static final double TARGET_MOTOR_SPEED = 0;
+    private static final double
+        TARGET_MOTOR_SPEED = 0,
+        P = 0,
+        I = 0,
+        D = 0,
+        ROBOT_RADIUS = 15;
     
     /**
      * Enum for setting states.
@@ -86,15 +96,13 @@ public class FullAutoShooterAssembly extends CommandBase {
         hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
         speedTable = NetworkTableInstance.getDefault().getTable("RPM");
         shooter.stop();
-        if (DriverStation.getAlliance().toString() == "kRed") {
-            teamClrIsBlue = ConveyorState.RED;
-        } else {
-            teamClrIsBlue = ConveyorState.BLUE;
-        }
+        teamClr = getTeamColor();
         motorState = ShooterStates.IDLE;
         hoodState = ShooterStates.UNKNOWN;
         drivStates = ShooterStates.IDLE;
         convState = ShooterStates.REVVING;
+        pid.setSetpoint(0);
+        pid.reset();
     }
 
     /**
@@ -216,6 +224,21 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
     }
 
+    /**
+     * The drivetrain PID loop to be executed every cycle.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param limelight The limelight device
+     */
+    public void setDrivetrain(Drivetrain drivetrain, Lemonlight limelight) {
+
+        if (limelight.hasTarget()) {
+            drivetrain.setLeftMotorPower(pid.calculate(limelight.getSmoothedHorizontalOffset()));
+        } else {
+            pid.reset();
+        }
+    }
+
     @Override
     public void execute() { 
         // Checking Variable       
@@ -230,7 +253,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         isBallIndexed = conveyor.getIsBallIndexed();
 
         //Checking to make sure we have a ball and it is the same color as our team
-        if (isBallIndexed && indexState == teamClrIsBlue && distance > 0) {
+        if (isBallIndexed && indexState == teamClr && distance > 0) {
             if (motorSpeed != motorPower) {
                 shooter.setMotorTargetSpeed(motorPower);
                 motorState = ShooterStates.REVVING;
@@ -273,5 +296,15 @@ public class FullAutoShooterAssembly extends CommandBase {
                 }
             }
         }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        pid.reset();
+        pid.close();
+    }
+
+    public boolean isFinished() {
+        return false;
     }
 }

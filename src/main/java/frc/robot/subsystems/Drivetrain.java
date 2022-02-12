@@ -348,7 +348,7 @@ public class Drivetrain extends SubsystemBase {
         // TODO: Check if this works.
         leftPID.setReference(distToEncoder(degrees * ROBOT_CIRCUMFERENCE / 360),
             ControlType.kPosition);
-        rightPID.setReference(distToEncoder(degrees * ROBOT_CIRCUMFERENCE / 360),
+        rightPID.setReference(distToEncoder(-degrees * ROBOT_CIRCUMFERENCE / 360),
             ControlType.kPosition);
     }
 

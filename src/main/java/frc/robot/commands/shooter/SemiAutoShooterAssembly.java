@@ -167,4 +167,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         prioritizedShootButton = null;
         prioritizedShootButton.destroy();
     }
+
+    public boolean isFinished() {
+        return false;
+    }
 }
