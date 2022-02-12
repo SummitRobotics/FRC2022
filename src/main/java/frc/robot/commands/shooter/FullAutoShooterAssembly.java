@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import frc.robot.commands.drivetrain.EncoderDrive;
+import frc.robot.commands.drivetrain.TurnByEncoder;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
@@ -136,6 +138,88 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
     }
 
+    public void fire() {
+        conveyor.setIndexMotorPower(Conveyor.INDEX_MOTOR_POWER);
+    }
+
+    /**
+     * Returns whether or not there is a ball ready to be fired.
+     *
+     * @return Whether or not there is a ball ready to be fired.
+     */
+    public boolean isBallReady() {
+        if (indexState != ConveyorState.NONE
+            && isBallIndexed) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Move the robot to the target.
+     *
+     * @param smoothedHorizontalOffset The smoothed horizontal offset
+     */
+    public void driveToTarget(double smoothedHorizontalOffset) {
+        if (smoothedHorizontalOffset > Shooter.TARGET_HORIZONTAL_ACCURACY) {
+
+            CommandScheduler.getInstance().schedule(
+                new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
+
+        } else if (smoothedHorizontalOffset < -Shooter.TARGET_HORIZONTAL_ACCURACY) {
+
+            CommandScheduler.getInstance().schedule(
+                new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
+
+        } else {
+
+            CommandScheduler.getInstance().schedule(new EncoderDrive(
+                Drivetrain.MOVE_FORWARD_PER_CYCLE, Drivetrain.MOVE_FORWARD_PER_CYCLE, drivetrain));
+        }
+    }
+
+    /**
+     * Aims the shooter.
+     *
+     * @param smoothedHorizontalOffset The smoothed horizontal offset
+     * @param teamColor The team color
+     */
+    public void aim(double smoothedHorizontalOffset, ConveyorState teamColor) {
+        if (indexState == teamColor) {
+
+            if (smoothedHorizontalOffset > Shooter.TARGET_HORIZONTAL_ACCURACY) {
+
+                CommandScheduler.getInstance().schedule(
+                    new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
+
+            } else if (smoothedHorizontalOffset
+                < -Shooter.TARGET_HORIZONTAL_ACCURACY) {
+
+                CommandScheduler.getInstance().schedule(
+                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
+
+            } else if (indexState != teamColor) {
+
+                if (smoothedHorizontalOffset
+                    > Shooter.TARGET_HORIZONTAL_ACCURACY
+                    + Shooter.TARGET_WRONG_COLOR_MISS) {
+
+                    CommandScheduler.getInstance().schedule(
+                        new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                } else if (smoothedHorizontalOffset
+                    < -Shooter.TARGET_HORIZONTAL_ACCURACY
+                    + Shooter.TARGET_WRONG_COLOR_MISS) {
+
+                    CommandScheduler.getInstance().schedule(
+                        new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
+
+                }
+            }
+        }
+    }
+
     @Override
     public void execute() { 
         // Checking Variable       
@@ -189,15 +273,9 @@ public class FullAutoShooterAssembly extends CommandBase {
                             conveyor.setIndexMotorPower(0);
                             convState = ShooterStates.IDLE;
                         }
-                        
-
                     }
-
-
                 }
-
             }
-
         }
     }
 }

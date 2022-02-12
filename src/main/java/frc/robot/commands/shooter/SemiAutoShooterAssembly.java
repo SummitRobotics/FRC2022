@@ -1,7 +1,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.drivetrain.EncoderDrive;
 import frc.robot.commands.drivetrain.TurnByEncoder;
 import frc.robot.devices.Lemonlight;
 import frc.robot.oi.inputs.OIButton;
@@ -36,17 +35,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private ConveyorState teamColor;
     private double smoothedHorizontalOffset;
     private double targetMotorSpeed;
-
-    // constants
-    private static final double
-        TURN_DEGREES_PER_CYCLE = 1.0,
-        MOVE_FORWARD_PER_CYCLE = 1.0,
-        SHOOTER_RANGE = 10.0,
-        HOOD_UP_RANGE = 5,
-        TARGET_HORIZONTAL_ACCURACY = 3,
-        TARGET_WRONG_COLOR_MISS = 45,
-        TARGET_MOTOR_SPEED_ACCURACY = 3;
-
 
     // devices
     private Lemonlight limelight;
@@ -99,9 +87,9 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
             if (limelightHasTarget) {
 
-                if (limelightDistanceEstimate < SHOOTER_RANGE) {
+                if (limelightDistanceEstimate < Shooter.SHOOTER_RANGE) {
 
-                    if (limelightDistanceEstimate < HOOD_UP_RANGE) {
+                    if (limelightDistanceEstimate < Shooter.HOOD_UP_RANGE) {
                         shooter.setHoodPos(true);
                         targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, true);
                     } else {
@@ -110,42 +98,49 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                     }
 
                     if (Functions.isWithin(
-                        motorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
+                        motorSpeed, targetMotorSpeed, Shooter.TARGET_MOTOR_SPEED_ACCURACY)) {
 
                         if (indexState == teamColor) {
 
-                            if (smoothedHorizontalOffset > TARGET_HORIZONTAL_ACCURACY) {
+                            if (smoothedHorizontalOffset > Shooter.TARGET_HORIZONTAL_ACCURACY) {
 
                                 CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(-TURN_DEGREES_PER_CYCLE, drivetrain));
+                                    new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE,
+                                    drivetrain));
 
-                            } else if (smoothedHorizontalOffset < -TARGET_HORIZONTAL_ACCURACY) {
+                            } else if (smoothedHorizontalOffset
+                                < -Shooter.TARGET_HORIZONTAL_ACCURACY) {
 
                                 CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+                                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE,
+                                    drivetrain));
 
                             } else {
                                 // Everything seems in order, so trigger the index motor.
-                                conveyor.setIndexMotorPower(Conveyor.INDEX_MOTOR_POWER);
+                                fire();
                             }
 
                         } else if (indexState != teamColor) {
 
                             if (smoothedHorizontalOffset
-                                > TARGET_HORIZONTAL_ACCURACY + TARGET_WRONG_COLOR_MISS) {
+                                > Shooter.TARGET_HORIZONTAL_ACCURACY
+                                + Shooter.TARGET_WRONG_COLOR_MISS) {
 
                                 CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(-TURN_DEGREES_PER_CYCLE, drivetrain));
+                                    new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE,
+                                    drivetrain));
 
                             } else if (smoothedHorizontalOffset
-                                < -TARGET_HORIZONTAL_ACCURACY + TARGET_WRONG_COLOR_MISS) {
+                                < -Shooter.TARGET_HORIZONTAL_ACCURACY
+                                + Shooter.TARGET_WRONG_COLOR_MISS) {
 
                                 CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+                                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE,
+                                    drivetrain));
 
                             } else {
                                 // Everything seems in order, so trigger the index motor.
-                                conveyor.setIndexMotorPower(Conveyor.INDEX_MOTOR_POWER);
+                                fire();
                             }
                         }
 
@@ -154,28 +149,13 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                     }
 
                 } else {
-                    // Align with target before moving towards it
-                    if (smoothedHorizontalOffset > TARGET_HORIZONTAL_ACCURACY) {
-
-                        CommandScheduler.getInstance().schedule(
-                            new TurnByEncoder(-TURN_DEGREES_PER_CYCLE, drivetrain));
-
-                    } else if (smoothedHorizontalOffset < -TARGET_HORIZONTAL_ACCURACY) {
-
-                        CommandScheduler.getInstance().schedule(
-                            new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
-
-                    } else {
-
-                        CommandScheduler.getInstance().schedule(new EncoderDrive(
-                            MOVE_FORWARD_PER_CYCLE, MOVE_FORWARD_PER_CYCLE, drivetrain));
-                    }
+                    driveToTarget(smoothedHorizontalOffset);
                 }
 
             } else {
 
                 CommandScheduler.getInstance().schedule(
-                    new TurnByEncoder(TURN_DEGREES_PER_CYCLE, drivetrain));
+                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
             }
         }
     }

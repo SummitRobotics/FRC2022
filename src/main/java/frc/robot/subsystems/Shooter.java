@@ -25,7 +25,12 @@ public class Shooter extends SubsystemBase {
             FF = 0,
             IZ = 0,
             MAX_RPM = 0,
-            RATE = 0.05;
+            RATE = 0.05,
+            SHOOTER_RANGE = 10.0,
+            HOOD_UP_RANGE = 5,
+            TARGET_HORIZONTAL_ACCURACY = 3,
+            TARGET_WRONG_COLOR_MISS = 45,
+            TARGET_MOTOR_SPEED_ACCURACY = 3;
 
     private final CANSparkMax shooterMotor = new CANSparkMax(
             Ports.SHOOTER_MOTOR,
