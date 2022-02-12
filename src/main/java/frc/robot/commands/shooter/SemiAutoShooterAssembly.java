@@ -1,5 +1,6 @@
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.TurnByEncoder;
 import frc.robot.devices.Lemonlight;
@@ -38,7 +39,22 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
     // devices
     private Lemonlight limelight;
+
+    // PID controllers
+    private PIDController alignRightPID;
+    private PIDController alignWrongPID;
+    private PIDController movePID;
     
+    // PID values
+    // TODO - Set these
+    private static final double
+        ALIGN_P = 0,
+        ALIGN_I = 0,
+        ALIGN_D = 0,
+        MOVE_P = 0,
+        MOVE_I = 0,
+        MOVE_D = 0;
+
     /**
      * Command for running the shooter in semi auto mode.
      *
@@ -53,23 +69,33 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         Drivetrain drivetrain,
         Lemonlight limelight,
         OIButton shootButton) {
+
         super(shooter, conveyor, drivetrain, limelight);
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.shootButton = shootButton;
 
-        addRequirements(shooter, conveyor);
+        alignRightPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+        alignWrongPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+        movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
+
+        // TODO - Set these
+        alignRightPID.setTolerance(1, 2);
+        alignWrongPID.setTolerance(1, 2);
+        movePID.setTolerance(1, 2);
+
+        addRequirements(shooter, conveyor, drivetrain);
     }
 
     @Override
     public void initialize() {
         shooter.stop();
-
+        teamColor = getTeamColor();
         prioritizedShootButton = shootButton.prioritize(AxisPriorities.DEFAULT);
         
     }
 
-    @Override
+    /*@Override
     public void execute() {
         // Tracker variables to prevent measurements from changing mid-cycle
         indexState = conveyor.getWillBeIndexedState();
@@ -77,7 +103,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         motorSpeed = shooter.getShooterVelocity();
         limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
         limelightHasTarget = limelight.hasTarget();
-        teamColor = getTeamColor();
         smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
 
 
@@ -157,6 +182,35 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
                 CommandScheduler.getInstance().schedule(
                     new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
             }
+        }
+    }*/
+
+    @Override
+    public void execute() {
+        limelightHasTarget = limelight.hasTarget();
+        limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
+        smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
+        indexState = conveyor.getWillBeIndexedState();
+
+        if (prioritizedShootButton.get() && isBallReady() && limelightHasTarget) {
+
+            driveToTarget(
+                drivetrain,
+                alignRightPID,
+                alignWrongPID,
+                movePID,
+                limelightDistanceEstimate,
+                limelightHasTarget,
+                smoothedHorizontalOffset);
+            alignWithTarget(
+                drivetrain,
+                alignRightPID,
+                alignWrongPID,
+                limelightHasTarget,
+                smoothedHorizontalOffset,
+                (indexState == teamColor));
+
+            
         }
     }
 
