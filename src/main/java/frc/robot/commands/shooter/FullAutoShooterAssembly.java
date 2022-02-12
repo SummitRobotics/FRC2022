@@ -16,7 +16,11 @@ import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
+import frc.robot.devices.Lemonlight;
 import java.lang.Math;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.Conveyor.ConveyorState;
+import frc.robot.commands.drivetrain.TurnByEncoder;
 
 /**
  * Command for running the shooter in full auto mode.
@@ -35,7 +39,6 @@ public class FullAutoShooterAssembly extends CommandBase {
     private boolean hoodAngle;
     private double motorPower;
     private double motorSpeed;
-    private NetworkTable limTable;
     private ConveyorState indexState;
     private boolean isBallIndexed;
     private ShooterStates motorState;
@@ -64,7 +67,6 @@ public class FullAutoShooterAssembly extends CommandBase {
         this.limelight = limelight;
         addRequirements(shooter);
     }
-
     // constants
     private static final double TARGET_MOTOR_SPEED = 0;
     
