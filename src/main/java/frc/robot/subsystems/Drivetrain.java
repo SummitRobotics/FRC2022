@@ -314,9 +314,9 @@ public class Drivetrain extends SubsystemBase {
      */
     public double convertMPStoRPM(double input) {
         double out = input / WHEEL_RADIUS_IN_METERS;
-        out = out * 60;
-        out = out * (2 * Math.PI);
-        out = out * HIGH_GEAR_RATIO;
+        out *= 60;
+        out *= (2 * Math.PI);
+        out *= HIGH_GEAR_RATIO;
         out /= 39.4784176044;
         return out;
     }
