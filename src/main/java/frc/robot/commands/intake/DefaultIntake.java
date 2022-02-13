@@ -35,8 +35,7 @@ public class DefaultIntake extends CommandBase {
     public void execute() {
         switch (intake.getState()) {
             case DOWN:
-                if (conveyor.getFront() != ConveyorState.NONE
-                    && conveyor.getBack() != ConveyorState.NONE) {
+                if (conveyor.getBeltState() != ConveyorState.NONE && conveyor.getWillBeIndexedState() != ConveyorState.NONE) {
 
                     if (loopCount < 50) {
                         intake.setIntakeMotorPower(-Intake.INTAKE_MOTOR_SPEED);

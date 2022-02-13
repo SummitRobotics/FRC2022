@@ -47,11 +47,11 @@ public class HomeByCurrent extends CommandBase {
     /**
      * The Constructor.
      *
-     * @param toHome TODO
-     * @param homingPower TODO
-     * @param currentThreshold TODO
-     * @param reversLimit TODO
-     * @param forwardLimit TODO
+     * @param toHome the subsystem to home
+     * @param homingPower the motor power [-1, 1] used to move the object into the hard stop
+     * @param currentThreshold the amount of amps the motor needs to draw before the motor is considered homed
+     * @param reversLimit the encoder revs that should be the min before the motor stops
+     * @param forwardLimit the encoder revs that should be the max before the motor stops
      */
     public HomeByCurrent(
             Homeable toHome,
@@ -92,11 +92,7 @@ public class HomeByCurrent extends CommandBase {
     public void end(boolean interrupted) {
         toHome.setHomingPower(0);
         // prints out homing completed message
-        System.out.println(
-                "homing of "
-                        + toHome.getSubsystemObject().getClass().getCanonicalName()
-                        + " ended with interrupted "
-                        + interrupted);
+        System.out.println( "homing of " + toHome.getSubsystemObject().getClass().getCanonicalName() + " ended with interrupted " + interrupted);
         if (!interrupted) {
             toHome.setHome(0);
             if (limits) {

@@ -22,39 +22,41 @@ public final class Ports {
 
             // Drivetrain
             // TODO: Set ports
-            LEFT_DRIVE_1 = 0,
-            LEFT_DRIVE_2 = 0,
-            LEFT_DRIVE_3 = 0,
-            RIGHT_DRIVE_1 = 0,
-            RIGHT_DRIVE_2 = 0,
-            RIGHT_DRIVE_3 = 0,
-            SHIFT_SOLENOID_UP = 0,
-            SHIFT_SOLENOID_DOWN = 0,
+            LEFT_DRIVE_1 = 10,
+            LEFT_DRIVE_2 = 11,
+            LEFT_DRIVE_3 = 12,
+            RIGHT_DRIVE_1 = 13,
+            RIGHT_DRIVE_2 = 14,
+            RIGHT_DRIVE_3 = 15,
+            SHIFT_SOLENOID_UP = 1,
+            SHIFT_SOLENOID_DOWN = 2,
 
             // Shooter
-            SHOOTER_MOTOR = 0,
-            HOOD_SOLENOID = 0,
+            SHOOTER_MOTOR = 16,
+            HOOD_SOLENOID = 3,
 
             // Climb
-            LEFT_CLIMB_MOTOR = 0,
-            RIGHT_CLIMB_MOTOR = 0,
-            PIVOT_CLIMB_SOLENOID = 0,
-            LEFT_DETACH_SOLENOID = 0,
-            RIGHT_DETACH_SOLENOID = 0,
+            LEFT_CLIMB_MOTOR = 17,
+            RIGHT_CLIMB_MOTOR = 18,
+            PIVOT_CLIMB_SOLENOID = 4,
+            LEFT_DETACH_SOLENOID = 5,
+            RIGHT_DETACH_SOLENOID = 6,
 
             // LEDs
             LED_PORT = 0,
-            LED_LENGTH = 0,
+            LED_LENGTH = 1000,
 
             // pneumatics
             PRESSURE_SENSOR = 0,
-            PCM_1 = 0,
+            PCM_1 = 1,
+
+            PDP = 2, 
 
             // conveyor
-            FRONT_CONVEYOR = 0,
-            BACK_CONVEYOR = 0,
+            FRONT_CONVEYOR = 19,
+            BACK_CONVEYOR = 20,
 
             // intake
-            INTAKE_MOTOR = 0,
-            INTAKE_SOLENOID = 0;
+            INTAKE_MOTOR = 21,
+            INTAKE_SOLENOID = 7;
 }

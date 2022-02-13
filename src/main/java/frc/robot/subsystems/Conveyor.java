@@ -192,9 +192,7 @@ public class Conveyor extends SubsystemBase {
         } else if (beltRPM > 0) {
             // If the belt is moving forwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
                 // If we detect a different measurement and it seems valid...
 
                 if (colorSensor.getColorString() == "Blue") {
@@ -221,10 +219,7 @@ public class Conveyor extends SubsystemBase {
                 }
             }
             
-            if (indexRPM > 0
-                && indexState != ConveyorState.NONE
-                && wasBallIndexed
-                && !isBallIndexed) {
+            if (indexRPM > 0 && indexState != ConveyorState.NONE && wasBallIndexed && !isBallIndexed) {
                 // If we probably fired the indexed ball...
 
                 // Update the ball states.
@@ -235,26 +230,15 @@ public class Conveyor extends SubsystemBase {
         } else if (beltRPM < 0) {
             // If the belt was manually overridden to run backwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
                 // If we detect a different measurement and it seems valid...
 
-                if ((colorSensorMeasurement == "Blue"
-                    && beltState == ConveyorState.BLUE)
-                    || (colorSensorMeasurement == "Red"
-                    && beltState == ConveyorState.RED)) {
+                if ( (colorSensorMeasurement == "Blue" && beltState == ConveyorState.BLUE) || (colorSensorMeasurement == "Red"&& beltState == ConveyorState.RED) ) {
                     // If that measurement matches beltState...
 
                     beltState = ConveyorState.NONE;
 
-                } else if (beltState == ConveyorState.NONE
-                    && ((colorSensorMeasurement == "Red"
-                    && indexState == ConveyorState.RED
-                    && !isBallIndexed)
-                    || (colorSensorMeasurement == "Blue"
-                    && indexState == ConveyorState.BLUE
-                    && !isBallIndexed))) {
+                } else if (beltState == ConveyorState.NONE && ( (colorSensorMeasurement == "Red" && indexState == ConveyorState.RED && !isBallIndexed) || (colorSensorMeasurement == "Blue" && indexState == ConveyorState.BLUE && !isBallIndexed) ) ) {
                     // If that measurement matches indexState, the ball is not yet indexed, and
                     // beltState is currently empty...
 
@@ -263,10 +247,7 @@ public class Conveyor extends SubsystemBase {
                 }
             }
             
-            if (indexRPM > 0
-                && indexState != ConveyorState.NONE
-                && wasBallIndexed
-                && !isBallIndexed) {
+            if (indexRPM > 0 && indexState != ConveyorState.NONE && wasBallIndexed && !isBallIndexed) {
                 // If we probably fired the indexed ball...
 
                 indexState = ConveyorState.NONE;
@@ -275,10 +256,7 @@ public class Conveyor extends SubsystemBase {
 
         } else {
 
-            if (indexRPM > 0
-                && indexState != ConveyorState.NONE
-                && wasBallIndexed
-                && !isBallIndexed) {
+            if (indexRPM > 0 && indexState != ConveyorState.NONE && wasBallIndexed && !isBallIndexed) {
                 // If the belt is stationary, but we probably still fired the indexed ball...
 
                 indexState = ConveyorState.NONE;
@@ -315,8 +293,7 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a ball ready to be fired
      */
     public boolean getIsBallIndexed() {
-        if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
+        if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
             return true;
         } else {
             return false;
@@ -330,8 +307,7 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a single ball in the conveyor
      */
     public boolean getDoesBallExist() {
-        if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
+        if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
             return true;
         } else {
             return false;
