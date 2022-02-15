@@ -51,11 +51,11 @@ public class RobotContainer {
 
     // Subsystems
     private final Drivetrain drivetrain;
-    private final Shooter shooter;
-    private final Conveyor conveyor;
-    private final Intake intake;
+    // private final Shooter shooter;
+    // private final Conveyor conveyor;
+    // private final Intake intake;
 
-    private final Lemonlight targetingLimelight, ballDetectionLimelight;
+    // private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PDP pdp;
     private final AHRS gyro;
 
@@ -79,15 +79,15 @@ public class RobotContainer {
             "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
-        targetingLimelight = new Lemonlight("limelight");
+        // targetingLimelight = new Lemonlight("limelight");
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("balldetect");
+        // ballDetectionLimelight = new Lemonlight("balldetect");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        shooter = new Shooter();
-        conveyor = new Conveyor();
-        intake = new Intake();
+        // shooter = new Shooter();
+        // conveyor = new Conveyor();
+        // intake = new Intake();
 
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -133,8 +133,8 @@ public class RobotContainer {
                             StatusPriorities.ENABLED)),
                 new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
                 new InstantCommand(drivetrain::highGear),
-                new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
-                new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                // new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
@@ -172,11 +172,11 @@ public class RobotContainer {
     private void initTelemetry() {
         SmartDashboard.putData("PDP", pdp);
         SmartDashboard.putData("Drivetrain", drivetrain);
-        SmartDashboard.putData("Lemonlight", targetingLimelight);
-        SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
-        SmartDashboard.putData("Shooter", shooter);
-        SmartDashboard.putData("Conveyor", conveyor);
-        SmartDashboard.putData("Intake", intake);
+        // SmartDashboard.putData("Lemonlight", targetingLimelight);
+        // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
+        // SmartDashboard.putData("Shooter", shooter);
+        // SmartDashboard.putData("Conveyor", conveyor);
+        // SmartDashboard.putData("Intake", intake);
     }
 
     /**
