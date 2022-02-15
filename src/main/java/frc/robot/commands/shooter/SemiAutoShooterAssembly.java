@@ -194,21 +194,25 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
         if (prioritizedShootButton.get() && isBallReady() && limelightHasTarget) {
 
-            driveToTarget(
-                drivetrain,
-                alignRightPID,
-                alignWrongPID,
-                movePID,
-                limelightDistanceEstimate,
-                limelightHasTarget,
-                smoothedHorizontalOffset);
-            alignWithTarget(
-                drivetrain,
-                alignRightPID,
-                alignWrongPID,
-                limelightHasTarget,
-                smoothedHorizontalOffset,
-                (indexState == teamColor));
+            if (driveToTarget(
+                    drivetrain,
+                    alignRightPID,
+                    alignWrongPID,
+                    movePID,
+                    limelightDistanceEstimate,
+                    limelightHasTarget,
+                    smoothedHorizontalOffset)
+                && alignWithTarget(
+                    drivetrain,
+                    alignRightPID,
+                    alignWrongPID,
+                    limelightHasTarget,
+                    smoothedHorizontalOffset,
+                    (indexState == teamColor))) {
+                
+                // shoot the ball
+                
+            }
 
             
         }

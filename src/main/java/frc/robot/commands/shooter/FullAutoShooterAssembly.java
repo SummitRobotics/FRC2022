@@ -238,13 +238,49 @@ public class FullAutoShooterAssembly extends CommandBase {
      *
      * @param drivetrain The drivetrain subsystem
      * @param hasTarget Whether or not the limelight has a target
+     * @return Whether or not we have a target already
      */
-    public void findTarget(Drivetrain drivetrain, boolean hasTarget) {
+    public boolean findTarget(Drivetrain drivetrain, boolean hasTarget) {
         if (!hasTarget) {
             drivetrain.setLeftMotorPower(0.5);
             drivetrain.setRightMotorPower(-0.5);
+            return false;
         } else {
             drivetrain.setBothMotorPower(0);
+            return true;
+        }
+    }
+
+    /*public boolean spoolMotor(Shooter shooter, double limelightDistanceEstimate) {
+        double targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, shooter.getHoodPos());
+
+        if (Functions.isWithin(shooter.get))
+    }*/
+
+    /**
+     * Method to set the hood position to what it should be.
+     *
+     * @param shooter The shooter subsystem
+     * @param limelightDistanceEstimate The reported distance between the limelight and the target
+     * @param hoodPos The hood position
+     * @return Whether or not the hood position was correct
+     */
+    public boolean setHood(Shooter shooter, double limelightDistanceEstimate, boolean hoodPos) {
+        if (limelightDistanceEstimate < Shooter.SHOOTER_RANGE) {
+            if ((limelightDistanceEstimate < Shooter.HOOD_UP_RANGE - Shooter.RANGE_OVERLAP
+                && hoodPos == false)
+                || (limelightDistanceEstimate > Shooter.HOOD_UP_RANGE + Shooter.RANGE_OVERLAP
+                && hoodPos == true)) {
+
+                shooter.toggleHoodPos();
+                return false;
+
+            } else {
+                return true;
+            }
+
+        } else {
+            return false;
         }
     }
 
