@@ -27,7 +27,7 @@ public class ArcadeDrive extends CommandBase {
 
     private final ChangeRateLimiter limiter;
 
-    private static final double DEAD_ZONE = .1;
+    private static final double DEAD_ZONE = .01;
 
     private static final double MAX_CHANGE_RATE = 0.05;
 

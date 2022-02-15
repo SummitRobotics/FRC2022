@@ -88,19 +88,25 @@ public class ShuffleboardDriver {
             Vector<Object> toRemove = new Vector<>();
             // loops through all the objects in the array
             for (Object x : hm.keySet()) {
+                //System.out.println(x);
                 // gets the name of the object
                 String name = SendableRegistry.getName((Sendable) x);
 
-                // loops through all bad item def
-                for (String badItem : BAD_SHUFFLE_HELL_ITEMS) {
+                if(name != null){
 
-                    // if the name of the current object contains a bad name def remove it and stop
-                    // looping
-                    if (name.contains(badItem)) {
-                        toRemove.add(x);
-                        break;
+                    //System.out.println(name);
+                    // loops through all bad item def
+                    for (String badItem : BAD_SHUFFLE_HELL_ITEMS) {
+
+                        // if the name of the current object contains a bad name def remove it and stop
+                        // looping
+                        if (name.contains(badItem)) {
+                            toRemove.add(x);
+                            break;
+                        }
                     }
                 }
+                
             }
             // removes any of the objects in the toRemove array from the sendableRegistry
             toRemove.forEach((obj) -> SendableRegistry.remove((Sendable) obj));
