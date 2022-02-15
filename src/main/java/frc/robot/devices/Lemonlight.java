@@ -23,10 +23,10 @@ public class Lemonlight implements Sendable {
             MAIN_MOUNT_HEIGHT = 0.0,
             MAIN_MOUNT_ANGLE = 0.0,
             MAIN_TARGET_HEIGHT = 0.0,
-            BALL_MOUNT_HEIGHT = 0.0,
-            BALL_MOUNT_ANGLE = 0.0,
+            BALL_MOUNT_HEIGHT = 47.625,
+            BALL_MOUNT_ANGLE = -20.0,
             BALL_MOUNT_ANGLE_X = 0.0,
-            BALL_TARGET_HEIGHT = 0.0;
+            BALL_TARGET_HEIGHT = 12.065;
 
     /**
      * Creates a new limelight object.
@@ -174,15 +174,14 @@ public class Lemonlight implements Sendable {
             double mountAngle, double mountHeight, double targetHeight, double targetYOffset
     ) {
         return ((targetHeight - mountHeight)
-                / Math.tan(((targetYOffset + mountAngle) * (Math.PI / 180))))
-                * 0.393701;
+            / Math.tan((targetYOffset + mountAngle) * (Math.PI / 180))) 
+            * 0.393701;
     }
 
     public static double getXOOffsetDistanceEstimateIN(
             double targetAngle, double mountAngle, double mountOffset, double targetDistance
     ) {
-        return ((Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * targetDistance)
-                - mountOffset) * 0.393701;
+        return targetDistance * Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * 0.393701;
     }
 
     /**
@@ -223,7 +222,9 @@ public class Lemonlight implements Sendable {
         ArrayList<CustomVisionData> out = new ArrayList<>();
 
         data.forEach((value) -> {
-            out.add(new CustomVisionData(value, BALL_MOUNT_ANGLE, BALL_MOUNT_HEIGHT, BALL_MOUNT_ANGLE_X));
+            out.add(new CustomVisionData(
+                value,
+                    BALL_MOUNT_ANGLE, BALL_MOUNT_HEIGHT, BALL_MOUNT_ANGLE_X, BALL_TARGET_HEIGHT));
         });
 
         return out;
@@ -245,11 +246,17 @@ public class Lemonlight implements Sendable {
         return out;
     }
 
+    private double getFirstInstanceCustomVisionData() {
+        return getCustomVisionDataForTelemetry()[0];
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Lemonlight");
         builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
         builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
-        builder.addDoubleArrayProperty("", this::getCustomVisionDataForTelemetry, null);
+        builder.addDoubleArrayProperty(
+            "customDataArray", this::getCustomVisionDataForTelemetry, null);
+        builder.addDoubleProperty("customData", this::getFirstInstanceCustomVisionData, null);
     }
 }

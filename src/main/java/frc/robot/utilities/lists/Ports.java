@@ -22,12 +22,12 @@ public final class Ports {
 
             // Drivetrain
             // TODO: Set ports
-            LEFT_DRIVE_1 = 0,
-            LEFT_DRIVE_2 = 0,
-            LEFT_DRIVE_3 = 0,
-            RIGHT_DRIVE_1 = 0,
-            RIGHT_DRIVE_2 = 0,
-            RIGHT_DRIVE_3 = 0,
+            LEFT_DRIVE_1 = 30,
+            LEFT_DRIVE_2 = 30,
+            LEFT_DRIVE_3 = 30,
+            RIGHT_DRIVE_1 = 20,
+            RIGHT_DRIVE_2 = 20,
+            RIGHT_DRIVE_3 = 20,
             SHIFT_SOLENOID_UP = 0,
             SHIFT_SOLENOID_DOWN = 0,
 
@@ -44,11 +44,11 @@ public final class Ports {
 
             // LEDs
             LED_PORT = 0,
-            LED_LENGTH = 0,
+            LED_LENGTH = 500,
 
             // pneumatics
             PRESSURE_SENSOR = 0,
-            PCM_1 = 0,
+            PCM_1 = 1,
 
             // conveyor
             FRONT_CONVEYOR = 0,
