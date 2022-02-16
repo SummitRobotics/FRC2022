@@ -1,15 +1,11 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.drivetrain.TurnByEncoder;
 import frc.robot.devices.Lemonlight;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
-import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.AxisPriorities;
 
 
@@ -24,36 +20,11 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private Drivetrain drivetrain;
 
     // OI
-    OIButton shootButton;
-    OIButton.PrioritizedButton prioritizedShootButton;
-
-    // tracker variables
-    private ConveyorState indexState;
-    private boolean isBallIndexed;
-    private double motorSpeed;
-    private double limelightDistanceEstimate;
-    private boolean limelightHasTarget;
-    private ConveyorState teamColor;
-    private double smoothedHorizontalOffset;
-    private double targetMotorSpeed;
+    private OIButton shootButton;
+    private OIButton.PrioritizedButton prioritizedShootButton;
 
     // devices
     private Lemonlight limelight;
-
-    // PID controllers
-    private PIDController alignRightPID;
-    private PIDController alignWrongPID;
-    private PIDController movePID;
-    
-    // PID values
-    // TODO - Set these
-    private static final double
-        ALIGN_P = 0,
-        ALIGN_I = 0,
-        ALIGN_D = 0,
-        MOVE_P = 0,
-        MOVE_I = 0,
-        MOVE_D = 0;
 
     /**
      * Command for running the shooter in semi auto mode.
@@ -73,6 +44,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         super(shooter, conveyor, drivetrain, limelight);
         this.shooter = shooter;
         this.conveyor = conveyor;
+        this.drivetrain = drivetrain;
+        this.limelight = limelight;
         this.shootButton = shootButton;
 
         alignRightPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
@@ -80,11 +53,14 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
 
         // TODO - Set these
-        alignRightPID.setTolerance(1, 2);
-        alignWrongPID.setTolerance(1, 2);
-        movePID.setTolerance(1, 2);
+        alignRightPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
+        alignWrongPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
+        movePID.setTolerance(1, 1);
+        alignRightPID.setSetpoint(0);
+        alignWrongPID.setSetpoint(Shooter.TARGET_WRONG_COLOR_MISS);
+        movePID.setSetpoint(Drivetrain.IDEAL_SHOOTING_DISTANCE);
 
-        addRequirements(shooter, conveyor, drivetrain);
+        addRequirements(shooter, drivetrain, conveyor);
     }
 
     @Override
@@ -92,98 +68,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         shooter.stop();
         teamColor = getTeamColor();
         prioritizedShootButton = shootButton.prioritize(AxisPriorities.DEFAULT);
-        
+
     }
-
-    /*@Override
-    public void execute() {
-        // Tracker variables to prevent measurements from changing mid-cycle
-        indexState = conveyor.getWillBeIndexedState();
-        isBallIndexed = conveyor.getIsBallIndexed();
-        motorSpeed = shooter.getShooterVelocity();
-        limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
-        limelightHasTarget = limelight.hasTarget();
-        smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
-
-
-        if (prioritizedShootButton.get()
-            && indexState != ConveyorState.NONE
-            && isBallIndexed) {
-
-            if (limelightHasTarget) {
-
-                if (limelightDistanceEstimate < Shooter.SHOOTER_RANGE) {
-
-                    if (limelightDistanceEstimate < Shooter.HOOD_UP_RANGE) {
-                        shooter.setHoodPos(true);
-                        targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, true);
-                    } else {
-                        shooter.setHoodPos(false);
-                        targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, false);
-                    }
-
-                    if (Functions.isWithin(
-                        motorSpeed, targetMotorSpeed, Shooter.TARGET_MOTOR_SPEED_ACCURACY)) {
-
-                        if (indexState == teamColor) {
-
-                            if (smoothedHorizontalOffset > Shooter.TARGET_HORIZONTAL_ACCURACY) {
-
-                                CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE,
-                                    drivetrain));
-
-                            } else if (smoothedHorizontalOffset
-                                < -Shooter.TARGET_HORIZONTAL_ACCURACY) {
-
-                                CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE,
-                                    drivetrain));
-
-                            } else {
-                                // Everything seems in order, so trigger the index motor.
-                                fire();
-                            }
-
-                        } else if (indexState != teamColor) {
-
-                            if (smoothedHorizontalOffset
-                                > Shooter.TARGET_HORIZONTAL_ACCURACY
-                                + Shooter.TARGET_WRONG_COLOR_MISS) {
-
-                                CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(-Drivetrain.TURN_DEGREES_PER_CYCLE,
-                                    drivetrain));
-
-                            } else if (smoothedHorizontalOffset
-                                < -Shooter.TARGET_HORIZONTAL_ACCURACY
-                                + Shooter.TARGET_WRONG_COLOR_MISS) {
-
-                                CommandScheduler.getInstance().schedule(
-                                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE,
-                                    drivetrain));
-
-                            } else {
-                                // Everything seems in order, so trigger the index motor.
-                                fire();
-                            }
-                        }
-
-                    } else {
-                        shooter.setMotorTargetSpeed(targetMotorSpeed);
-                    }
-
-                } else {
-                    driveToTarget(smoothedHorizontalOffset);
-                }
-
-            } else {
-
-                CommandScheduler.getInstance().schedule(
-                    new TurnByEncoder(Drivetrain.TURN_DEGREES_PER_CYCLE, drivetrain));
-            }
-        }
-    }*/
 
     @Override
     public void execute() {
@@ -191,30 +77,34 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
         smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
         indexState = conveyor.getWillBeIndexedState();
+        hoodPos = shooter.getHoodPos();
+        currentMotorSpeed = shooter.getShooterVelocity();
 
         if (prioritizedShootButton.get() && isBallReady() && limelightHasTarget) {
 
+            // These are outside the `if` block so that they run every loop,
+            // even if other conditions fail.
+            isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
+            isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
+
             if (driveToTarget(
                     drivetrain,
-                    alignRightPID,
-                    alignWrongPID,
-                    movePID,
                     limelightDistanceEstimate,
                     limelightHasTarget,
                     smoothedHorizontalOffset)
                 && alignWithTarget(
                     drivetrain,
-                    alignRightPID,
-                    alignWrongPID,
                     limelightHasTarget,
                     smoothedHorizontalOffset,
-                    (indexState == teamColor))) {
+                    (indexState == teamColor))
+                && isHoodSet
+                && isSpooled) {
                 
-                // shoot the ball
+                fire();
                 
+            } else {
+                conveyor.setIndexMotorPower(0);
             }
-
-            
         }
     }
 

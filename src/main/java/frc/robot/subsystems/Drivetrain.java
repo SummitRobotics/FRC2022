@@ -50,9 +50,8 @@ public class Drivetrain extends SubsystemBase {
         WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.7112,
-        TURN_DEGREES_PER_CYCLE = 1.0,
-        MOVE_FORWARD_PER_CYCLE = 1.0,
-        ROBOT_CIRCUMFERENCE = Math.PI * 0.6604;
+        ROBOT_CIRCUMFERENCE = Math.PI * 0.6604,
+        IDEAL_SHOOTING_DISTANCE = 1000;
 
 
     // left motors

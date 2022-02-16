@@ -1,9 +1,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
@@ -12,60 +9,44 @@ import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
-import java.lang.Math;
 
 /**
  * Command for running the shooter in full auto mode.
  */
 public class FullAutoShooterAssembly extends CommandBase {
-    // Variables for various things, names are pretty explanitory
+    // subsystems
     private Shooter shooter;
     private Conveyor conveyor;
-    private ConveyorState teamClr;
     private Drivetrain drivetrain;
-    private NetworkTable hoodTable;
-    private NetworkTable speedTable;
-    private double distance;
-    private NetworkTableEntry speed;
-    private NetworkTableEntry hood;
-    private boolean hoodAngle;
-    private double motorPower;
-    private double motorSpeed;
-    private ConveyorState indexState;
-    private boolean isBallIndexed;
-    private ShooterStates motorState;
-    private ShooterStates hoodState;
-    private ShooterStates drivStates;
-    private ShooterStates convState;
-    private double horizontalOffset;
-    private PIDController alignRightPID;
-    private PIDController alignWrongPID;
-    private PIDController movePID;
+    
+    // PID controllers
+    protected PIDController alignWrongPID;
+    protected PIDController movePID;
+    protected PIDController alignRightPID;
+
+    // tracker variables
+    protected ConveyorState indexState;
+    protected double limelightDistanceEstimate;
+    protected boolean limelightHasTarget;
+    protected ConveyorState teamColor;
+    protected double smoothedHorizontalOffset;
+    protected boolean hoodPos;
+    protected boolean isSpooled;
+    protected boolean isHoodSet;
+    protected double currentMotorSpeed;
 
        
-    // constants
-    private static final double
+    // PID values
+    protected static final double
         ALIGN_P = 0,
         ALIGN_I = 0,
         ALIGN_D = 0,
         MOVE_P = 0,
         MOVE_I = 0,
-        MOVE_D = 0,
-        ROBOT_RADIUS = 15;
-    
-    /**
-     * Enum for setting states.
-     */
-    public enum ShooterStates {
-        IDLE,
-        REVVING,
-        READY,
-        MISALIGNED, 
-        UNKNOWN
-    }
+        MOVE_D = 0;
 
     // devices
-    private Lemonlight limelight = new Lemonlight("Shooter");
+    private Lemonlight limelight;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -89,11 +70,13 @@ public class FullAutoShooterAssembly extends CommandBase {
         alignWrongPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
         movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
 
-        // TODO - Set these
-        alignRightPID.setTolerance(1, 2);
-        alignWrongPID.setTolerance(1, 2);
-        movePID.setTolerance(1, 2);
-
+        // TODO - Set these, including the constants
+        alignRightPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
+        alignWrongPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
+        movePID.setTolerance(1, 1);
+        alignRightPID.setSetpoint(0);
+        alignWrongPID.setSetpoint(Shooter.TARGET_WRONG_COLOR_MISS);
+        movePID.setSetpoint(Drivetrain.IDEAL_SHOOTING_DISTANCE);
 
         addRequirements(shooter, drivetrain, conveyor);
     }
@@ -121,7 +104,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     public double solveMotorSpeed(double distance, boolean hoodPos) {
         // Annoyingly, exponent notation requires importing a math library.
         // So, for simplicity, we do not use it.
-        // TODO: Test the shooter and do a cubic regression to find the right formula.
+        // TODO: Test the shooter and do a regression to find the right formula.
+        // Add higher order terms if necessary.
         if (hoodPos) {
             return 0 * distance * distance * distance
                 + 0 * distance * distance
@@ -146,7 +130,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      */
     public boolean isBallReady() {
         if (indexState != ConveyorState.NONE
-            && isBallIndexed) {
+            && conveyor.getIsBallIndexed()) {
             return true;
         } else {
             return false;
@@ -157,9 +141,6 @@ public class FullAutoShooterAssembly extends CommandBase {
      * Method to drive into the range needed by the shooter.
      *
      * @param drivetrain The drivetrain subsystem
-     * @param alignRightPID The PID controller in use for aiming accurately
-     * @param alignWrongPID The PID controller in use for aiming inaccurately
-     * @param movePID The PID controller in use for moving towards the target
      * @param distance The reported distance between the limelight and the target
      * @param hasTarget Whether or not the limelight has a target
      * @param horizontalOffset The limelight's measurement of the horizontal offset
@@ -167,17 +148,12 @@ public class FullAutoShooterAssembly extends CommandBase {
      */
     public boolean driveToTarget(
         Drivetrain drivetrain,
-        PIDController alignRightPID,
-        PIDController alignWrongPID,
-        PIDController movePID,
         double distance,
         boolean hasTarget,
         double horizontalOffset) {
 
         if (alignWithTarget(
             drivetrain,
-            alignRightPID,
-            alignWrongPID,
             hasTarget,
             horizontalOffset,
             true)) {
@@ -198,38 +174,44 @@ public class FullAutoShooterAssembly extends CommandBase {
      * Method to align the drivetrain with the target.
      *
      * @param drivetrain The drivetrain subsystem
-     * @param alignRightPID The PID controller in use for aligning directly towards the target
-     * @param alignWrongPID The PID controller in use for aligning to the side
      * @param hasTarget Whether or not the limelight has a target
      * @param horizontalOffset The limelight's measurement of the horizontal offset
      * @param isAccurate Whether or not our aim should be off
      * @return Whether or not we were aligned
      */
     public boolean alignWithTarget(Drivetrain drivetrain,
-        PIDController alignRightPID,
-        PIDController alignWrongPID,
         boolean hasTarget,
         double horizontalOffset,
         boolean isAccurate) {
 
-
-        if (!Functions.isWithin(horizontalOffset, 0, Shooter.TARGET_HORIZONTAL_ACCURACY)) {
-            if (hasTarget) {
-                if (isAccurate) {
+        if (hasTarget) {
+            if (isAccurate) {
+                if (!Functions.isWithin(horizontalOffset, 0, Shooter.TARGET_HORIZONTAL_ACCURACY)) {
                     drivetrain.setLeftMotorPower(alignRightPID.calculate(horizontalOffset));
                     drivetrain.setRightMotorPower(-alignRightPID.calculate(horizontalOffset));
+                    return false;
                 } else {
+                    return true;
+                }
+                
+            } else {
+                if (!Functions.isWithin(horizontalOffset,
+                    Shooter.TARGET_WRONG_COLOR_MISS,
+                    Shooter.TARGET_HORIZONTAL_ACCURACY)) {
+
                     drivetrain.setLeftMotorPower(alignWrongPID.calculate(horizontalOffset));
                     drivetrain.setRightMotorPower(-alignWrongPID.calculate(horizontalOffset));
+                    return false;
+                    
+                } else {
+                    return true;
                 }
-            } else {
-                alignRightPID.reset();
-                alignWrongPID.reset();
             }
-            return false;
 
         } else {
-            return true;
+            alignRightPID.reset();
+            alignWrongPID.reset();
+            return false;
         }
     }
 
@@ -251,11 +233,33 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
     }
 
-    /*public boolean spoolMotor(Shooter shooter, double limelightDistanceEstimate) {
-        double targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, shooter.getHoodPos());
+    /**
+     * Method to spool the flywheel to the correct speed.
+     *
+     * @param shooter The shooter subsystem
+     * @param limelightDistanceEstimate The limelight's reported distance estimate from the target
+     * @param currentMotorSpeed The current motor speed
+     * @param hoodPos The current hood position
+     * @return Whether or not the motor was already spooled
+     */
+    public boolean spool(Shooter shooter,
+        double limelightDistanceEstimate,
+        double currentMotorSpeed,
+        boolean hoodPos) {
 
-        if (Functions.isWithin(shooter.get))
-    }*/
+        double targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, hoodPos);
+
+        if (!Functions.isWithin(currentMotorSpeed,
+            targetMotorSpeed,
+            Shooter.TARGET_MOTOR_SPEED_ACCURACY)) {
+
+            shooter.setMotorTargetSpeed(targetMotorSpeed);
+            return false;
+
+        } else {
+            return true;
+        }
+    }
 
     /**
      * Method to set the hood position to what it should be.
@@ -289,14 +293,8 @@ public class FullAutoShooterAssembly extends CommandBase {
      */
     @Override
     public void initialize() {
-        hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
-        speedTable = NetworkTableInstance.getDefault().getTable("RPM");
         shooter.stop();
-        teamClr = getTeamColor();
-        motorState = ShooterStates.IDLE;
-        hoodState = ShooterStates.UNKNOWN;
-        drivStates = ShooterStates.IDLE;
-        convState = ShooterStates.REVVING;
+        teamColor = getTeamColor();
         alignRightPID.setSetpoint(0);
         alignRightPID.reset();
         alignWrongPID.setSetpoint(0);
@@ -306,64 +304,42 @@ public class FullAutoShooterAssembly extends CommandBase {
 
     }
 
-    /*@Override
-    public void execute() { 
-        // Checking Variable       
-        motorSpeed = shooter.getShooterVelocity();
-        distance = limelight.getLimelightDistanceEstimateIN();
-        distance = Math.round(distance);
-        hood = hoodTable.getEntry(Double.toString(distance));
-        speed = speedTable.getEntry(Double.toString(distance));
-        hoodAngle = hood.getBoolean(false);
-        motorPower = speed.getDouble(0);
+    @Override
+    public void execute() {
+        limelightHasTarget = limelight.hasTarget();
+        limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
+        smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
         indexState = conveyor.getWillBeIndexedState();
-        isBallIndexed = conveyor.getIsBallIndexed();
+        hoodPos = shooter.getHoodPos();
+        currentMotorSpeed = shooter.getShooterVelocity();
 
-        //Checking to make sure we have a ball and it is the same color as our team
-        if (isBallIndexed && indexState == teamClr && distance > 0) {
-            if (motorSpeed != motorPower) {
-                shooter.setMotorTargetSpeed(motorPower);
-                motorState = ShooterStates.REVVING;
+        if (isBallReady() && limelightHasTarget) {
+
+            // These are outside the `if` block so that they run every loop,
+            // even if other conditions fail.
+            isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
+            isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
+
+            if (driveToTarget(
+                    drivetrain,
+                    limelightDistanceEstimate,
+                    limelightHasTarget,
+                    smoothedHorizontalOffset)
+                && alignWithTarget(
+                    drivetrain,
+                    limelightHasTarget,
+                    smoothedHorizontalOffset,
+                    (indexState == teamColor))
+                && isHoodSet
+                && isSpooled) {
+                
+                fire();
+                
             } else {
-                motorState = ShooterStates.READY;
-            }
-            if (hoodAngle != shooter.getHoodPos()) {
-                shooter.setHoodPos(hoodAngle);
-                hoodState = ShooterStates.MISALIGNED;
-            } else {
-                hoodState = ShooterStates.READY;
-            }
-            if (motorState == ShooterStates.READY && hoodState == ShooterStates.READY) {
-                horizontalOffset = limelight.getSmoothedHorizontalOffset();
-                if (Math.round(horizontalOffset) != 0) {
-                    double radians = Math.PI / 180;
-                    double dst = ROBOT_RADIUS * radians;
-                    if (drivStates == ShooterStates.IDLE) {
-                        drivetrain.stop();
-                        drivetrain.zeroDistance();
-                        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(dst));
-                        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(-dst));
-                        drivStates = ShooterStates.MISALIGNED;
-                    }
-                    
-                } else {
-                    drivetrain.stop();
-                    drivStates = ShooterStates.IDLE;
-                    if (convState == ShooterStates.IDLE) {
-                        conveyor.setIndexEncoder(0);
-                        conveyor.setIndexMotorPower(.5);
-                        convState = ShooterStates.REVVING;
-                         
-                    } else {
-                        if (conveyor.getIndexEncoderPosition() > 2) {
-                            conveyor.setIndexMotorPower(0);
-                            convState = ShooterStates.IDLE;
-                        }
-                    }
-                }
+                conveyor.setIndexMotorPower(0);
             }
         }
-    }*/
+    }
 
     @Override
     public void end(boolean interrupted) {
