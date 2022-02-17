@@ -7,7 +7,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LidarV3;
-import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -36,10 +35,6 @@ public class Conveyor extends SubsystemBase {
     // encoders
     private final RelativeEncoder beltEncoder = belt.getEncoder();
     private final RelativeEncoder indexEncoder = index.getEncoder();
-
-    // rate limiters
-    private final ChangeRateLimiter beltRateLimiter = new ChangeRateLimiter(BELT_RATE);
-    private final ChangeRateLimiter indexRateLimiter = new ChangeRateLimiter(INDEX_RATE);
 
     // sensors
     private final ColorSensor colorSensor;
@@ -86,36 +81,26 @@ public class Conveyor extends SubsystemBase {
         wasBallIndexed = false;
         isBallIndexed = getIsBallIndexed();
         doesBallExist = getDoesBallExist();
-        beltRPM = getBeltRPM();
-        indexRPM = getIndexRPM();
+        beltRPM = 0;
+        indexRPM = 0;
     }
 
     /**
      * Sets the power of the belt motor.
      *
-     * @param power The power of the belt motor (between 1 and -1).
+     * @param power The rate-limited power of the belt motor (between 1 and -1).
      */
     public void setBeltMotorPower(double power) {
-        belt.set(beltRateLimiter.getRateLimitedValue(power));
+        belt.set(power);
     }
 
     /**
      * Sets the power of the index motor.
      *
-     * @param power The power of the index motor (between 1 and -1).
+     * @param power The rate-limited power of the index motor (between 1 and -1).
      */
     public void setIndexMotorPower(double power) {
-        index.set(indexRateLimiter.getRateLimitedValue(power));
-    }
-
-    /**
-     * Sets the power of both motors.
-     *
-     * @param power the power to set the motor.
-     */
-    public void setMotorPower(double power) {
-        setIndexMotorPower(power);
-        setBeltMotorPower(power);
+        index.set(power);
     }
 
     /**
@@ -181,15 +166,6 @@ public class Conveyor extends SubsystemBase {
     }
 
     /**
-     * Resets the rate limiters.
-     * This should only be run when the motors are not moving.
-     */
-    public void resetRateLimiter() {
-        beltRateLimiter.resetOld();
-        indexRateLimiter.resetOld();
-    }
-
-    /**
      * Stops both motors.
      */
     public void stop() {
@@ -221,9 +197,7 @@ public class Conveyor extends SubsystemBase {
         } else if (beltRPM > 0) {
             // If the belt is moving forwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
                 // If we detect a different measurement and it seems valid...
 
                 if (colorSensor.getColorString() == "Blue") {
@@ -250,10 +224,7 @@ public class Conveyor extends SubsystemBase {
                 }
             }
             
-            if (indexRPM > 0
-                && indexState != ConveyorState.NONE
-                && wasBallIndexed
-                && !isBallIndexed) {
+            if (indexRPM > 0 && indexState != ConveyorState.NONE && wasBallIndexed && !isBallIndexed) {
                 // If we probably fired the indexed ball...
 
                 // Update the ball states.
@@ -264,26 +235,15 @@ public class Conveyor extends SubsystemBase {
         } else if (beltRPM < 0) {
             // If the belt was manually overridden to run backwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
                 // If we detect a different measurement and it seems valid...
 
-                if ((colorSensorMeasurement == "Blue"
-                    && beltState == ConveyorState.BLUE)
-                    || (colorSensorMeasurement == "Red"
-                    && beltState == ConveyorState.RED)) {
+                if ( (colorSensorMeasurement == "Blue" && beltState == ConveyorState.BLUE) || (colorSensorMeasurement == "Red"&& beltState == ConveyorState.RED) ) {
                     // If that measurement matches beltState...
 
                     beltState = ConveyorState.NONE;
 
-                } else if (beltState == ConveyorState.NONE
-                    && ((colorSensorMeasurement == "Red"
-                    && indexState == ConveyorState.RED
-                    && !isBallIndexed)
-                    || (colorSensorMeasurement == "Blue"
-                    && indexState == ConveyorState.BLUE
-                    && !isBallIndexed))) {
+                } else if (beltState == ConveyorState.NONE && ( (colorSensorMeasurement == "Red" && indexState == ConveyorState.RED && !isBallIndexed) || (colorSensorMeasurement == "Blue" && indexState == ConveyorState.BLUE && !isBallIndexed) ) ) {
                     // If that measurement matches indexState, the ball is not yet indexed, and
                     // beltState is currently empty...
 
@@ -292,10 +252,7 @@ public class Conveyor extends SubsystemBase {
                 }
             }
             
-            if (indexRPM > 0
-                && indexState != ConveyorState.NONE
-                && wasBallIndexed
-                && !isBallIndexed) {
+            if (indexRPM > 0 && indexState != ConveyorState.NONE && wasBallIndexed && !isBallIndexed) {
                 // If we probably fired the indexed ball...
 
                 indexState = ConveyorState.NONE;
@@ -304,10 +261,7 @@ public class Conveyor extends SubsystemBase {
 
         } else {
 
-            if (indexRPM > 0
-                && indexState != ConveyorState.NONE
-                && wasBallIndexed
-                && !isBallIndexed) {
+            if (indexRPM > 0 && indexState != ConveyorState.NONE && wasBallIndexed && !isBallIndexed) {
                 // If the belt is stationary, but we probably still fired the indexed ball...
 
                 indexState = ConveyorState.NONE;
@@ -344,8 +298,7 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a ball ready to be fired
      */
     public boolean getIsBallIndexed() {
-        if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
+        if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
             return true;
         } else {
             return false;
@@ -359,12 +312,15 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a single ball in the conveyor
      */
     public boolean getDoesBallExist() {
-        if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
+        if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public double getLidarDistance() {
+        return lidar.getAverageDistance();
     }
 
     @Override
