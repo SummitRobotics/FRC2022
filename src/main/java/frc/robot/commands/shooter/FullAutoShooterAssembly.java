@@ -34,7 +34,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected boolean isSpooled;
     protected boolean isHoodSet;
     protected double currentMotorSpeed;
-
+    protected double currentIndexSpeed;
+    protected boolean isDrivenAndAligned;
        
     // PID values
     protected static final double
@@ -104,7 +105,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     public double solveMotorSpeed(double distance, boolean hoodPos) {
         // Annoyingly, exponent notation requires importing a math library.
         // So, for simplicity, we do not use it.
-        // TODO: Test the shooter and do a regression to find the right formula.
+        // TODO - Test the shooter and do a regression to find the right formula.
         // Add higher order terms if necessary.
         if (hoodPos) {
             return 0 * distance * distance * distance
@@ -138,59 +139,38 @@ public class FullAutoShooterAssembly extends CommandBase {
     }
 
     /**
-     * Method to drive into the range needed by the shooter.
+     * Method to drive into range and align with the target. We only run this if we have a target.
      *
      * @param drivetrain The drivetrain subsystem
-     * @param distance The reported distance between the limelight and the target
-     * @param hasTarget Whether or not the limelight has a target
-     * @param horizontalOffset The limelight's measurement of the horizontal offset
-     * @return Whether or not we were in the right position
+     * @param horizontalOffset The angle between us and the target, as reported by the limelight
+     * @param isAccurate Whether we are shooting accurately or intentionally missing
+     * @param limelightDistanceEstimate The limelight's reported distance estimate from the target
+     * @return Whether or not we are aligned and in range
      */
-    public boolean driveToTarget(
-        Drivetrain drivetrain,
-        double distance,
-        boolean hasTarget,
-        double horizontalOffset) {
+    public boolean driveAndAlign(Drivetrain drivetrain,
+        double horizontalOffset,
+        boolean isAccurate,
+        double limelightDistanceEstimate) {
+        
+        if (limelightDistanceEstimate > Shooter.SHOOTER_RANGE) {
+            if (!Functions.isWithin(horizontalOffset, 0, Shooter.TARGET_HORIZONTAL_ACCURACY)) {
 
-        if (alignWithTarget(
-            drivetrain,
-            hasTarget,
-            horizontalOffset,
-            true)) {
-
-            if (distance > Shooter.SHOOTER_RANGE) {
-                drivetrain.setBothMotorPower(movePID.calculate(distance));
+                drivetrain.setLeftMotorPower(alignRightPID.calculate(horizontalOffset));
+                drivetrain.setRightMotorPower(-alignRightPID.calculate(horizontalOffset));
                 return false;
             } else {
-                drivetrain.setBothMotorPower(0);
-                return true;
+                drivetrain.setBothMotorPower(movePID.calculate(limelightDistanceEstimate));
+                return false;
             }
         } else {
-            return false;
-        }
-    }
-
-    /**
-     * Method to align the drivetrain with the target.
-     *
-     * @param drivetrain The drivetrain subsystem
-     * @param hasTarget Whether or not the limelight has a target
-     * @param horizontalOffset The limelight's measurement of the horizontal offset
-     * @param isAccurate Whether or not our aim should be off
-     * @return Whether or not we were aligned
-     */
-    public boolean alignWithTarget(Drivetrain drivetrain,
-        boolean hasTarget,
-        double horizontalOffset,
-        boolean isAccurate) {
-
-        if (hasTarget) {
             if (isAccurate) {
                 if (!Functions.isWithin(horizontalOffset, 0, Shooter.TARGET_HORIZONTAL_ACCURACY)) {
                     drivetrain.setLeftMotorPower(alignRightPID.calculate(horizontalOffset));
                     drivetrain.setRightMotorPower(-alignRightPID.calculate(horizontalOffset));
                     return false;
+
                 } else {
+                    drivetrain.setBothMotorPower(0);
                     return true;
                 }
                 
@@ -204,14 +184,10 @@ public class FullAutoShooterAssembly extends CommandBase {
                     return false;
                     
                 } else {
+                    drivetrain.setBothMotorPower(0);
                     return true;
                 }
             }
-
-        } else {
-            alignRightPID.reset();
-            alignWrongPID.reset();
-            return false;
         }
     }
 
@@ -219,18 +195,10 @@ public class FullAutoShooterAssembly extends CommandBase {
      * Method to spin the drivetrain to locate a target.
      *
      * @param drivetrain The drivetrain subsystem
-     * @param hasTarget Whether or not the limelight has a target
-     * @return Whether or not we have a target already
      */
-    public boolean findTarget(Drivetrain drivetrain, boolean hasTarget) {
-        if (!hasTarget) {
-            drivetrain.setLeftMotorPower(0.5);
-            drivetrain.setRightMotorPower(-0.5);
-            return false;
-        } else {
-            drivetrain.setBothMotorPower(0);
-            return true;
-        }
+    public void findTarget(Drivetrain drivetrain) {
+        drivetrain.setLeftMotorPower(0.5);
+        drivetrain.setRightMotorPower(-0.5);
     }
 
     /**
@@ -295,11 +263,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     public void initialize() {
         shooter.stop();
         teamColor = getTeamColor();
-        alignRightPID.setSetpoint(0);
         alignRightPID.reset();
-        alignWrongPID.setSetpoint(0);
         alignWrongPID.reset();
-        movePID.setSetpoint(0);
         movePID.reset();
 
     }
@@ -312,37 +277,38 @@ public class FullAutoShooterAssembly extends CommandBase {
         indexState = conveyor.getWillBeIndexedState();
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterVelocity();
+        currentIndexSpeed = conveyor.getIndexRPM();
 
         if (isBallReady() && limelightHasTarget) {
 
-            // These are outside the `if` block so that they run every loop,
-            // even if other conditions fail.
             isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
             isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
+            isDrivenAndAligned = driveAndAlign(drivetrain,
+                smoothedHorizontalOffset,
+                (indexState == teamColor),
+                limelightDistanceEstimate);
 
-            if (driveToTarget(
-                    drivetrain,
-                    limelightDistanceEstimate,
-                    limelightHasTarget,
-                    smoothedHorizontalOffset)
-                && alignWithTarget(
-                    drivetrain,
-                    limelightHasTarget,
-                    smoothedHorizontalOffset,
-                    (indexState == teamColor))
-                && isHoodSet
-                && isSpooled) {
-                
+            if (isDrivenAndAligned && isHoodSet && isSpooled) {
                 fire();
-                
-            } else {
+            } else if (currentIndexSpeed != 0) {
                 conveyor.setIndexMotorPower(0);
             }
+        } else if (currentIndexSpeed != 0) {
+            conveyor.setIndexMotorPower(0);
+        }
+        
+        if (!limelightHasTarget) {
+            alignRightPID.reset();
+            alignWrongPID.reset();
+            movePID.reset();
+            findTarget(drivetrain);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
+        shooter.stop();
+        
         alignRightPID.reset();
         alignWrongPID.reset();
         movePID.reset();

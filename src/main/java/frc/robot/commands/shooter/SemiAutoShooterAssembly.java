@@ -52,7 +52,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         alignWrongPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
         movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
 
-        // TODO - Set these
+        // TODO - Set these, including the constants
         alignRightPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
         alignWrongPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
         movePID.setTolerance(1, 1);
@@ -68,6 +68,9 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         shooter.stop();
         teamColor = getTeamColor();
         prioritizedShootButton = shootButton.prioritize(AxisPriorities.DEFAULT);
+        alignRightPID.reset();
+        alignWrongPID.reset();
+        movePID.reset();
 
     }
 
@@ -79,32 +82,31 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         indexState = conveyor.getWillBeIndexedState();
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterVelocity();
+        currentIndexSpeed = conveyor.getIndexRPM();
 
         if (prioritizedShootButton.get() && isBallReady() && limelightHasTarget) {
 
-            // These are outside the `if` block so that they run every loop,
-            // even if other conditions fail.
             isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
             isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
+            isDrivenAndAligned = driveAndAlign(drivetrain,
+                smoothedHorizontalOffset,
+                (indexState == teamColor),
+                limelightDistanceEstimate);
 
-            if (driveToTarget(
-                    drivetrain,
-                    limelightDistanceEstimate,
-                    limelightHasTarget,
-                    smoothedHorizontalOffset)
-                && alignWithTarget(
-                    drivetrain,
-                    limelightHasTarget,
-                    smoothedHorizontalOffset,
-                    (indexState == teamColor))
-                && isHoodSet
-                && isSpooled) {
-                
+            if (isDrivenAndAligned && isHoodSet && isSpooled) {
                 fire();
-                
-            } else {
+            } else if (currentIndexSpeed != 0) {
                 conveyor.setIndexMotorPower(0);
             }
+        } else if (currentIndexSpeed != 0) {
+            conveyor.setIndexMotorPower(0);
+        }
+        
+        if (!limelightHasTarget) {
+            alignRightPID.reset();
+            alignWrongPID.reset();
+            movePID.reset();
+            drivetrain.setBothMotorPower(0);
         }
     }
 
@@ -114,6 +116,13 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
         prioritizedShootButton = null;
         prioritizedShootButton.destroy();
+
+        alignRightPID.reset();
+        alignWrongPID.reset();
+        movePID.reset();
+        alignRightPID.close();
+        alignWrongPID.close();
+        movePID.close();
     }
 
     public boolean isFinished() {
