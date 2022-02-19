@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
-
+import edu.wpi.first.wpilibj.PowerDistribution;
 /**
  * Subsystem to control the intake of the robot.
  */
 public class Intake extends SubsystemBase {
-
+    PowerDistribution powerDistributionHub;
     public static final double INTAKE_RATE = 0.01;
 
     // motor
@@ -35,7 +35,8 @@ public class Intake extends SubsystemBase {
     private boolean intakeSolenoidPosition = false;
 
 
-    public Intake() {
+    public Intake(PowerDistribution powerDistributionHub) {
+        this.powerDistributionHub = powerDistributionHub;
         zeroEncoder();
     }
 

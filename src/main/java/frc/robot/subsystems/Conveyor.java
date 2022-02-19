@@ -1,4 +1,5 @@
 package frc.robot.subsystems;
+import edu.wpi.first.wpilibj.PowerDistribution;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -56,7 +57,7 @@ public class Conveyor extends SubsystemBase {
     private boolean doesBallExist;
     private double beltRPM;
     private double indexRPM;
-
+    PowerDistribution powerDistributionHub;
     // Constants storing acceptable distance data
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 0,
@@ -72,11 +73,11 @@ public class Conveyor extends SubsystemBase {
      * @param colorSensor the color sensor
      * @param lidar the lidar
      */
-    public Conveyor(ColorSensor colorSensor, LidarV3 lidar) {
+    public Conveyor(ColorSensor colorSensor, LidarV3 lidar, PowerDistribution powerDistributionHub) {
         this.colorSensor = colorSensor;
         this.lidar = lidar;
         zeroEncoders();
-
+        this.powerDistributionHub = powerDistributionHub;
         beltState = ConveyorState.NONE;
         indexState = ConveyorState.NONE;
         previousColorSensorMeasurement = "Unknown";

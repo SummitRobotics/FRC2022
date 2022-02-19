@@ -24,7 +24,7 @@ import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
-
+import edu.wpi.first.wpilibj.PowerDistribution;
 /**
  * Subsystem to control the drivetrain of the robot.
  */
@@ -51,7 +51,8 @@ public class Drivetrain extends SubsystemBase {
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.7112;
 
-
+    // Adding Pdh for current draw
+    PowerDistribution powerDistributionHub;
     // left motors
     private final CANSparkMax left =
         new CANSparkMax(Ports.LEFT_DRIVE_3, MotorType.kBrushless);
@@ -119,8 +120,8 @@ public class Drivetrain extends SubsystemBase {
      *
      * @param gyro       odimetry is bad
      */
-    public Drivetrain(AHRS gyro) {
-
+    public Drivetrain(AHRS gyro, PowerDistribution powerDistributionHub) {
+        this.powerDistributionHub = powerDistributionHub;
         this.gyro = gyro;
 
         shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
@@ -418,7 +419,19 @@ public class Drivetrain extends SubsystemBase {
     public double getRightRPM() {
         return rightEncoder.getVelocity();
     }
-
+    //hmm, i wonder what this does... 
+    public double getLeftCurrentDraw(){
+        return powerDistributionHub.getCurrent(Ports.LEFT_DRIVE_1)
+        + powerDistributionHub.getCurrent(Ports.LEFT_DRIVE_2)
+        + powerDistributionHub.getCurrent(Ports.LEFT_DRIVE_3);
+    }
+    
+    //hmm, i wonder what this does...
+    public double getRightCurrentDraw(){
+        return powerDistributionHub.getCurrent(Ports.RIGHT_DRIVE_1)
+        + powerDistributionHub.getCurrent(Ports.RIGHT_DRIVE_2)
+        + powerDistributionHub.getCurrent(Ports.RIGHT_DRIVE_3);
+    }
     /**
      * Gets the total distance the left side has traveled since its last reset.
      *

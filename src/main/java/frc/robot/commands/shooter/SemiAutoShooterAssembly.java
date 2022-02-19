@@ -69,7 +69,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         Drivetrain drivetrain,
         Lemonlight limelight,
         OIButton shootButton) {
-        super(shooter, conveyor, drivetrain, limelight);
+        super(shooter, conveyor, drivetrain);
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.shootButton = shootButton;

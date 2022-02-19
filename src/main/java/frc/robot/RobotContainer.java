@@ -36,7 +36,8 @@ import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 import frc.robot.utilities.lists.StatusPriorities;
-
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -62,6 +63,8 @@ public class RobotContainer {
     private final AHRS gyro;
     private final ColorSensor colorSensor;
     private final LidarV3 lidarV3;
+    // Adding Pdh for current draw
+    private PowerDistribution powerDistributionHub = new PowerDistribution(1, ModuleType.kRev);
 
     private final Command teleInit;
     private final Command autoInit;
@@ -90,10 +93,10 @@ public class RobotContainer {
         ballDetectionLimelight = new Lemonlight("balldetect");
 
         // Init Subsystems
-        drivetrain = new Drivetrain(gyro);
-        shooter = new Shooter();
-        conveyor = new Conveyor(colorSensor, lidarV3);
-        intake = new Intake();
+        drivetrain = new Drivetrain(gyro, powerDistributionHub);
+        shooter = new Shooter(powerDistributionHub);
+        conveyor = new Conveyor(colorSensor, lidarV3, powerDistributionHub);
+        intake = new Intake(powerDistributionHub);
 
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(

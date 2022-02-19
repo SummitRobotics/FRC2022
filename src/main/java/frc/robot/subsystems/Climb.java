@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
-
+import edu.wpi.first.wpilibj.PowerDistribution;
 /**
  * Subsystem for the Climb Subsystem.
  */
@@ -53,7 +53,7 @@ public class Climb extends SubsystemBase {
     // PID Controllers
     private final SparkMaxPIDController leftPidController = leftMotor.getPIDController();
     private final SparkMaxPIDController rightPidController = rightMotor.getPIDController();
-
+    PowerDistribution powerDistributionHub;
     // Encoders
     private final RelativeEncoder leftMotorEncoder = leftMotor.getEncoder();
     private final RelativeEncoder rightMotorEncoder = rightMotor.getEncoder();
@@ -65,14 +65,14 @@ public class Climb extends SubsystemBase {
     /**
      * Public Constructor for climb subsystem.
      */
-    public Climb() {
+    public Climb(PowerDistribution powerDistributionHub) {
         leftPidController.setP(P);
         leftPidController.setI(I);
         leftPidController.setD(D);
         leftPidController.setFF(FF);
         leftPidController.setIZone(IZ);
         leftPidController.setOutputRange(-1.0, 1.0);
-
+        this.powerDistributionHub = powerDistributionHub;
         rightPidController.setP(P);
         rightPidController.setI(I);
         rightPidController.setD(D);
@@ -309,7 +309,15 @@ public class Climb extends SubsystemBase {
     public double[] getPID() {
         return new double[] {P, I, D, FF, IZ};
     }
-
+    //hmm, i wonder what this does... 
+    public double getLeftCurrentDraw(){
+        return powerDistributionHub.getCurrent(Ports.LEFT_CLIMB_MOTOR);
+    }
+    
+    //hmm, i wonder what this does...
+    public double getRightCurrentDraw(){
+        return powerDistributionHub.getCurrent(Ports.RIGHT_CLIMB_MOTOR);
+    }
     /**
      * Function to init telemetry for the climb subsystem.
      */
