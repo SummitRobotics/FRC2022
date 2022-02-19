@@ -19,6 +19,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private OIButton.PrioritizedButton prioritizedShootButton;
     private OIAxis controlAxis;
     private OIAxis.PrioritizedAxis prioritizedControlAxis;
+    private final int axisPriority = 5;
 
     /**
      * Command for running the shooter in semi auto mode.
@@ -61,33 +62,19 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
     @Override
     public void initialize() {
-        shooter.stop();
-        teamColor = getTeamColor();
-        prioritizedShootButton = shootButton.prioritize(AxisPriorities.DEFAULT);
-        prioritizedControlAxis = controlAxis.prioritize(5);
-        alignPID.reset();
-        movePID.reset();
-        shootDelayTimer.start();
+        super.initialize();
+        
+        prioritizedShootButton = shootButton.prioritize(axisPriority);
+        prioritizedControlAxis = controlAxis.prioritize(axisPriority);
     }
 
     @Override
     public void end(final boolean interrupted) {
-        shooter.stop();
+        super.end(interrupted);
 
         prioritizedShootButton = null;
         prioritizedShootButton.destroy();
         prioritizedControlAxis.destroy();
-
-        shootDelayTimer.stop();
-
-        alignPID.reset();
-        movePID.reset();
-        alignPID.close();
-        movePID.close();
-        super.end(false);
     }
 
-    public boolean isFinished() {
-        return false;
-    }
 }
