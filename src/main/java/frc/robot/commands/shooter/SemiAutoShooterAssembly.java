@@ -14,17 +14,9 @@ import frc.robot.utilities.lists.AxisPriorities;
  */
 public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
-    // subsystems
-    private Shooter shooter;
-    private Conveyor conveyor;
-    private Drivetrain drivetrain;
-
     // OI
     private OIButton shootButton;
     private OIButton.PrioritizedButton prioritizedShootButton;
-
-    // devices
-    private Lemonlight limelight;
 
     /**
      * Command for running the shooter in semi auto mode.
@@ -42,23 +34,17 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         OIButton shootButton) {
 
         super(shooter, conveyor, drivetrain, limelight);
-        this.shooter = shooter;
-        this.conveyor = conveyor;
-        this.drivetrain = drivetrain;
-        this.limelight = limelight;
+        super.initialize();
         this.shootButton = shootButton;
 
-        alignRightPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
-        alignWrongPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+        alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
         movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
 
         // TODO - Set these, including the constants
-        alignRightPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
-        alignWrongPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
+        alignPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
         movePID.setTolerance(1, 1);
-        alignRightPID.setSetpoint(0);
-        alignWrongPID.setSetpoint(Shooter.TARGET_WRONG_COLOR_MISS);
-        movePID.setSetpoint(Drivetrain.IDEAL_SHOOTING_DISTANCE);
+        alignPID.setSetpoint(0);
+        movePID.setSetpoint(Shooter.IDEAL_SHOOTING_DISTANCE);
 
         addRequirements(shooter, drivetrain, conveyor);
     }
@@ -68,10 +54,9 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         shooter.stop();
         teamColor = getTeamColor();
         prioritizedShootButton = shootButton.prioritize(AxisPriorities.DEFAULT);
-        alignRightPID.reset();
-        alignWrongPID.reset();
+        alignPID.reset();
         movePID.reset();
-
+        shootDelayTimer.start();
     }
 
     @Override
@@ -95,16 +80,11 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
             if (isDrivenAndAligned && isHoodSet && isSpooled) {
                 fire();
-            } else if (currentIndexSpeed != 0) {
-                conveyor.setIndexMotorPower(0);
             }
-        } else if (currentIndexSpeed != 0) {
-            conveyor.setIndexMotorPower(0);
         }
         
         if (!limelightHasTarget) {
-            alignRightPID.reset();
-            alignWrongPID.reset();
+            alignPID.reset();
             movePID.reset();
             drivetrain.setBothMotorPower(0);
         }
@@ -117,12 +97,13 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         prioritizedShootButton = null;
         prioritizedShootButton.destroy();
 
-        alignRightPID.reset();
-        alignWrongPID.reset();
+        shootDelayTimer.stop();
+
+        alignPID.reset();
         movePID.reset();
-        alignRightPID.close();
-        alignWrongPID.close();
+        alignPID.close();
         movePID.close();
+        super.end(false);
     }
 
     public boolean isFinished() {

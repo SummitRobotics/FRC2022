@@ -2,6 +2,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
@@ -15,14 +16,13 @@ import frc.robot.utilities.Functions;
  */
 public class FullAutoShooterAssembly extends CommandBase {
     // subsystems
-    private Shooter shooter;
-    private Conveyor conveyor;
-    private Drivetrain drivetrain;
+    protected Shooter shooter;
+    protected Conveyor conveyor;
+    protected Drivetrain drivetrain;
     
     // PID controllers
-    protected PIDController alignWrongPID;
     protected PIDController movePID;
-    protected PIDController alignRightPID;
+    protected PIDController alignPID;
 
     // tracker variables
     protected ConveyorState indexState;
@@ -47,7 +47,10 @@ public class FullAutoShooterAssembly extends CommandBase {
         MOVE_D = 0;
 
     // devices
-    private Lemonlight limelight;
+    protected Lemonlight limelight;
+
+    // timer
+    protected Timer shootDelayTimer;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -67,17 +70,16 @@ public class FullAutoShooterAssembly extends CommandBase {
         this.drivetrain = drivetrain;
         this.limelight = limelight;
 
-        alignRightPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
-        alignWrongPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
-        movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
+        this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+        this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
 
         // TODO - Set these, including the constants
-        alignRightPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
-        alignWrongPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
+        alignPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
         movePID.setTolerance(1, 1);
-        alignRightPID.setSetpoint(0);
-        alignWrongPID.setSetpoint(Shooter.TARGET_WRONG_COLOR_MISS);
-        movePID.setSetpoint(Drivetrain.IDEAL_SHOOTING_DISTANCE);
+        alignPID.setSetpoint(0);
+        movePID.setSetpoint(Shooter.IDEAL_SHOOTING_DISTANCE);
+
+        this.shootDelayTimer = new Timer();
 
         addRequirements(shooter, drivetrain, conveyor);
     }
@@ -120,8 +122,14 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
     }
 
+    /**
+     * Spins the index motor 360 degrees, moving a ball into the shooter.
+     */
     public void fire() {
-        conveyor.setIndexMotorPower(Conveyor.INDEX_MOTOR_POWER);
+        if (shootDelayTimer.get() > Shooter.SHOOT_DELAY_SECONDS) {
+            conveyor.setIndexTargetPosition(conveyor.getIndexEncoderPosition() + 50);
+            shootDelayTimer.reset();
+        }
     }
 
     /**
@@ -153,10 +161,14 @@ public class FullAutoShooterAssembly extends CommandBase {
         double limelightDistanceEstimate) {
         
         if (limelightDistanceEstimate > Shooter.SHOOTER_RANGE) {
-            if (!Functions.isWithin(horizontalOffset, 0, Shooter.TARGET_HORIZONTAL_ACCURACY)) {
+            if (alignPID.getSetpoint() != 0) {
+                alignPID.setSetpoint(0);
+            }
 
-                drivetrain.setLeftMotorPower(alignRightPID.calculate(horizontalOffset));
-                drivetrain.setRightMotorPower(-alignRightPID.calculate(horizontalOffset));
+            if (!alignPID.atSetpoint()) {
+
+                drivetrain.setLeftMotorPower(alignPID.calculate(horizontalOffset));
+                drivetrain.setRightMotorPower(-alignPID.calculate(horizontalOffset));
                 return false;
             } else {
                 drivetrain.setBothMotorPower(movePID.calculate(limelightDistanceEstimate));
@@ -164,9 +176,13 @@ public class FullAutoShooterAssembly extends CommandBase {
             }
         } else {
             if (isAccurate) {
-                if (!Functions.isWithin(horizontalOffset, 0, Shooter.TARGET_HORIZONTAL_ACCURACY)) {
-                    drivetrain.setLeftMotorPower(alignRightPID.calculate(horizontalOffset));
-                    drivetrain.setRightMotorPower(-alignRightPID.calculate(horizontalOffset));
+                if (alignPID.getSetpoint() != 0) {
+                    alignPID.setSetpoint(0);
+                }
+
+                if (!alignPID.atSetpoint()) {
+                    drivetrain.setLeftMotorPower(alignPID.calculate(horizontalOffset));
+                    drivetrain.setRightMotorPower(-alignPID.calculate(horizontalOffset));
                     return false;
 
                 } else {
@@ -175,12 +191,14 @@ public class FullAutoShooterAssembly extends CommandBase {
                 }
                 
             } else {
-                if (!Functions.isWithin(horizontalOffset,
-                    Shooter.TARGET_WRONG_COLOR_MISS,
-                    Shooter.TARGET_HORIZONTAL_ACCURACY)) {
+                if (alignPID.getSetpoint() != Shooter.TARGET_WRONG_COLOR_MISS) {
+                    alignPID.setSetpoint(Shooter.TARGET_WRONG_COLOR_MISS);
+                }
 
-                    drivetrain.setLeftMotorPower(alignWrongPID.calculate(horizontalOffset));
-                    drivetrain.setRightMotorPower(-alignWrongPID.calculate(horizontalOffset));
+                if (!alignPID.atSetpoint()) {
+
+                    drivetrain.setLeftMotorPower(alignPID.calculate(horizontalOffset));
+                    drivetrain.setRightMotorPower(-alignPID.calculate(horizontalOffset));
                     return false;
                     
                 } else {
@@ -263,10 +281,9 @@ public class FullAutoShooterAssembly extends CommandBase {
     public void initialize() {
         shooter.stop();
         teamColor = getTeamColor();
-        alignRightPID.reset();
-        alignWrongPID.reset();
+        alignPID.reset();
         movePID.reset();
-
+        shootDelayTimer.start();
     }
 
     @Override
@@ -290,16 +307,11 @@ public class FullAutoShooterAssembly extends CommandBase {
 
             if (isDrivenAndAligned && isHoodSet && isSpooled) {
                 fire();
-            } else if (currentIndexSpeed != 0) {
-                conveyor.setIndexMotorPower(0);
             }
-        } else if (currentIndexSpeed != 0) {
-            conveyor.setIndexMotorPower(0);
         }
         
         if (!limelightHasTarget) {
-            alignRightPID.reset();
-            alignWrongPID.reset();
+            alignPID.reset();
             movePID.reset();
             findTarget(drivetrain);
         }
@@ -309,12 +321,12 @@ public class FullAutoShooterAssembly extends CommandBase {
     public void end(boolean interrupted) {
         shooter.stop();
         
-        alignRightPID.reset();
-        alignWrongPID.reset();
+        alignPID.reset();
         movePID.reset();
-        alignRightPID.close();
-        alignWrongPID.close();
+        alignPID.close();
         movePID.close();
+
+        shootDelayTimer.stop();
     }
 
     public boolean isFinished() {

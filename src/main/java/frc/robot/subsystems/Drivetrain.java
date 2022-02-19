@@ -49,9 +49,7 @@ public class Drivetrain extends SubsystemBase {
         WHEEL_RADIUS_IN_METERS = 0.0762,
         WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
-        DRIVE_WIDTH = 0.7112,
-        ROBOT_CIRCUMFERENCE = Math.PI * 0.6604,
-        IDEAL_SHOOTING_DISTANCE = 1000;
+        DRIVE_WIDTH = 0.7112;
 
 
     // left motors
@@ -351,19 +349,6 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized void setRightMotorTarget(double position) {
         rightPID.setReference(position, ControlType.kPosition);
-    }
-
-    /**
-     * Sets the PID controllers to rotate the robot a desired number of degrees.
-     *
-     * @param degrees The measurement of the desired rotation in degrees. Positive is clockwise.
-     */
-    public synchronized void setRotateTarget(double degrees) {
-        // TODO: Check if this works.
-        leftPID.setReference(distToEncoder(degrees * ROBOT_CIRCUMFERENCE / 360),
-            ControlType.kPosition);
-        rightPID.setReference(distToEncoder(-degrees * ROBOT_CIRCUMFERENCE / 360),
-            ControlType.kPosition);
     }
 
     /**

@@ -32,7 +32,9 @@ public class Shooter extends SubsystemBase {
             RANGE_OVERLAP = 1,
             TARGET_HORIZONTAL_ACCURACY = 3,
             TARGET_WRONG_COLOR_MISS = 45,
-            TARGET_MOTOR_SPEED_ACCURACY = 3;
+            TARGET_MOTOR_SPEED_ACCURACY = 3,
+            IDEAL_SHOOTING_DISTANCE = 1000,
+            SHOOT_DELAY_SECONDS = 1;
 
     private final CANSparkMax shooterMotor = new CANSparkMax(
             Ports.SHOOTER_MOTOR,
