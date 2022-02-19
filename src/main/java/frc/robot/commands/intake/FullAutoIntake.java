@@ -7,14 +7,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drivetrain.FollowTrajectory;
-import frc.robot.commands.drivetrain.FollowTrajectoryThreaded;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.utilities.CustomVisionData;
 import java.util.Arrays;
 
@@ -23,21 +21,31 @@ import java.util.Arrays;
  */
 public class FullAutoIntake extends CommandBase {
 
+    // subsystems
+    private Intake intake;
     private Drivetrain drivetrain;
+
+    // devices
     private Lemonlight ballDetectionLimelight;
+
+    // pathfinding objects
     private FollowTrajectory followTrajectoryCommand;
     private Pose2d ballPose = new Pose2d();
 
     /**
      * Constructor.
      *
-     * @param drivetrain the robot drivetrain
-     * @param ballDetectionLimelight the ball detection limelight
+     * @param drivetrain The drivetrain subsystem
+     * @param ballDetectionLimelight The ball detection limelight
+     * @param intake The intake subsystem
      */
-    //FullAutoIntake(Drivetrain drivetrain, Intake intake, Lemonlight ballDetectionLimelight) {
-    public FullAutoIntake(Drivetrain drivetrain, Lemonlight ballDetectionLimelight) {
+    public FullAutoIntake(Drivetrain drivetrain,
+        Lemonlight ballDetectionLimelight,
+        Intake intake) {
+
         this.drivetrain = drivetrain;
         this.ballDetectionLimelight = ballDetectionLimelight;
+        this.intake = intake;
     }
 
     @Override
@@ -53,7 +61,8 @@ public class FullAutoIntake extends CommandBase {
 
             Pose2d startPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
             ballPose =
-                    new Pose2d(Units.inchesToMeters(ball.getYDistance() + 12), -Units.inchesToMeters(ball.getXDistance()), Rotation2d.fromDegrees(0));
+                    new Pose2d(Units.inchesToMeters(ball.getYDistance() + 12),
+                        -Units.inchesToMeters(ball.getXDistance()), Rotation2d.fromDegrees(0));
 
             drivetrain.setPose(startPosition);
 
@@ -72,11 +81,11 @@ public class FullAutoIntake extends CommandBase {
     @Override
     public void execute() {
         if (followTrajectoryCommand != null) {
-//            Pose2d newBallPose = calculateBallPose(getBestBall(), drivetrain.getPose());
-//            if (!inProximity(newBallPose, ballPose, 0.2)) {
-//                //System.out.println("NEW POSITION: " + newBallPose);
-//                ballPose = newBallPose;
-//            }
+            Pose2d newBallPose = calculateBallPose(getBestBall(), drivetrain.getPose());
+            if (!inProximity(newBallPose, ballPose, 0.2)) {
+                //System.out.println("NEW POSITION: " + newBallPose);
+                ballPose = newBallPose;
+            }
 
             followTrajectoryCommand.execute();
         }

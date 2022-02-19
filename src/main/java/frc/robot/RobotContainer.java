@@ -111,8 +111,8 @@ public class RobotContainer {
                         // simulated robots don't have joysticks
                         if (RobotBase.isReal()) {
                             if (!controller1.isConnected()
-                                //|| !launchpad.isConnected()
-                                //|| !joystick.isConnected()
+                            //|| !launchpad.isConnected()
+                            //|| !joystick.isConnected()
                             ) {
                                 System.out.println(
                                     "not enough joysticks connected,"
@@ -169,7 +169,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
+        // controller1.buttonA.whileHeld(
+            // new FullAutoIntake(drivetrain, ballDetectionLimelight, intake));
     }
 
     /**
