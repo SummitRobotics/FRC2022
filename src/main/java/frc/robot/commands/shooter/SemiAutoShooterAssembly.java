@@ -1,7 +1,7 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.math.controller.PIDController;
 import frc.robot.devices.Lemonlight;
+import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
@@ -17,6 +17,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     // OI
     private OIButton shootButton;
     private OIButton.PrioritizedButton prioritizedShootButton;
+    private OIAxis controlAxis;
+    private OIAxis.PrioritizedAxis prioritizedControlAxis;
 
     /**
      * Command for running the shooter in semi auto mode.
@@ -26,27 +28,35 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
      * @param drivetrain The drivetrain subsystem.
      * @param limelight The limelight device.
      * @param shootButton The button to enable the shooter.
+     * @param controlAxis The joystick used to manually align the robot to find a target.
      */
     public SemiAutoShooterAssembly(Shooter shooter,
         Conveyor conveyor,
         Drivetrain drivetrain,
         Lemonlight limelight,
-        OIButton shootButton) {
+        OIButton shootButton,
+        OIAxis controlAxis) {
 
         super(shooter, conveyor, drivetrain, limelight);
         super.initialize();
         this.shootButton = shootButton;
-
-        alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
-        movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
-
-        // TODO - Set these, including the constants
-        alignPID.setTolerance(Shooter.TARGET_HORIZONTAL_ACCURACY, 1);
-        movePID.setTolerance(1, 1);
-        alignPID.setSetpoint(0);
-        movePID.setSetpoint(Shooter.IDEAL_SHOOTING_DISTANCE);
+        this.controlAxis = controlAxis;
 
         addRequirements(shooter, drivetrain, conveyor);
+    }
+
+    @Override
+    public void findTarget(Drivetrain drivetrain) {
+        drivetrain.setLeftMotorPower(prioritizedControlAxis.get());
+        drivetrain.setRightMotorPower(-prioritizedControlAxis.get());
+
+    }
+
+    @Override
+    public void fire() {
+        if (prioritizedShootButton.get()) {
+            super.fire();
+        }
     }
 
     @Override
@@ -54,40 +64,10 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         shooter.stop();
         teamColor = getTeamColor();
         prioritizedShootButton = shootButton.prioritize(AxisPriorities.DEFAULT);
+        prioritizedControlAxis = controlAxis.prioritize(5);
         alignPID.reset();
         movePID.reset();
         shootDelayTimer.start();
-    }
-
-    @Override
-    public void execute() {
-        limelightHasTarget = limelight.hasTarget();
-        limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
-        smoothedHorizontalOffset = limelight.getSmoothedHorizontalOffset();
-        indexState = conveyor.getWillBeIndexedState();
-        hoodPos = shooter.getHoodPos();
-        currentMotorSpeed = shooter.getShooterVelocity();
-        currentIndexSpeed = conveyor.getIndexRPM();
-
-        if (prioritizedShootButton.get() && isBallReady() && limelightHasTarget) {
-
-            isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
-            isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
-            isDrivenAndAligned = driveAndAlign(drivetrain,
-                smoothedHorizontalOffset,
-                (indexState == teamColor),
-                limelightDistanceEstimate);
-
-            if (isDrivenAndAligned && isHoodSet && isSpooled) {
-                fire();
-            }
-        }
-        
-        if (!limelightHasTarget) {
-            alignPID.reset();
-            movePID.reset();
-            drivetrain.setBothMotorPower(0);
-        }
     }
 
     @Override
@@ -96,6 +76,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
         prioritizedShootButton = null;
         prioritizedShootButton.destroy();
+        prioritizedControlAxis.destroy();
 
         shootDelayTimer.stop();
 

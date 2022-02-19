@@ -274,9 +274,6 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
     }
 
-    /**
-     * Initializing variables.
-     */
     @Override
     public void initialize() {
         shooter.stop();
