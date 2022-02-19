@@ -92,7 +92,7 @@ public class ShuffleboardDriver {
                 // gets the name of the object
                 String name = SendableRegistry.getName((Sendable) x);
 
-                if(name != null){
+                if (name != null) {
 
                     //System.out.println(name);
                     // loops through all bad item def
