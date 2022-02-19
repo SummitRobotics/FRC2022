@@ -32,24 +32,24 @@ public class Drivetrain extends SubsystemBase {
 
     // TODO re tune/calculate all these
     public static final double 
-        LOW_P = 2.29,
+        LOW_P = 0.0,
         LOW_I = 0.0,
         LOW_D = 0.0,
-        LOW_KS = 0.177,
-        LOW_KV = 1.55,
-        LOW_KA = 0.133,
-        HIGH_P = 2.85,
+        LOW_KS = 0.0,
+        LOW_KV = 0.0,
+        LOW_KA = 0.0,
+        HIGH_P = 14.301,
         HIGH_I = 0.0,
-        HIGH_D = 0.0,
-        HIGH_KS = 0.211,
-        HIGH_KV = 0.734,
-        HIGH_KA = 0.141,
-        HIGH_GEAR_RATIO = 9.1,
-        LOW_GEAR_RATIO = 19.65,
-        WHEEL_RADIUS_IN_METERS = 0.0762,
+        HIGH_D = 581.73,
+        HIGH_KS = 0.18976,
+        HIGH_KV = 1.9778,
+        HIGH_KA = 0.16066,
+        HIGH_GEAR_RATIO = 5.088,
+        LOW_GEAR_RATIO = 11.022,
+        WHEEL_RADIUS_IN_METERS = 0.0508,
         WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
-        DRIVE_WIDTH = 0.7112;
+        DRIVE_WIDTH = 0.6858;
 
 
     // left motors
@@ -146,24 +146,24 @@ public class Drivetrain extends SubsystemBase {
         zeroDistance();
 
         // pid for position
-        leftPID.setP(0.05);
+        leftPID.setP(14.301);
         leftPID.setI(0);
-        leftPID.setD(0);
+        leftPID.setD(581.73);
         leftPID.setOutputRange(-.25, .25);
 
-        rightPID.setP(0.05);
+        rightPID.setP(14.301);
         rightPID.setI(0);
-        rightPID.setD(0);
+        rightPID.setD(581.73);
         rightPID.setOutputRange(-.25, .25);
 
         // pid for velocity
-        leftPID.setP(0.000278, 2);
+        leftPID.setP(0.00012245, 2);
         leftPID.setI(0, 2);
-        leftPID.setD(0.0001, 2);
+        leftPID.setD(0.0, 2);
 
-        rightPID.setP(0.000278, 2);
+        rightPID.setP(0.00012245, 2);
         rightPID.setI(0, 2);
-        rightPID.setD(0.0001, 2);
+        rightPID.setD(0.0, 2);
 
         left.disableVoltageCompensation();
         right.disableVoltageCompensation();
@@ -214,6 +214,17 @@ public class Drivetrain extends SubsystemBase {
         oldShift = false;
         updateDistanceAcum();
         shift.set(false);
+    }
+
+    /**
+     * Toggles the shift state.
+     */
+    public void toggleShift() {
+        if (oldShift) {
+            lowGear();
+        } else {
+            highGear();
+        }
     }
 
     /**

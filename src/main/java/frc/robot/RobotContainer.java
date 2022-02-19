@@ -177,6 +177,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.lowGear()));
+        controller1.leftBumper.whenReleased(new InstantCommand(() -> drivetrain.highGear()));
     }
 
     /**
