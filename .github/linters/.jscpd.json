@@ -1,4 +1,4 @@
 {
-  "threshold": 3,
+  "threshold": 30,
   "reporters": ["console"]
 }
