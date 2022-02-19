@@ -263,14 +263,10 @@ public class Drivetrain extends SubsystemBase {
      *
      * @param power The power, between -1 and 1
      */
-    public void setBothMotorPower(double power) {
+    public synchronized void setBothMotorPower(double power) {
         power = Functions.clampDouble(power, 1.0, -1.0);
-        synchronized (left) {
-            left.set(power);
-        }
-        synchronized (right) {
-            right.set(power);
-        }
+        left.set(power);
+        right.set(power);
     }
 
     /**

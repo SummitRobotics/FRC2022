@@ -8,7 +8,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LidarV3;
-import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -156,16 +155,6 @@ public class Conveyor extends SubsystemBase {
      */
     public void setIndexEncoder(double position) {
         indexEncoder.setPosition(position);
-    }
-
-    /**
-     * Sets the target speed of the index motor using the PID controller.
-     *
-     * @param speed The desired speed of the index motor.
-     */
-    public void setIndexTargetSpeed(double speed) {
-        speed = Functions.clampDouble(speed, MAX_INDEX_RPM, -MAX_INDEX_RPM);
-        indexPID.setReference(speed, CANSparkMax.ControlType.kVelocity);
     }
 
     /**
