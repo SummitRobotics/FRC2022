@@ -228,7 +228,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Updateds the distace acumulator.
+     * Updates the distace acumulator.
      */
     private void updateDistanceAcum() {
         leftDistanceAcum += getLeftDistance();
@@ -267,6 +267,17 @@ public class Drivetrain extends SubsystemBase {
         synchronized (right) {
             right.set(power);
         }
+    }
+
+    /**
+     * Sets the power of both sides of the drivetrain.
+     *
+     * @param power The power, between -1 and 1
+     */
+    public synchronized void setBothMotorPower(double power) {
+        power = Functions.clampDouble(power, 1.0, -1.0);
+        left.set(power);
+        right.set(power);
     }
 
     /**
@@ -322,9 +333,9 @@ public class Drivetrain extends SubsystemBase {
      */
     public double convertMPStoRPM(double input) {
         double out = input / WHEEL_RADIUS_IN_METERS;
-        out = out * 60;
-        out = out * (2 * Math.PI);
-        out = out * HIGH_GEAR_RATIO;
+        out *= 60;
+        out *= (2 * Math.PI);
+        out *= HIGH_GEAR_RATIO;
         out /= 39.4784176044;
         return out;
     }

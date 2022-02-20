@@ -39,7 +39,7 @@ public class EncoderDrive extends CommandBase {
     public void initialize() {
         drivetrain.stop();
         drivetrain.zeroDistance();
-        // TODO test if this is acurate
+        // TODO test if this is accurate
         drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
         drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right));
     }

@@ -18,6 +18,7 @@ import frc.robot.utilities.lists.Ports;
  */
 public class Shooter extends SubsystemBase {
 
+    // TODO - Set these
     public static final double
             P = 0,
             I = 0,
@@ -26,6 +27,7 @@ public class Shooter extends SubsystemBase {
             IZ = 0,
             MAX_RPM = 0,
             RATE = 0.05;
+
 
     private final CANSparkMax shooterMotor = new CANSparkMax(
             Ports.SHOOTER_MOTOR,
