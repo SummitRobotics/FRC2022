@@ -31,11 +31,9 @@ public class Climb extends SubsystemBase {
     private final CANSparkMax rightMotor =
             new CANSparkMax(Ports.RIGHT_CLIMB_MOTOR, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-    // Pivot Solenoid
-    private final Solenoid pivotLeft =
-            new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.PIVOT_CLIMB_SOLENOID_LEFT);
-    private final Solenoid pivotRight =
-            new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.PIVOT_CLIMB_SOLENOID_RIGHT);
+    // Pivot Solenoid;
+    private final Solenoid pivot =
+            new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.PIVOT_CLIMB_SOLENOID);
 
     // Detach Solenoids
     private final Solenoid leftDetach =
@@ -45,8 +43,7 @@ public class Climb extends SubsystemBase {
 
     // Solenoid Positions
     private boolean
-            pivotPosLeft = false,
-            pivotPosRight = false,
+            pivotPos = false,
             leftDetachPos = false,
             rightDetachPos = false;
 
@@ -130,21 +127,12 @@ public class Climb extends SubsystemBase {
     }
 
     /**
-     * Gets the current position of the left pneumatic pivot.
+     * Gets the current position of the pneumatic pivot.
      *
-     * @return The current position of the left pivot piston.
+     * @return The current position of the pivot piston.
      */
-    public boolean getPivotPosLeft() {
-        return pivotPosLeft;
-    }
-
-    /**
-     * Gets the current position of the right pneumatic pivot.
-     *
-     * @return The current position of the right pivot piston.
-     */
-    public boolean getPivotPosRight() {
-        return pivotPosRight;
+    public boolean getPivotPos() {
+        return pivotPos;
     }
 
     /**
@@ -225,34 +213,19 @@ public class Climb extends SubsystemBase {
     }
 
     /**
-     * Sets the pivot position for the left pneumatics.
+     * Sets the pivot position for the pneumatics.
      *
      * @param pos The position to set it to (Boolean)
      */
-    public void setPivotPosLeft(boolean pos) {
-        pivotPosLeft = pos;
-        pivotLeft.set(pos);
+    public void setPivotPos(boolean pos) {
+        pivotPos = pos;
+        pivot.set(pos);
     }
     /**
-     * Sets the pivot position for the right pneumatics.
-     *
-     * @param pos The position to set it to (Boolean)
+     * Toggles the position of the pivot.
      */
-    public void setPivotPosRight(boolean pos) {
-        pivotPosRight = pos;
-        pivotRight.set(pos);
-    }
-    /**
-     * Toggles the position of the left pivot.
-     */
-    public void togglePivotPosLeft() {
-        setPivotPosLeft(!pivotPosLeft);
-    }
-    /**
-     * Toggles the position of the right pivot.
-     */
-    public void togglePivotPosRight() {
-        setPivotPosRight(!pivotPosRight);
+    public void togglePivotPos() {
+        setPivotPos(!pivotPos);
     }
     /**
      * Sets the position for the left detach pneumatics.
@@ -329,8 +302,7 @@ public class Climb extends SubsystemBase {
         builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
         builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
         builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
-        builder.addBooleanProperty("pivotPositionLeft", this::getPivotPosLeft, null);
-        builder.addBooleanProperty("pivotPositionRight", this::getPivotPosRight, null);
+        builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
         builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
         builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
     }

@@ -84,8 +84,7 @@ public class ClimbAutomation extends CommandBase {
     prioritizedClimbButton =  climbButton.prioritize(AxisPriorities.DEFAULT);
     motorLeft = motorStates.IDLE;
     motorRight = motorStates.IDLE; 
-    climb.setPivotPosLeft(false);
-    climb.setPivotPosRight(false);
+    climb.setPivotPos(false);
     climb.setLeftDetachPos(false);
     climb.setRightDetachPos(false);
     pivotPistLeft = pistonStates.RETRACTED; 
@@ -123,13 +122,13 @@ public class ClimbAutomation extends CommandBase {
       motorRight = motorStates.IDLE;
     if (motorRight == motorStates.IDLE && motorLeft == motorStates.IDLE){
       climbSystem = climbStates.EXTENDED;
-      climb.setPivotPosLeft(false);
-      climb.setPivotPosRight(false);
+      climb.setPivotPos(false);
 
     }
 
     }
   }
+  //TODO add gyro code
   // retracting screws 
   public void retract(){
     if (Math.abs(avgRightScrewPower.getAverage() - avgLeftScrewPower.getAverage())<1 
@@ -149,6 +148,7 @@ public class ClimbAutomation extends CommandBase {
       motorLeft = motorStates.BROKEN;
       climb.stop();
     }
+    
     if (climb.getRightEncoderValue() <= 0 && climb.getLeftEncoderValue() <= 0){
       climb.setMotorPower(0);
       climb.setRightDetachPos(true);
@@ -167,8 +167,7 @@ public class ClimbAutomation extends CommandBase {
     if (climb.getRightEncoderValue() > 10 && climb.getLeftEncoderValue() > 10){
       climb.setLeftMotorPower(0);
       climb.setRightMotorPower(0);
-      climb.setPivotPosRight(true);
-      climb.setPivotPosLeft(true);
+      climb.setPivotPos(true);
       climbSystem = climbStates.DONE;
       motorRight = motorStates.IDLE;
       motorLeft = motorStates.IDLE;
