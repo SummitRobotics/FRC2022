@@ -1,14 +1,13 @@
 package frc.robot.subsystems;
-import edu.wpi.first.wpilibj.PowerDistribution;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LidarV3;
-import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -16,9 +15,16 @@ import frc.robot.utilities.lists.Ports;
  */
 public class Conveyor extends SubsystemBase {
 
+    // TODO - Set these
     public static final double
             BELT_RATE = 0.01,
-            INDEX_RATE = 0.01;
+            INDEX_RATE = 0.01,
+            MAX_INDEX_RPM = 0,
+            P = 0,
+            I = 0,
+            D = 0,
+            FF = 0,
+            IZ = 0;
 
     /**
     * Enum tracking what could be in the front or back of the conveyor.
@@ -37,9 +43,8 @@ public class Conveyor extends SubsystemBase {
     private final RelativeEncoder beltEncoder = belt.getEncoder();
     private final RelativeEncoder indexEncoder = index.getEncoder();
 
-    // rate limiters
-    private final ChangeRateLimiter beltRateLimiter = new ChangeRateLimiter(BELT_RATE);
-    private final ChangeRateLimiter indexRateLimiter = new ChangeRateLimiter(INDEX_RATE);
+    // PID controllers
+    private final SparkMaxPIDController indexPID = index.getPIDController();
 
     // sensors
     private final ColorSensor colorSensor;
@@ -57,8 +62,9 @@ public class Conveyor extends SubsystemBase {
     private boolean doesBallExist;
     private double beltRPM;
     private double indexRPM;
-    PowerDistribution powerDistributionHub;
+
     // Constants storing acceptable distance data
+    // TODO - set these
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 0,
         MAX_EXISTS_LIDAR_DISTANCE = 0,
@@ -73,11 +79,18 @@ public class Conveyor extends SubsystemBase {
      * @param colorSensor the color sensor
      * @param lidar the lidar
      */
-    public Conveyor(ColorSensor colorSensor, LidarV3 lidar, PowerDistribution powerDistributionHub) {
+    public Conveyor(ColorSensor colorSensor, LidarV3 lidar) {
         this.colorSensor = colorSensor;
         this.lidar = lidar;
         zeroEncoders();
-        this.powerDistributionHub = powerDistributionHub;
+
+        indexPID.setP(P);
+        indexPID.setI(I);
+        indexPID.setD(D);
+        indexPID.setFF(FF);
+        indexPID.setIZone(IZ);
+        indexPID.setOutputRange(-1.0, 1.0);
+
         beltState = ConveyorState.NONE;
         indexState = ConveyorState.NONE;
         previousColorSensorMeasurement = "Unknown";
@@ -86,36 +99,26 @@ public class Conveyor extends SubsystemBase {
         wasBallIndexed = false;
         isBallIndexed = getIsBallIndexed();
         doesBallExist = getDoesBallExist();
-        beltRPM = getBeltRPM();
-        indexRPM = getIndexRPM();
+        beltRPM = 0;
+        indexRPM = 0;
     }
 
     /**
      * Sets the power of the belt motor.
      *
-     * @param power The power of the belt motor (between 1 and -1).
+     * @param power The rate-limited power of the belt motor (between 1 and -1).
      */
     public void setBeltMotorPower(double power) {
-        belt.set(beltRateLimiter.getRateLimitedValue(power));
+        belt.set(power);
     }
 
     /**
      * Sets the power of the index motor.
      *
-     * @param power The power of the index motor (between 1 and -1).
+     * @param power The rate-limited power of the index motor (between 1 and -1).
      */
     public void setIndexMotorPower(double power) {
-        index.set(indexRateLimiter.getRateLimitedValue(power));
-    }
-
-    /**
-     * Sets the power of both motors.
-     *
-     * @param power the power to set the motor.
-     */
-    public void setMotorPower(double power) {
-        setIndexMotorPower(power);
-        setBeltMotorPower(power);
+        index.set(power);
     }
 
     /**
@@ -155,6 +158,15 @@ public class Conveyor extends SubsystemBase {
     }
 
     /**
+     * Sets the target position of the index motor.
+     *
+     * @param position The desired position of the index motor.
+     */
+    public void setIndexTargetPosition(double position) {
+        indexPID.setReference(position, CANSparkMax.ControlType.kPosition);
+    }
+
+    /**
      * Gets the speed of the belt motor (in RPM).
      *
      * @return speed The speed of the front motor in RPM.
@@ -178,15 +190,6 @@ public class Conveyor extends SubsystemBase {
     public void zeroEncoders() {
         setBeltEncoder(0);
         setIndexEncoder(0);
-    }
-
-    /**
-     * Resets the rate limiters.
-     * This should only be run when the motors are not moving.
-     */
-    public void resetRateLimiter() {
-        beltRateLimiter.resetOld();
-        indexRateLimiter.resetOld();
     }
 
     /**
@@ -265,8 +268,8 @@ public class Conveyor extends SubsystemBase {
             // If the belt was manually overridden to run backwards...
 
             if (colorSensorMeasurement != previousColorSensorMeasurement
-                && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
-                && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
+                    && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
+                    && colorSensorDistance <= MAX_COLOR_SENSOR_DISTANCE) {
                 // If we detect a different measurement and it seems valid...
 
                 if ((colorSensorMeasurement == "Blue"
@@ -279,10 +282,8 @@ public class Conveyor extends SubsystemBase {
 
                 } else if (beltState == ConveyorState.NONE
                     && ((colorSensorMeasurement == "Red"
-                    && indexState == ConveyorState.RED
-                    && !isBallIndexed)
-                    || (colorSensorMeasurement == "Blue"
-                    && indexState == ConveyorState.BLUE
+                    && indexState == ConveyorState.RED && !isBallIndexed)
+                    || (colorSensorMeasurement == "Blue" && indexState == ConveyorState.BLUE
                     && !isBallIndexed))) {
                     // If that measurement matches indexState, the ball is not yet indexed, and
                     // beltState is currently empty...
@@ -365,6 +366,10 @@ public class Conveyor extends SubsystemBase {
         } else {
             return false;
         }
+    }
+
+    public double getLidarDistance() {
+        return lidar.getAverageDistance();
     }
 
     @Override

@@ -24,7 +24,7 @@ import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
-import edu.wpi.first.wpilibj.PowerDistribution;
+
 /**
  * Subsystem to control the drivetrain of the robot.
  */
@@ -51,8 +51,7 @@ public class Drivetrain extends SubsystemBase {
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.7112;
 
-    // Adding Pdh for current draw
-    PowerDistribution powerDistributionHub;
+
     // left motors
     private final CANSparkMax left =
         new CANSparkMax(Ports.LEFT_DRIVE_3, MotorType.kBrushless);
@@ -120,8 +119,8 @@ public class Drivetrain extends SubsystemBase {
      *
      * @param gyro       odimetry is bad
      */
-    public Drivetrain(AHRS gyro, PowerDistribution powerDistributionHub) {
-        this.powerDistributionHub = powerDistributionHub;
+    public Drivetrain(AHRS gyro) {
+
         this.gyro = gyro;
 
         shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
@@ -260,6 +259,17 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
+     * Sets the power of both sides of the drivetrain.
+     *
+     * @param power The power, between -1 and 1
+     */
+    public synchronized void setBothMotorPower(double power) {
+        power = Functions.clampDouble(power, 1.0, -1.0);
+        left.set(power);
+        right.set(power);
+    }
+
+    /**
      * Sets the voltage to the left motors.
      *
      * @param volts Amount of volts to send to left motors.
@@ -312,9 +322,9 @@ public class Drivetrain extends SubsystemBase {
      */
     public double convertMPStoRPM(double input) {
         double out = input / WHEEL_RADIUS_IN_METERS;
-        out = out * 60;
-        out = out * (2 * Math.PI);
-        out = out * HIGH_GEAR_RATIO;
+        out *= 60;
+        out *= (2 * Math.PI);
+        out *= HIGH_GEAR_RATIO;
         out /= 39.4784176044;
         return out;
     }
@@ -419,19 +429,7 @@ public class Drivetrain extends SubsystemBase {
     public double getRightRPM() {
         return rightEncoder.getVelocity();
     }
-    //hmm, i wonder what this does... 
-    public double getLeftCurrentDraw(){
-        return powerDistributionHub.getCurrent(Ports.LEFT_DRIVE_1)
-        + powerDistributionHub.getCurrent(Ports.LEFT_DRIVE_2)
-        + powerDistributionHub.getCurrent(Ports.LEFT_DRIVE_3);
-    }
-    
-    //hmm, i wonder what this does...
-    public double getRightCurrentDraw(){
-        return powerDistributionHub.getCurrent(Ports.RIGHT_DRIVE_1)
-        + powerDistributionHub.getCurrent(Ports.RIGHT_DRIVE_2)
-        + powerDistributionHub.getCurrent(Ports.RIGHT_DRIVE_3);
-    }
+
     /**
      * Gets the total distance the left side has traveled since its last reset.
      *

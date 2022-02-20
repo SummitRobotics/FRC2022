@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
-import edu.wpi.first.wpilibj.PowerDistribution;
+
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
@@ -16,7 +17,8 @@ import frc.robot.utilities.lists.Ports;
  * Subsystem for the Shooter mechanism.
  */
 public class Shooter extends SubsystemBase {
-    PowerDistribution powerDistributionHub;
+
+    // TODO - Set these
     public static final double
             P = 0,
             I = 0,
@@ -25,6 +27,7 @@ public class Shooter extends SubsystemBase {
             IZ = 0,
             MAX_RPM = 0,
             RATE = 0.05;
+
 
     private final CANSparkMax shooterMotor = new CANSparkMax(
             Ports.SHOOTER_MOTOR,
@@ -50,14 +53,14 @@ public class Shooter extends SubsystemBase {
     /**
      * Creates a new shooter instance.
      */
-    public Shooter(PowerDistribution powerDistributionHub) {
+    public Shooter() {
         shooterMotorPIDController.setP(P);
         shooterMotorPIDController.setI(I);
         shooterMotorPIDController.setD(D);
         shooterMotorPIDController.setFF(FF);
         shooterMotorPIDController.setIZone(IZ);
         shooterMotorPIDController.setOutputRange(-1.0, 1.0);
-        this.powerDistributionHub = powerDistributionHub;
+        
         zeroEncoders();
     }
 

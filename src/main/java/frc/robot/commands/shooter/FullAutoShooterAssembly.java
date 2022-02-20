@@ -1,43 +1,72 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-import frc.robot.devices.Lemonlight;
-import java.lang.Math;
-
+import frc.robot.utilities.Functions;
 
 /**
  * Command for running the shooter in full auto mode.
  */
 public class FullAutoShooterAssembly extends CommandBase {
-    // Variables for various things, names are pretty explanitory
-    private Shooter shooter;
-    private Conveyor conveyor;
-    private ConveyorState teamClrIsBlue;
-    private Drivetrain drivetrain;
-    private NetworkTable hoodTable;
-    private NetworkTable speedTable;
-    private double distance;
-    private NetworkTableEntry speed;
-    private NetworkTableEntry hood;
-    private boolean hoodAngle;
-    private double motorPower;
-    private double motorSpeed;
-    private ConveyorState indexState;
-    private boolean isBallIndexed;
-    private ShooterStates motorState;
-    private ShooterStates hoodState;
-    private ShooterStates drivStates;
-    private ShooterStates convState;
-    private double horizontalOffset;
-    private static final double ROBOT_RADIUS = 15;
+    // subsystems
+    protected Shooter shooter;
+    protected Conveyor conveyor;
+    protected Drivetrain drivetrain;
+    
+    // PID controllers
+    protected PIDController movePID;
+    protected PIDController alignPID;
+
+    // tracker variables
+    protected ConveyorState indexState;
+    protected double limelightDistanceEstimate;
+    protected boolean limelightHasTarget;
+    protected ConveyorState teamColor;
+    protected double smoothedHorizontalOffset;
+    protected boolean hoodPos;
+    protected boolean isSpooled;
+    protected boolean isHoodSet;
+    protected double currentMotorSpeed;
+    protected double currentIndexSpeed;
+    protected boolean isDrivenAndAligned;
+       
+    // PID values
+    protected static final double
+        ALIGN_P = 0,
+        ALIGN_I = 0,
+        ALIGN_D = 0,
+        MOVE_P = 0,
+        MOVE_I = 0,
+        MOVE_D = 0;
+
+    //constants
+    protected static final double
+        MAX_SHOOTER_RANGE = 100,
+        MIN_SHOOTER_RANGE = 20,
+        OK_TO_MOVE_OFSET = 5,
+        HOOD_UP_RANGE = 5,
+        RANGE_OVERLAP = 1,
+        TARGET_HORIZONTAL_ACCURACY = 3,
+        TARGET_WRONG_COLOR_MISS = 45,
+        TARGET_MOTOR_SPEED_ACCURACY = 3,
+        IDEAL_SHOOTING_DISTANCE = 1000,
+        SHOOT_DELAY_SECONDS = 1,
+        SHOOTER_IDLE_SPEED = 3000;
+
+    // devices
+    protected Lemonlight limelight;
+
+    // timer
+    protected Timer shootDelayTimer;
+
+    protected boolean hasRecordedLimelightDistance = false;
 
     /**
      * Command for running the shooter in full auto mode.
@@ -47,38 +76,28 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @param drivetrain The drivetrain subsystem.
      * @param limelight The limelight device.
      */
-    public FullAutoShooterAssembly(Shooter shooter, Conveyor conveyor, Drivetrain drivetrain) {
+    public FullAutoShooterAssembly(Shooter shooter,
+        Conveyor conveyor,
+        Drivetrain drivetrain,
+        Lemonlight limelight) {
+
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;
         this.limelight = limelight;
-        addRequirements(shooter);
-    }
-    // Enum for setting state
-    public enum ShooterStates{
-        IDLE,
-        REVVING,
-        READY,
-        MISALIGNED, 
-        UNKNOWN
-    }
 
-    // devices
-    private Lemonlight limelight = new Lemonlight("Shooter");
-    @Override
-    public void initialize() {
-        hoodTable = NetworkTableInstance.getDefault().getTable("Hood");
-        speedTable = NetworkTableInstance.getDefault().getTable("RPM");
-        shooter.stop();
-        if (DriverStation.getAlliance().toString() == "kRed") {
-            teamClrIsBlue = ConveyorState.RED;
-        } else {
-            teamClrIsBlue = ConveyorState.BLUE;
-        }
-        motorState = ShooterStates.IDLE;
-        hoodState = ShooterStates.UNKNOWN;
-        drivStates = ShooterStates.IDLE;
-        convState = ShooterStates.REVVING;
+        this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+        this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
+
+        // TODO - Set these, including the constants
+        alignPID.setTolerance(TARGET_HORIZONTAL_ACCURACY, 1);
+        movePID.setTolerance(1, 1);
+        alignPID.setSetpoint(0);
+        movePID.setSetpoint(IDEAL_SHOOTING_DISTANCE);
+
+        this.shootDelayTimer = new Timer();
+
+        addRequirements(shooter, drivetrain, conveyor);
     }
 
     /**
@@ -104,7 +123,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     public double solveMotorSpeed(double distance, boolean hoodPos) {
         // Annoyingly, exponent notation requires importing a math library.
         // So, for simplicity, we do not use it.
-        // TODO: Test the shooter and do a cubic regression to find the right formula.
+        // TODO - Test the shooter and do a regression to find the right formula.
+        // Add higher order terms if necessary.
         if (hoodPos) {
             return 0 * distance * distance * distance
                 + 0 * distance * distance
@@ -118,72 +138,187 @@ public class FullAutoShooterAssembly extends CommandBase {
         }
     }
 
-    @Override
-    public void execute() { 
-        // Checking Variable       
-        motorSpeed = shooter.getShooterVelocity();
-        distance = limelight.getLimelightDistanceEstimateIN();
-        distance = Math.round(distance);
-        hood = hoodTable.getEntry(Double.toString(distance));
-        speed = speedTable.getEntry(Double.toString(distance));
-        hoodAngle = hood.getBoolean(false);
-        motorPower = speed.getDouble(0);
-        indexState = conveyor.getWillBeIndexedState();
-        isBallIndexed = conveyor.getIsBallIndexed();
-        //Checking to make sure we have a ball and it is the same color as our team
-        if (isBallIndexed && indexState == teamClrIsBlue && distance > 0){
-            if (motorSpeed != motorPower){
-                shooter.setMotorTargetSpeed(motorPower);
-                motorState = ShooterStates.REVVING;
-            } else{
-                motorState = ShooterStates.READY;
-            }
-            if (hoodAngle != shooter.getHoodPos()) {
-                shooter.setHoodPos(hoodAngle);
-                hoodState = ShooterStates.MISALIGNED;
-            }else{
-                hoodState = ShooterStates.READY;
-            }
-            if (motorState == ShooterStates.READY && hoodState == ShooterStates.READY){
-                horizontalOffset = limelight.getSmoothedHorizontalOffset();
-                if (Math.round(horizontalOffset) != 0){
-                    double radians = Math.PI / 180;
-                    double dst = ROBOT_RADIUS * radians;
-                    if (drivStates == ShooterStates.IDLE){
-                        drivetrain.stop();
-                        drivetrain.zeroDistance();
-                        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(dst));
-                        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(-dst));
-                        drivStates = ShooterStates.MISALIGNED;
-                    }
-                    
-                }else{
-                    drivetrain.stop();
-                    drivStates = ShooterStates.IDLE;
-                    if (convState == ShooterStates.IDLE){
-                        conveyor.setIndexEncoder(0);
-                        conveyor.setIndexMotorPower(.5);
-                        convState = ShooterStates.REVVING;
-                         
-                    }else{
-                        if (conveyor.getIndexEncoderPosition() > 2) {
-                            conveyor.setIndexMotorPower(0);
-                            convState = ShooterStates.IDLE;
-                        }
-                        
+    /**
+     * Spins the index motor 360 degrees, moving a ball into the shooter.
+     */
+    public void fire() {
+        if (shootDelayTimer.get() > SHOOT_DELAY_SECONDS) {
+            conveyor.setIndexTargetPosition(conveyor.getIndexEncoderPosition() + 50);
+            shootDelayTimer.reset();
+        }
+    }
 
-                    }
+    /**
+     * Returns whether or not there is a ball ready to be fired.
+     *
+     * @return Whether or not there is a ball ready to be fired.
+     */
+    public boolean isBallReady() {
+        return (indexState != ConveyorState.NONE && conveyor.getIsBallIndexed());
+    }
 
-
-                }
-
-            }
-
+    /**
+     * Method to drive into range and align with the target. We only run this if we have a target.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param horizontalOffset The angle between us and the target, as reported by the limelight
+     * @param isAccurate Whether we are shooting accurately or intentionally missing
+     * @param limelightDistanceEstimate The limelight's reported distance estimate from the target
+     * @return Whether or not we are aligned and in range
+     */
+    public boolean driveAndAlign(Drivetrain drivetrain,
+        double horizontalOffset,
+        boolean isAccurate,
+        double limelightDistanceEstimate) {
+        
+        //sets if align target based on ball color
+        if (isAccurate) {
+            alignPID.setSetpoint(0);
+        } else {
+            alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
         }
         
-        
-        
+        double leftPower = 0;
+        double rightPower = 0;
 
-    
+        //align to target
+        double alignPower = alignPID.calculate(horizontalOffset);
+        leftPower += alignPower;
+        rightPower += -alignPower;
+
+
+        //move towards target
+        if (Functions.isWithin(horizontalOffset, 0, OK_TO_MOVE_OFSET)) {
+            //records current distance to be heald with pid, clamped to the max and min range of the shooter
+            if (!hasRecordedLimelightDistance) {
+                movePID.setSetpoint(Functions.clampDouble(horizontalOffset, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
+                hasRecordedLimelightDistance = true;
+            }
+
+            double movePower = movePID.calculate(horizontalOffset);
+
+            leftPower += movePower;
+            rightPower += movePower;
+
+        }
+
+        //sets drivetrain powers
+        drivetrain.setLeftMotorPower(leftPower);
+        drivetrain.setRightMotorPower(rightPower);
+
+        return alignPID.atSetpoint() && movePID.atSetpoint();
+    }
+
+    /**
+     * Method to spin the drivetrain to locate a target.
+     *
+     * @param drivetrain The drivetrain subsystem
+     */
+    public void findTarget(Drivetrain drivetrain) {
+        drivetrain.setLeftMotorPower(0.5);
+        drivetrain.setRightMotorPower(-0.5);
+    }
+
+    /**
+     * Method to spool the flywheel to the correct speed.
+     *
+     * @param shooter The shooter subsystem
+     * @param limelightDistanceEstimate The limelight's reported distance estimate from the target
+     * @param currentMotorSpeed The current motor speed
+     * @param hoodPos The current hood position
+     * @return Whether or not the motor was already spooled
+     */
+    public boolean spool(Shooter shooter,
+        double limelightDistanceEstimate,
+        double currentMotorSpeed,
+        boolean hoodPos) {
+
+        double targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, hoodPos);
+
+        if (!Functions.isWithin(currentMotorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
+
+            shooter.setMotorTargetSpeed(targetMotorSpeed);
+            return false;
+
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Method to set the hood position to what it should be.
+     *
+     * @param shooter The shooter subsystem
+     * @param limelightDistanceEstimate The reported distance between the limelight and the target
+     * @param hoodPos The hood position
+     * @return Whether or not the hood position was correct
+     */
+    public boolean setHood(Shooter shooter, double limelightDistanceEstimate, boolean hoodPos) {
+        if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
+
+            shooter.toggleHoodPos();
+            return false;
+
+        } else {
+            return true;
+        }
+
+    }
+
+    @Override
+    public void initialize() {
+        teamColor = getTeamColor();
+        alignPID.reset();
+        movePID.reset();
+        shootDelayTimer.reset();
+        shootDelayTimer.start();
+        hasRecordedLimelightDistance = false;
+    }
+
+    @Override
+    public void execute() {
+        limelightHasTarget = limelight.hasTarget();
+        limelightDistanceEstimate = limelight.getLimelightDistanceEstimateIN();
+        smoothedHorizontalOffset = limelight.getHorizontalOffset();
+        indexState = conveyor.getWillBeIndexedState();
+        hoodPos = shooter.getHoodPos();
+        currentMotorSpeed = shooter.getShooterVelocity();
+
+        if (limelightHasTarget) {
+
+            isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
+            isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
+            isDrivenAndAligned = driveAndAlign(drivetrain,
+                smoothedHorizontalOffset,
+                (indexState == teamColor),
+                limelightDistanceEstimate);
+
+            if (isDrivenAndAligned && isHoodSet && isSpooled && isBallReady()) {
+                fire();
+            }
+        }
+        
+        if (!limelightHasTarget) {
+            shooter.setMotorTargetSpeed(SHOOTER_IDLE_SPEED);
+            alignPID.reset();
+            movePID.reset();
+            findTarget(drivetrain);
+        }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        shooter.stop();
+        
+        alignPID.reset();
+        movePID.reset();
+        alignPID.close();
+        movePID.close();
+
+        shootDelayTimer.stop();
+    }
+
+    public boolean isFinished() {
+        return false;
     }
 }

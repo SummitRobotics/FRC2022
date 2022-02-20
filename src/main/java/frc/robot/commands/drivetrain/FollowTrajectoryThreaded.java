@@ -70,7 +70,7 @@ public class FollowTrajectoryThreaded extends CommandBase {
         Runnable onExecute =
                 () -> {
                     drivetrain.updateOdometry();
-                    ramseteCommand.initialize();
+                    ramseteCommand.execute();
                 };
 
         // Wraps the ramseteCommand in a functional command,
