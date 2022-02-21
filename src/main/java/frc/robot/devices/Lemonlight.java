@@ -6,7 +6,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.utilities.CustomVisionData;
-import frc.robot.utilities.RollingAverage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,9 +15,8 @@ import java.util.Arrays;
 public class Lemonlight implements Sendable {
     private final NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline, llpython;
 
-    private final RollingAverage horizontalSmoothed;
-
     // VALUES SHOULD BE IN CM and DEGREES
+    // TODO - Set these
     public static final double
             MAIN_MOUNT_HEIGHT = 0.0,
             MAIN_MOUNT_ANGLE = 0.0,
@@ -26,7 +24,9 @@ public class Lemonlight implements Sendable {
             BALL_MOUNT_HEIGHT = 47.625,
             BALL_MOUNT_ANGLE = -20.0,
             BALL_MOUNT_ANGLE_X = 0.0,
-            BALL_TARGET_HEIGHT = 12.065;
+            BALL_TARGET_HEIGHT = 12.065,
+            TARGET_HEIGHT = 0,
+            Y_OFFSET = 0;
 
     /**
      * Creates a new limelight object.
@@ -48,7 +48,6 @@ public class Lemonlight implements Sendable {
 
         pipeline = limelight.getEntry("pipeline");
 
-        horizontalSmoothed = new RollingAverage(5, false);
     }
 
     /**
@@ -79,17 +78,6 @@ public class Lemonlight implements Sendable {
         CamModes(int value) {
             this.value = value;
         }
-    }
-
-    // TODO - make right
-
-    /**
-     * TODO: STILL NEED TO IMPLEMENT THIS.
-     *
-     * @return if the limelight is at target.
-     */
-    public boolean atTarget() {
-        return false;
     }
 
     /**
@@ -137,11 +125,6 @@ public class Lemonlight implements Sendable {
         return tx.getDouble(0);
     }
 
-    public double getSmoothedHorizontalOffset() {
-        horizontalSmoothed.set(getHorizontalOffset());
-        return horizontalSmoothed.getAverage();
-    }
-
     /**
      * Gets the vertical offset from the limelight.
      *
@@ -161,7 +144,7 @@ public class Lemonlight implements Sendable {
     }
 
     /**
-     * gets a distance estimate of the target using the limelight and trig.
+     * gets a distance estimate IN INCHES of the target using the limelight and trig.
      * You need to check if the limelight has a target before running this
      *
      * @param mountAngle Mounting angle of the limelight

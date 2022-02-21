@@ -1,8 +1,8 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import frc.robot.subsystems.Conveyor;
+import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Intake;
 
 /**
@@ -10,29 +10,48 @@ import frc.robot.subsystems.Intake;
  */
 public class DefaultIntake extends CommandBase {
 
-    private Intake intake;
+    private final Intake intake;
+    private final Conveyor conveyor;
+    private double loopCount;
 
-    public DefaultIntake(Intake intake) {
-        addRequirements(intake);
+    /**
+     * Default command for Intake.
+     *
+     * @param intake The intake
+     * @param conveyor The conveyor
+     */
+    public DefaultIntake(Intake intake, Conveyor conveyor) {
+        addRequirements(intake, conveyor);
         this.intake = intake;
+        this.conveyor = conveyor;
     }
 
     @Override
     public void initialize() {
+        loopCount = 0;
     }
 
     @Override
     public void execute() {
         switch (intake.getState()) {
-            case UP:
-                intake.setIntakeMotorPower(0);
-                return;
             case DOWN:
-                intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                if (conveyor.getBeltState() != ConveyorState.NONE && conveyor.getWillBeIndexedState() != ConveyorState.NONE) {
+
+                    if (loopCount < 50) {
+                        intake.setIntakeMotorPower(-Intake.INTAKE_MOTOR_SPEED);
+                        loopCount++;
+                    } else {
+                        intake.stop();
+                    }
+
+                } else {
+                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                    if (loopCount != 0) {
+                        loopCount = 0;
+                    }
+                }
                 break;
-            case UNKNOWN:
             default:
-                CommandScheduler.getInstance().schedule(new RaiseIntake(intake));
                 break;
         }
     }
