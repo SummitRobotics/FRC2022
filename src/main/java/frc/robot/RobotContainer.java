@@ -61,8 +61,8 @@ public class RobotContainer {
     //private final Intake intake;
 
     private final Lemonlight ballDetectionLimelight;
-    private final PDP pdp;
-    private final PCM pcm;
+    // private final PDP pdp;
+    // private final PCM pcm;
     private final AHRS gyro;
     // private final ColorSensor colorSensor;
     // private final LidarV3 lidarV3;
@@ -80,8 +80,8 @@ public class RobotContainer {
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         //launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         //joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
-        pdp = new PDP(Ports.PDP);
-        pcm = new PCM(Ports.PCM_1);
+        // pdp = new PDP(Ports.PDP);
+        // pcm = new PCM(Ports.PCM_1);
         // colorSensor = new ColorSensor();
         // lidarV3 = new LidarV3();
 
@@ -136,7 +136,7 @@ public class RobotContainer {
                             }
                         }
                     }),
-                new InstantCommand(() -> pcm.enableCompressorDigital()),
+                // new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -179,16 +179,16 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        // controller1.buttonA.whileHeld(
-            // new FullAutoIntake(drivetrain, ballDetectionLimelight, intake));
+        controller1.buttonA.whileHeld(
+            new FullAutoIntake(drivetrain, ballDetectionLimelight));
     }
 
     /**
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        SmartDashboard.putData("PDP", pdp);
-        SmartDashboard.putData("PCM", pcm);
+        // SmartDashboard.putData("PDP", pdp);
+        // SmartDashboard.putData("PCM", pcm);
         SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
         SmartDashboard.putData("BallLemonlight", ballDetectionLimelight);

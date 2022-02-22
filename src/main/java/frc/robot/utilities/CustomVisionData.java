@@ -14,10 +14,7 @@ public class CustomVisionData {
     private double
             xAngle = 0.0,
             yAngle = 0.0,
-            mountYAngle = 0.0,
-            mountYOffset = 0.0,
             mountXAngle = 0.0,
-            targetHeight = 5.5,
             yOffset = 0.0,
             xOffset = 0.0,
             distance = 1_000_000_000;
@@ -63,9 +60,6 @@ public class CustomVisionData {
             color = ((int) (data / 1_000_000_000)) == 1 ? Colors.RED : Colors.BLUE;
 
             this.mountXAngle = mountXAngle;
-            this.mountYAngle = mountYAngle;
-            this.mountYOffset = mountYOffset;
-            this.targetHeight = targetHeight;
 
             yOffset = calculateYOffset();
             xOffset = calculateXOffset(yOffset);
@@ -96,7 +90,10 @@ public class CustomVisionData {
      */
     private double calculateYOffset() {
         return Lemonlight.getLimelightDistanceEstimateIN(
-                mountYAngle, mountYOffset, targetHeight, yAngle
+                Lemonlight.BALL_MOUNT_HEIGHT,
+                Lemonlight.BALL_MOUNT_ANGLE,
+                Lemonlight.BALL_TARGET_HEIGHT,
+                yAngle
         );
     }
 

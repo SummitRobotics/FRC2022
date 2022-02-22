@@ -49,7 +49,7 @@ public final class Ports {
             // pneumatics
             PRESSURE_SENSOR = 0,
             PCM_1 = 1,
-            PDP = 2, 
+            PDP = 0, 
 
             // conveyor
             FRONT_CONVEYOR = 19,

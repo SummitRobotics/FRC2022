@@ -279,11 +279,11 @@ public class FullAutoShooterAssembly extends CommandBase {
     public void execute() {
         limelightHasTarget = limelight.hasTarget();
         limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
-            Lemonlight.MAIN_MOUNT_ANGLE,
             Lemonlight.MAIN_MOUNT_HEIGHT,
-            Lemonlight.TARGET_HEIGHT,
-            Lemonlight.Y_OFFSET
-        );
+            Lemonlight.MAIN_MOUNT_ANGLE,
+            Lemonlight.MAIN_TARGET_HEIGHT,
+            limelight.getVerticalOffset());
+
         smoothedHorizontalOffset = limelight.getHorizontalOffset();
         indexState = conveyor.getWillBeIndexedState();
         hoodPos = shooter.getHoodPos();

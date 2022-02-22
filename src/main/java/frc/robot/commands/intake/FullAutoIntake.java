@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drivetrain.FollowTrajectory;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Intake;
 import frc.robot.utilities.CustomVisionData;
 import java.util.Arrays;
 
@@ -22,7 +21,6 @@ import java.util.Arrays;
 public class FullAutoIntake extends CommandBase {
 
     // subsystems
-    private Intake intake;
     private Drivetrain drivetrain;
 
     // devices
@@ -37,15 +35,12 @@ public class FullAutoIntake extends CommandBase {
      *
      * @param drivetrain The drivetrain subsystem
      * @param ballDetectionLimelight The ball detection limelight
-     * @param intake The intake subsystem
      */
     public FullAutoIntake(Drivetrain drivetrain,
-        Lemonlight ballDetectionLimelight,
-        Intake intake) {
+        Lemonlight ballDetectionLimelight) {
 
         this.drivetrain = drivetrain;
         this.ballDetectionLimelight = ballDetectionLimelight;
-        this.intake = intake;
     }
 
     @Override
@@ -56,25 +51,39 @@ public class FullAutoIntake extends CommandBase {
         if (ball.isValid()) {
 
             // Generates the poses.
-            //Pose2d startPosition = drivetrain.getPose();
-            //ballPose = calculateBallPose(ball, drivetrain.getPose());
+            // Pose2d startPosition = drivetrain.getPose();
+            // ballPose = calculateBallPose(ball, drivetrain.getPose());
 
-            Pose2d startPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
-            ballPose =
-                    new Pose2d(Units.inchesToMeters(ball.getYDistance() + 12),
-                        -Units.inchesToMeters(ball.getXDistance()), Rotation2d.fromDegrees(0));
-
-            drivetrain.setPose(startPosition);
-
-            // Generates the trajectory's
-            TrajectoryConfig config = new TrajectoryConfig(4, 2.5);
-            System.out.println("Ball Position" + ballPose);
-            Trajectory trajectory = TrajectoryGenerator
-                    .generateTrajectory(Arrays.asList(startPosition, ballPose), config);
+            // Generates the trajectories
+            // TrajectoryConfig config = new TrajectoryConfig(4, 2.5);
+            // System.out.println("Ball Position" + ballPose);
+            // Trajectory trajectory = TrajectoryGenerator
+                    // .generateTrajectory(Arrays.asList(startPosition, ballPose), config);
 
             // Creates the command to follow the ball.
-            followTrajectoryCommand = new FollowTrajectory(drivetrain, trajectory);
-            followTrajectoryCommand.initialize();
+            // followTrajectoryCommand = new FollowTrajectory(drivetrain, trajectory);
+            // followTrajectoryCommand.initialize();
+
+            double angle = drivetrain.getPose().getRotation().getRadians()
+                + Units.degreesToRadians(ball.getXAngle());
+
+            Pose2d ballPos = new Pose2d(
+                Units.inchesToMeters(ball.getDistance()) * Math.cos(angle),
+                Units.inchesToMeters(ball.getDistance()) * -Math.sin(angle),
+                Rotation2d.fromDegrees(0)
+            );
+
+
+            TrajectoryConfig config = new TrajectoryConfig(4, 2.5);
+            Trajectory trajectory = TrajectoryGenerator
+                .generateTrajectory(Arrays.asList(
+                    new Pose2d(0.0, 0.0, new Rotation2d(0)), ballPos), config);
+
+            Pose2d originPos = new Pose2d(-drivetrain.getPose().getX(),
+                -drivetrain.getPose().getY(),
+                new Rotation2d(-drivetrain.getPose().getRotation().getRadians()));
+
+            followTrajectoryCommand = new FollowTrajectory(drivetrain, trajectory.relativeTo(originPos));
         }
     }
 
@@ -112,7 +121,7 @@ public class FullAutoIntake extends CommandBase {
         // Ball Position relative to field with robot at origin.
         Pose2d ball = new Pose2d(
             Units.inchesToMeters(bestBall.getDistance()) * Math.cos(angle),
-            Units.inchesToMeters(bestBall.getDistance()) * Math.sin(angle) * -1,
+            Units.inchesToMeters(bestBall.getDistance()) * -Math.sin(angle),
             Rotation2d.fromDegrees(0)
             );
 
