@@ -203,6 +203,10 @@ public class Conveyor extends SubsystemBase {
     @Override
     public void periodic() {
 
+        if (lidar == null || colorSensor == null) {
+            return;
+        }
+
         // Set tracker variables to prevent weird stuff from happening
         // if measurements change mid-cycle.
         previousColorSensorMeasurement = colorSensorMeasurement;
@@ -345,6 +349,9 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a ball ready to be fired
      */
     public boolean getIsBallIndexed() {
+        if (lidar == null || colorSensor == null) {
+            return false;
+        }
         if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
             && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
             return true;
@@ -360,6 +367,9 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a single ball in the conveyor
      */
     public boolean getDoesBallExist() {
+        if (lidar == null || colorSensor == null) {
+            return false;
+        }
         if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance
             && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
             return true;

@@ -1,6 +1,7 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Shooter;
@@ -49,6 +50,8 @@ public class ShooterMO extends CommandBase {
 
     @Override
     public void execute() {
+        System.out.println(controlAxis.get());
+        System.out.println(prioritizedControlAxis.get());
         shooter.setMotorPower(controlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();

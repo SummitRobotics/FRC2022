@@ -14,8 +14,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
+import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -56,15 +58,15 @@ public class RobotContainer {
     // Subsystems
     private final Drivetrain drivetrain;
     // private final Shooter shooter;
-    // private final Conveyor conveyor;
+    private final Conveyor conveyor;
     // private final Intake intake;
 
     // private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PDP pdp;
     private final PCM pcm;
     private final AHRS gyro;
-    private final ColorSensor colorSensor;
-    private final LidarV3 lidarV3;
+    //private final ColorSensor colorSensor;
+    //private final LidarV3 lidarV3;
 
     private final Command teleInit;
     private final Command autoInit;
@@ -81,8 +83,8 @@ public class RobotContainer {
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
         pdp = new PDP(Ports.PDP);
         pcm = new PCM(Ports.PCM_1);
-        colorSensor = new ColorSensor();
-        lidarV3 = new LidarV3();
+        //colorSensor = new ColorSensor();
+        //lidarV3 = new LidarV3();
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
         ShuffleboardDriver.statusDisplay.addStatus(
@@ -96,7 +98,7 @@ public class RobotContainer {
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
         // shooter = new Shooter();
-        // conveyor = new Conveyor();
+        conveyor = new Conveyor(null, null);
         // intake = new Intake();
 
         autoInit = new SequentialCommandGroup(
@@ -154,20 +156,26 @@ public class RobotContainer {
         // Configure the button bindings
         setDefaultCommands();
         configureButtonBindings();
+        setLedButtons();
 
         // Init Telemetry
         initTelemetry();
     }
 
+    private void setLedButtons() {
+        // launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
+    }
+
     private void setDefaultCommands() {
         // drive by controller
-        drivetrain.setDefaultCommand(new ArcadeDrive(
-            drivetrain,
-            controller1.rightTrigger,
-            controller1.leftTrigger,
-            controller1.leftX));
+        // drivetrain.setDefaultCommand(new ArcadeDrive(
+        //     drivetrain,
+        //     controller1.rightTrigger,
+        //     controller1.leftTrigger,
+        //     controller1.leftX));
 
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
+        // shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
     }
 
     /**
@@ -179,6 +187,9 @@ public class RobotContainer {
     private void configureButtonBindings() {
         controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.lowGear()));
         controller1.leftBumper.whenReleased(new InstantCommand(() -> drivetrain.highGear()));
+
+        // MOs
+        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
     }
 
     /**
@@ -191,7 +202,7 @@ public class RobotContainer {
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         // SmartDashboard.putData("Shooter", shooter);
-        // SmartDashboard.putData("Conveyor", conveyor);
+        SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
         // SmartDashboard.putData("Color Sensor", colorSensor);
         // SmartDashboard.putData("LidarV3", lidarV3);

@@ -32,12 +32,13 @@ public final class Ports {
             SHIFT_SOLENOID_DOWN = 7,
 
             // Shooter
-            SHOOTER_MOTOR = 16,
-            HOOD_SOLENOID = 3,
+            SHOOTER_MOTOR_1 = 30,
+            SHOOTER_MOTOR_2 = 31,
+            HOOD_SOLENOID = 0,
 
             // Climb
-            LEFT_CLIMB_MOTOR = 17,
-            RIGHT_CLIMB_MOTOR = 18,
+            LEFT_CLIMB_MOTOR = 20,
+            RIGHT_CLIMB_MOTOR = 21,
             PIVOT_CLIMB_SOLENOID = 4,
             LEFT_DETACH_SOLENOID = 5,
             RIGHT_DETACH_SOLENOID = 6,
@@ -52,10 +53,10 @@ public final class Ports {
             PDP = 1,
 
             // conveyor
-            FRONT_CONVEYOR = 19,
-            BACK_CONVEYOR = 20,
+            FRONT_CONVEYOR = 40,
+            BACK_CONVEYOR = 41,
 
             // intake
-            INTAKE_MOTOR = 21,
+            INTAKE_MOTOR = 50,
             INTAKE_SOLENOID = 7;
 }

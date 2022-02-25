@@ -26,12 +26,16 @@ public class Shooter extends SubsystemBase {
             FF = 0,
             IZ = 0,
             MAX_RPM = 0,
-            RATE = 0.05;
+            GEAR_RATIO = 2;
 
 
-    private final CANSparkMax shooterMotor = new CANSparkMax(
-            Ports.SHOOTER_MOTOR,
+    private final CANSparkMax shooterMotorMain = new CANSparkMax(
+            Ports.SHOOTER_MOTOR_1,
             CANSparkMaxLowLevel.MotorType.kBrushless);
+    private final CANSparkMax shooterMotorFollow = new CANSparkMax(
+        Ports.SHOOTER_MOTOR_2,
+        CANSparkMaxLowLevel.MotorType.kBrushless
+    );
 
     private final Solenoid hood = new Solenoid(
             Ports.PCM_1,
@@ -39,16 +43,13 @@ public class Shooter extends SubsystemBase {
             Ports.HOOD_SOLENOID);
 
     // Pid controller
-    private final SparkMaxPIDController shooterMotorPIDController = shooterMotor.getPIDController();
+    private final SparkMaxPIDController shooterMotorPIDController = shooterMotorMain.getPIDController();
 
     // Encoder
-    private final RelativeEncoder shooterEncoder = shooterMotor.getEncoder();
+    private final RelativeEncoder shooterEncoder = shooterMotorMain.getEncoder();
 
     // Hood position false - Piston not extended : true - Piston extended
     private boolean hoodPos = false;
-
-    // Rate Limiter
-    private ChangeRateLimiter motorRateLimiter = new ChangeRateLimiter(RATE);
 
     /**
      * Creates a new shooter instance.
@@ -62,6 +63,7 @@ public class Shooter extends SubsystemBase {
         shooterMotorPIDController.setOutputRange(-1.0, 1.0);
         
         zeroEncoders();
+        shooterMotorFollow.follow(shooterMotorMain, true);
     }
 
     /**
@@ -70,7 +72,7 @@ public class Shooter extends SubsystemBase {
      * @param power speed to set the motor to
      */
     public void setMotorPower(double power) {
-        shooterMotor.set(motorRateLimiter.getRateLimitedValue(power));
+        shooterMotorMain.set(power);
     }
     
     /**
@@ -86,7 +88,7 @@ public class Shooter extends SubsystemBase {
      * @param volts The voltage.
      */
     public void setMotorVolts(double volts) {
-        shooterMotor.setVoltage(volts);
+        shooterMotorMain.setVoltage(volts);
     }
 
     /**
@@ -130,8 +132,8 @@ public class Shooter extends SubsystemBase {
      *
      * @return the shooter velocity in RPM
      */
-    public double getShooterVelocity() {
-        return shooterEncoder.getVelocity();
+    public double getShooterRPM() {
+        return shooterEncoder.getVelocity() * GEAR_RATIO;
     }
 
     /**
@@ -195,7 +197,7 @@ public class Shooter extends SubsystemBase {
         builder.setSmartDashboardType("Shooter");
 
         builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
-        builder.addDoubleProperty("shooterVelocity", this::getShooterVelocity, null);
+        builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
         builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
     }
 }
