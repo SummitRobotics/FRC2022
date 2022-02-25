@@ -1,10 +1,14 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands.climb;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climb;
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.lists.AxisPriorities;
@@ -14,7 +18,24 @@ import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.utilities.Functions;
+import java.math.*;
 public class ClimbAutomation extends CommandBase {
+  // Adding network tables for vision
+  NetworkTableEntry angleToTurn;
+  NetworkTableEntry distToMove;
+  //Pid Variables
+  protected static final double
+        ALIGN_P = 0,
+        ALIGN_I = 0,
+        ALIGN_D = 0,
+        MOVE_P = 0,
+        MOVE_I = 0,
+        MOVE_D = 0,
+        HEIGHT_OF_BAR = 3;
+  // PID controllers
+  protected PIDController movePID;
+  protected PIDController alignPID;
   // Initializing Subsystems
   Climb climb;
   Drivetrain drivetrain;
@@ -62,7 +83,9 @@ public class ClimbAutomation extends CommandBase {
     int normalScrewPower;
     int normalTestDrivePower;
     int normalTestScrewPower;
-    boolean isStraight;
+    boolean hasHorizonalDistance;
+    double turnAngle;
+    double moveDist;
     private final LEDCall climbingLedCall =
     new LEDCall(LEDPriorities.ARMS_UP, LEDRange.All).sine(Colors.ORANGE);
   // OI
@@ -80,6 +103,8 @@ public class ClimbAutomation extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+    this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
     climb.stop();
     prioritizedClimbButton =  climbButton.prioritize(AxisPriorities.DEFAULT);
     motorLeft = motorStates.IDLE;
@@ -87,6 +112,7 @@ public class ClimbAutomation extends CommandBase {
     climb.setPivotPos(false);
     climb.setLeftDetachPos(false);
     climb.setRightDetachPos(false);
+    climb.zeroEncoders();
     pivotPistLeft = pistonStates.RETRACTED; 
     pivotPistRight = pistonStates.RETRACTED; 
     clampPistLeft = pistonStates.RETRACTED; 
@@ -102,7 +128,20 @@ public class ClimbAutomation extends CommandBase {
     normalTestDrivePower = 0;
     normalScrewPower = 0;
     normalTestScrewPower = 0;
-    isStraight = false;
+    hasHorizonalDistance = false;
+    motorLeft = motorStates.IDLE;
+    motorRight = motorStates.IDLE;
+    //get the default instance of NetworkTables
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+    //get a reference to the subtable called "datatable"
+    NetworkTable datatable = inst.getTable("Vision");
+
+    //get a reference to key in "datatable" called "Y"
+    angleToTurn = datatable.getEntry("Target Angle");
+    distToMove = datatable.getEntry("Target Angle");
+    inst.startClientTeam(5468);
+
   }
   // Extending to grab bar using screws
   public void extend(){
@@ -174,26 +213,54 @@ public class ClimbAutomation extends CommandBase {
     }
 
   }
+  // update with network tables code
+  public boolean aligned(){
+    double angle = angleToTurn.getDouble(0.0);
+    double dist = distToMove.getDouble(0.0);
+    double alignPower = alignPID.calculate(angle);
+    double leftPower = 0;
+    double rightPower = 0;
+    leftPower += alignPower;
+    rightPower += -alignPower;
+    double offsetDistance = Math.tan(Math.toRadians(dist))*HEIGHT_OF_BAR;
+    if (!Functions.isWithin(1, offsetDistance, .5)) {
+      //records current distance to be heald with pid, clamped to the max and min range of the shooter
+      if (!hasHorizonalDistance) {
+          movePID.setSetpoint(Functions.clampDouble(offsetDistance, 1, 1.5));
+          hasHorizonalDistance = true;
+      }
+
+      double movePower = movePID.calculate(offsetDistance);
+
+      leftPower += movePower;
+      rightPower += movePower;
+
+    }
+    
+    //sets drivetrain powers
+    drivetrain.setLeftMotorPower(leftPower);
+    drivetrain.setRightMotorPower(rightPower);
+
+    return alignPID.atSetpoint() && movePID.atSetpoint();
+  }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    avgLeftMotorPower.update(drivetrain.getLeftCurrentDraw());
-    avgRightMotorPower.update(drivetrain.getRightCurrentDraw());
     avgLeftScrewPower.update(climb.getLeftCurrentDraw());
     avgRightScrewPower.update(climb.getRightCurrentDraw());
     if (prioritizedClimbButton.get() && barNumber < 3){
       climbingLedCall.activate();
       if (barNumber == 0){
-        if (climbSystem == climbStates.DONE){
+        if (climbSystem == climbStates.DONE && aligned()){
           extend();
-        }else if (climbSystem == climbStates.EXTENDED && isStraight){
+        }else if (climbSystem == climbStates.EXTENDED){
           retract();
         }else if (climbSystem == climbStates.LATCHED){
           cycle();
         }else if (climbSystem == climbStates.BROKEN){
 
         }
-      }else{
+      }else if (barNumber <= 2){
           if (climbSystem == climbStates.DONE){
             extend();
           }else if (climbSystem == climbStates.EXTENDED){

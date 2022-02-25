@@ -88,13 +88,14 @@ public class ClimbMO extends CommandBase {
             climb.setLeftMotorPower(prioritizedControlAxis.get());
         } else if (prioritizedRightMotorButton.get()) {
             climb.setRightMotorPower(prioritizedControlAxis.get());
-        } else {
-            climb.setMotorPower(prioritizedControlAxis.get());
+        }else{
+            climb.setMotorPower(0);
         }
 
-        climb.setPivotPos(prioritizedPivotButton.get());
-        climb.setLeftDetachPos(prioritizedLeftDetachButton.get());
-        climb.setRightDetachPos(prioritizedRightDetachButton.get());
+        prioritizedPivotButton.toggleWhenPressed(climb.togglePivotPos());
+        prioritizedLeftDetachButton.toggleWhenPressed(climb.toggleLeftDetachPos());
+        prioritizedRightDetachButton.toggleWhenPressed(climb.toggleRightDetachPos());
+       
     }
 
     @Override
