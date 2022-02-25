@@ -22,14 +22,17 @@ public class ClimbMO extends CommandBase {
     // button for the pivot solenoid
     OIButton pivotButton;
     OIButton.PrioritizedButton prioritizedPivotButton;
+    SimpleButton simplePrioritizedPivotButton;
 
     // button for only the left detach solenoid
     OIButton leftDetachButton;
     OIButton.PrioritizedButton prioritizedLeftDetachButton;
+    SimpleButton simplePrioritizedLeftDetachButton;
 
     // button for only the right detach solenoid
     OIButton rightDetachButton;
     OIButton.PrioritizedButton prioritizedRightDetachButton;
+    SimpleButton simplePrioritizedRightDetachButton;
 
     // button for LeftMotorPower
     OIButton leftMotorButton;
@@ -38,6 +41,11 @@ public class ClimbMO extends CommandBase {
     // button for rightMotorPower
     OIButton rightMotorButton;
     OIButton.PrioritizedButton prioritizedRightMotorButton;
+
+    // button for both detach solenoids
+    OIButton bothDetachButton;
+    OIButton.PrioritizedButton prioritizedBothDetachButton;
+    SimpleButton simplePrioritizedBothDetachButton;
 
     /**
      * Manual override for the climber. Many parameters!
@@ -49,6 +57,7 @@ public class ClimbMO extends CommandBase {
      * @param pivotButton button for the pivot solenoid
      * @param leftDetachButton button for only the left detach solenoid
      * @param rightDetachButton button for only the right detach solenoid
+     * @param bothDetachButton button for both detach solenoids
      */
     public ClimbMO(
         Climb climb,
@@ -57,7 +66,8 @@ public class ClimbMO extends CommandBase {
         OIButton rightMotorButton,
         OIButton pivotButton,
         OIButton leftDetachButton,
-        OIButton rightDetachButton
+        OIButton rightDetachButton,
+        OIButton bothDetachButton
     ) {
         addRequirements(climb);
         this.climb = climb;
@@ -67,6 +77,7 @@ public class ClimbMO extends CommandBase {
         this.pivotButton = pivotButton;
         this.leftDetachButton = leftDetachButton;
         this.rightDetachButton = rightDetachButton;
+        this.bothDetachButton = bothDetachButton;
     }
 
     @Override
@@ -77,6 +88,11 @@ public class ClimbMO extends CommandBase {
         prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+
+        simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
+        simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedPivotButton::get);
+        simplePrioritizedRightDetachButton = new SimpleButton(prioritizedRightDetachButton::get);
+        simplePrioritizedBothDetachButton = new SimpleButton(prioritizedBothDetachButton::get);
 
         climb.stop();
     }
@@ -93,9 +109,15 @@ public class ClimbMO extends CommandBase {
             climb.setMotorPower(prioritizedControlAxis.get());
         }
 
-        climb.setPivotPos(prioritizedPivotButton.get());
-        climb.setLeftDetachPos(prioritizedLeftDetachButton.get());
-        climb.setRightDetachPos(prioritizedRightDetachButton.get());
+        climb.setPivotPos(simplePrioritizedPivotButton.get());
+
+        if (simplePrioritizedBothDetachButton.get()) {
+            climb.setDetachPos(simplePrioritizedBothDetachButton.get());
+            climb.setDetachPos(simplePrioritizedBothDetachButton.get());
+        } else {
+            climb.setLeftDetachPos(simplePrioritizedLeftDetachButton.get());
+            climb.setRightDetachPos(simplePrioritizedRightDetachButton.get());
+        }
     }
 
     @Override
