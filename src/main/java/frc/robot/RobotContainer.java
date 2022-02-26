@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
+import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
@@ -122,7 +123,8 @@ public class RobotContainer {
                         if (RobotBase.isReal()) {
                             if (!controller1.isConnected()
                                 || !launchpad.isConnected()
-                                || !joystick.isConnected()) {
+                                || !joystick.isConnected()
+                            ) {
                                 System.out.println(
                                     "not enough joysticks connected,"
                                         + "please make sure the xbox controller,launchpad,"
