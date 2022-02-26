@@ -72,12 +72,12 @@ public class FullAutoIntake extends CommandBase {
         System.out.println("distance : " + limelightDistanceEstimate + "   hzo: " + horizontalOffset);
 
         if (limelightHasTarget) {
-            double alignPower = -alignPID.calculate(horizontalOffset);
-            double movePower =  -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.3, -0.3);
+            double alignPower = alignPID.calculate(horizontalOffset);
+            double movePower =  -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
 
             System.out.println("align: " + alignPower + "   drive: " + movePower);
-            drivetrain.setLeftMotorPower(movePower + alignPower);
-            drivetrain.setRightMotorPower(movePower - alignPower);
+            drivetrain.setLeftMotorPower(movePower - alignPower);
+            drivetrain.setRightMotorPower(movePower + alignPower);
         }
     }
 
