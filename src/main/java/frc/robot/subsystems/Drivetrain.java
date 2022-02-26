@@ -596,6 +596,10 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    public double getRotation() {
+        return gyro.getRotation2d().getDegrees();
+    }
+
 
     /**
      * Method that runs once per scheduler cycle.
@@ -621,6 +625,7 @@ public class Drivetrain extends SubsystemBase {
         builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
         //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
         builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
+        builder.addDoubleProperty("rotation", this::getRotation, null);
 
         builder.addBooleanProperty("shifterStatus", this::getShift, null);
         builder.addDoubleArrayProperty("pidValues", this::getPid, null);
