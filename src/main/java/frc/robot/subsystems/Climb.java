@@ -272,7 +272,12 @@ public class Climb extends SubsystemBase {
         setRightDetachPos(pos);
         setLeftDetachPos(pos);
     }
-    
+    /** 
+     * zeros climb at the beginning of the match
+    */
+    public void zeroClimb(){
+        setLeftMotorPower(-.01);
+    }
     /**
      * Stops the motors.
      */
