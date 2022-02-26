@@ -25,8 +25,7 @@ public class Shooter extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            MAX_RPM = 0,
-            GEAR_RATIO = 2;
+            MAX_RPM = 0;
 
 
     private final CANSparkMax shooterMotorMain = new CANSparkMax(
@@ -133,7 +132,7 @@ public class Shooter extends SubsystemBase {
      * @return the shooter velocity in RPM
      */
     public double getShooterRPM() {
-        return shooterEncoder.getVelocity() * GEAR_RATIO;
+        return shooterEncoder.getVelocity();
     }
 
     /**

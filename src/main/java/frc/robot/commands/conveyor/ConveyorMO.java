@@ -4,18 +4,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
-import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.AxisPriorities;
 
 /**
  * Manual override for the conveyor.
  */
 public class ConveyorMO extends CommandBase {
-
-    private static final double
-            BELT_RATE = 0.01,
-            INDEX_RATE = 0.01;
-
     Conveyor conveyor;
 
     OIAxis controlAxis;
@@ -26,10 +20,6 @@ public class ConveyorMO extends CommandBase {
 
     OIButton indexMotor;
     OIButton.PrioritizedButton prioritizedIndexButton;
-
-    // rate limiters
-    private final ChangeRateLimiter beltRateLimiter;
-    private final ChangeRateLimiter indexRateLimiter;
 
     /**
      * Manual override for the conveyor.
@@ -51,8 +41,6 @@ public class ConveyorMO extends CommandBase {
         this.controlAxis = controlAxis;
         this.beltMotor = beltMotor;
         this.indexMotor = indexMotor;
-        beltRateLimiter = new ChangeRateLimiter(BELT_RATE);
-        indexRateLimiter = new ChangeRateLimiter(INDEX_RATE);
     }
 
     @Override
@@ -67,20 +55,22 @@ public class ConveyorMO extends CommandBase {
     @Override
     public void execute() {
         if (prioritizedBeltButton.get()) {
-            conveyor.setBeltMotorPower(beltRateLimiter.getRateLimitedValue(
-                prioritizedControlAxis.get()));
+            conveyor.setBeltMotorPower(
+                prioritizedControlAxis.get());
+            conveyor.setIndexMotorPower(0);
         }
 
         if (prioritizedIndexButton.get()) {
-            conveyor.setIndexMotorPower(indexRateLimiter.getRateLimitedValue(
-                prioritizedControlAxis.get()));
+            conveyor.setIndexMotorPower(
+                prioritizedControlAxis.get());
+            conveyor.setBeltMotorPower(0);
         }
 
         if (!prioritizedIndexButton.get() && !prioritizedBeltButton.get()) {
-            conveyor.setBeltMotorPower(beltRateLimiter.getRateLimitedValue(
-                prioritizedControlAxis.get()));
-            conveyor.setIndexMotorPower(indexRateLimiter.getRateLimitedValue(
-                prioritizedControlAxis.get()));
+            conveyor.setBeltMotorPower(
+                prioritizedControlAxis.get());
+            conveyor.setIndexMotorPower(
+                prioritizedControlAxis.get());
         }
     }
 

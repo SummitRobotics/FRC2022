@@ -28,13 +28,13 @@ public final class Ports {
             RIGHT_DRIVE_1 = 13,
             RIGHT_DRIVE_2 = 14,
             RIGHT_DRIVE_3 = 15,
-            SHIFT_SOLENOID_UP = 7,
-            SHIFT_SOLENOID_DOWN = 7,
+            SHIFT_SOLENOID_UP = 0,
+            SHIFT_SOLENOID_DOWN = 0,
 
             // Shooter
             SHOOTER_MOTOR_1 = 30,
             SHOOTER_MOTOR_2 = 31,
-            HOOD_SOLENOID = 0,
+            HOOD_SOLENOID = 7,
 
             // Climb
             LEFT_CLIMB_MOTOR = 20,

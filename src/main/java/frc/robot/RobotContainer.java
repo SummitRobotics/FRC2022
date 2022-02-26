@@ -57,7 +57,7 @@ public class RobotContainer {
 
     // Subsystems
     private final Drivetrain drivetrain;
-    // private final Shooter shooter;
+    private final Shooter shooter;
     private final Conveyor conveyor;
     // private final Intake intake;
 
@@ -97,7 +97,7 @@ public class RobotContainer {
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        // shooter = new Shooter();
+        shooter = new Shooter();
         conveyor = new Conveyor(null, null);
         // intake = new Intake();
 
@@ -163,19 +163,19 @@ public class RobotContainer {
     }
 
     private void setLedButtons() {
-        // launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
+        launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
     }
 
     private void setDefaultCommands() {
         // drive by controller
-        // drivetrain.setDefaultCommand(new ArcadeDrive(
-        //     drivetrain,
-        //     controller1.rightTrigger,
-        //     controller1.leftTrigger,
-        //     controller1.leftX));
+        drivetrain.setDefaultCommand(new ArcadeDrive(
+            drivetrain,
+            controller1.rightTrigger,
+            controller1.leftTrigger,
+            controller1.leftX));
 
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
-        // shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
+        shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
     }
 
     /**
@@ -185,8 +185,7 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.lowGear()));
-        controller1.leftBumper.whenReleased(new InstantCommand(() -> drivetrain.highGear()));
+        controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.toggleShift()));
 
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
@@ -201,7 +200,7 @@ public class RobotContainer {
         SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
-        // SmartDashboard.putData("Shooter", shooter);
+        SmartDashboard.putData("Shooter", shooter);
         SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
         // SmartDashboard.putData("Color Sensor", colorSensor);

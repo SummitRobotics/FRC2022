@@ -36,6 +36,7 @@ public class ShooterMO extends CommandBase {
 
         this.shooter = shooter;
         this.controlAxis = controlAxis;
+        this.controlButton = controlButton;
     }
 
     @Override
@@ -50,8 +51,6 @@ public class ShooterMO extends CommandBase {
 
     @Override
     public void execute() {
-        System.out.println(controlAxis.get());
-        System.out.println(prioritizedControlAxis.get());
         shooter.setMotorPower(controlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();

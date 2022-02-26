@@ -101,6 +101,7 @@ public class Conveyor extends SubsystemBase {
         doesBallExist = getDoesBallExist();
         beltRPM = 0;
         indexRPM = 0;
+        index.setInverted(true);
     }
 
     /**
