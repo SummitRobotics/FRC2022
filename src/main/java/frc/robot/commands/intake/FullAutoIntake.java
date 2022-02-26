@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
 
 /**
@@ -60,6 +61,7 @@ public class FullAutoIntake extends CommandBase {
     @Override
     public void execute() {
         limelightHasTarget = limelight.hasTarget();
+        System.out.println(limelightHasTarget);
         limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
             Lemonlight.BALL_MOUNT_HEIGHT,
             Lemonlight.BALL_MOUNT_ANGLE,
@@ -67,10 +69,13 @@ public class FullAutoIntake extends CommandBase {
             limelight.getVerticalOffset());
         horizontalOffset = limelight.getHorizontalOffset();
 
-        if (limelightHasTarget && !movePID.atSetpoint()) {
-            double alignPower = alignPID.calculate(horizontalOffset);
-            double movePower =  movePID.calculate(limelightDistanceEstimate);
+        System.out.println("distance : " + limelightDistanceEstimate + "   hzo: " + horizontalOffset);
 
+        if (limelightHasTarget) {
+            double alignPower = -alignPID.calculate(horizontalOffset);
+            double movePower =  -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.3, -0.3);
+
+            System.out.println("align: " + alignPower + "   drive: " + movePower);
             drivetrain.setLeftMotorPower(movePower + alignPower);
             drivetrain.setRightMotorPower(movePower - alignPower);
         }

@@ -5,14 +5,14 @@ package frc.robot.utilities.lists;
  */
 public final class PIDValues {
     // TODO - configure
-    public static final int
+    public static final double
         // move PID
-        MOVE_P = 0,
+        MOVE_P = 0.2,
         MOVE_I = 0,
         MOVE_D = 0,
 
         // align PID
-        ALIGN_P = 0,
+        ALIGN_P = 0.2,
         ALIGN_I = 0,
         ALIGN_D = 0;
 }
