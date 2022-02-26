@@ -58,7 +58,7 @@ public class RobotContainer {
 
     // Subsystems
     private final Drivetrain drivetrain;
-    // private final Shooter shooter;
+    private final Shooter shooter;
     private final Conveyor conveyor;
     // private final Intake intake;
 
@@ -98,7 +98,7 @@ public class RobotContainer {
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        // shooter = new Shooter();
+        shooter = new Shooter();
         conveyor = new Conveyor(null, null);
         // intake = new Intake();
 
@@ -111,8 +111,8 @@ public class RobotContainer {
                             StatusPriorities.ENABLED)),
                 new InstantCommand(drivetrain::highGear),
                 new InstantCommand(() -> {
-                    //launchpad.bigLEDRed.set(false);
-                    //launchpad.bigLEDGreen.set(true);
+                    launchpad.bigLEDRed.set(false);
+                    launchpad.bigLEDGreen.set(true);
                 }));
 
         teleInit =
@@ -122,8 +122,8 @@ public class RobotContainer {
                         // simulated robots don't have joysticks
                         if (RobotBase.isReal()) {
                             if (!controller1.isConnected()
-                            //|| !launchpad.isConnected()
-                            //|| !joystick.isConnected()
+                                || !launchpad.isConnected()
+                                || !joystick.isConnected()
                             ) {
                                 System.out.println(
                                     "not enough joysticks connected,"
@@ -138,7 +138,7 @@ public class RobotContainer {
                             }
                         }
                     }),
-                // new InstantCommand(() -> pcm.enableCompressorDigital()),
+                new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -146,13 +146,13 @@ public class RobotContainer {
                             "robot enabled",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
-                //new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
+                new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
                 new InstantCommand(drivetrain::highGear),
                 // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 // new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> {
-                    //launchpad.bigLEDRed.set(false);
-                    //launchpad.bigLEDGreen.set(true);
+                    launchpad.bigLEDRed.set(false);
+                    launchpad.bigLEDGreen.set(true);
                 }));
 
         // Configure the button bindings
@@ -165,19 +165,19 @@ public class RobotContainer {
     }
 
     private void setLedButtons() {
-        // launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
+        launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
     }
 
     private void setDefaultCommands() {
         // drive by controller
-        // drivetrain.setDefaultCommand(new ArcadeDrive(
-        //     drivetrain,
-        //     controller1.rightTrigger,
-        //     controller1.leftTrigger,
-        //     controller1.leftX));
+        drivetrain.setDefaultCommand(new ArcadeDrive(
+            drivetrain,
+            controller1.rightTrigger,
+            controller1.leftTrigger,
+            controller1.leftX));
 
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
-        // shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
+        shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
     }
 
     /**
@@ -198,12 +198,12 @@ public class RobotContainer {
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        // SmartDashboard.putData("PDP", pdp);
-        // SmartDashboard.putData("PCM", pcm);
+        SmartDashboard.putData("PDP", pdp);
+        SmartDashboard.putData("PCM", pcm);
         SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
-        // SmartDashboard.putData("Shooter", shooter);
+        SmartDashboard.putData("Shooter", shooter);
         SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
         // SmartDashboard.putData("Color Sensor", colorSensor);

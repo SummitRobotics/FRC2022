@@ -110,17 +110,17 @@ public class ClimbMO extends CommandBase {
         }
 
         if (simplePrioritizedPivotButton.get()) {
-            climb.setPivotPos(!climb.getPivotPos());
+            climb.togglePivotPos();
         }
 
         if (simplePrioritizedBothDetachButton.get()) {
             climb.setDetachPos(!(climb.getLeftDetachPos() && climb.getRightDetachPos()));
         } else {
             if (simplePrioritizedLeftDetachButton.get()) {
-                climb.setLeftDetachPos(!climb.getLeftDetachPos());
+                climb.toggleLeftDetachPos();
             }
             if (simplePrioritizedRightDetachButton.get()) {
-                climb.setRightDetachPos(climb.getRightDetachPos());
+                climb.toggleRightDetachPos();
             }
         }
     }
