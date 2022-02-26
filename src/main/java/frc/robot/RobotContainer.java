@@ -27,6 +27,7 @@ import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
 import frc.robot.oi.drivers.ShuffleboardDriver;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
@@ -57,6 +58,7 @@ public class RobotContainer {
     private final Shooter shooter;
     private final Conveyor conveyor;
     private final Intake intake;
+    private final Climb climb;
 
     private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PDP pdp;
@@ -93,11 +95,11 @@ public class RobotContainer {
         ballDetectionLimelight = new Lemonlight("balldetect");
 
         // Init Subsystems
-        drivetrain = new Drivetrain(gyro, powerDistributionHub);
-        shooter = new Shooter(powerDistributionHub);
-        conveyor = new Conveyor(colorSensor, lidarV3, powerDistributionHub);
+        drivetrain = new Drivetrain(gyro);
+        shooter = new Shooter();
+        conveyor = new Conveyor(colorSensor, lidarV3);
         intake = new Intake(powerDistributionHub);
-
+        climb = new Climb(powerDistributionHub, gyro);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(

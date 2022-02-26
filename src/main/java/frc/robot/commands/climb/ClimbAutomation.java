@@ -92,7 +92,7 @@ public class ClimbAutomation extends CommandBase {
   OIButton climbButton;
   OIButton.PrioritizedButton prioritizedClimbButton;
   /** Creates a new ClimbAutomation. */
-  public ClimbAutomation(Climb climb, Drivetrain drivetrain, OIButton climbButton) {
+  public ClimbAutomation(Climb climb, Drivetrain drivetrain, OIButton climbButtonS) {
     this.climbButton = climbButton;
     this.drivetrain = drivetrain;
     this.climb = climb;
@@ -170,8 +170,7 @@ public class ClimbAutomation extends CommandBase {
   //TODO add gyro code
   // retracting screws 
   public void retract(){
-    if (Math.abs(avgRightScrewPower.getAverage() - avgLeftScrewPower.getAverage())<1 
-        && avgLeftScrewPower.getAverage() - normalScrewPower < 1 && motorRight == motorStates.TESTING){
+    if (climb.isHooked() && motorRight == motorStates.TESTING){
           climb.setMotorPower(-1);
           climb.setLeftDetachPos(false);
           climb.setRightDetachPos(false);
@@ -181,7 +180,7 @@ public class ClimbAutomation extends CommandBase {
       climb.setMotorPower(-.1);
       motorLeft = motorStates.TESTING;
       motorRight = motorStates.TESTING;
-    }else if(motorRight == motorStates.TESTING && climb.getRightEncoderValue() > 8){
+    }else if(motorRight == motorStates.TESTING && climb.getRightEncoderValue() < 30){
       climbSystem = climbStates.BROKEN;
       motorRight = motorStates.BROKEN;
       motorLeft = motorStates.BROKEN;
@@ -248,6 +247,7 @@ public class ClimbAutomation extends CommandBase {
   public void execute() {
     avgLeftScrewPower.update(climb.getLeftCurrentDraw());
     avgRightScrewPower.update(climb.getRightCurrentDraw());
+    climb.updateClimbAverage();
     if (prioritizedClimbButton.get() && barNumber < 3){
       climbingLedCall.activate();
       if (barNumber == 0){
