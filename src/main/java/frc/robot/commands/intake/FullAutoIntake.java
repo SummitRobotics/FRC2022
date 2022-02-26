@@ -1,100 +1,92 @@
 package frc.robot.commands.intake;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.drivetrain.FollowTrajectory;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.utilities.CustomVisionData;
-import java.util.List;
 
 /**
  * Full auto intake mode.
  */
 public class FullAutoIntake extends CommandBase {
 
+    // PID values and constants
+    // TODO - configure
+    private static final double
+        MOVE_P = 0,
+        MOVE_I = 0,
+        MOVE_D = 0,
+        ALIGN_P = 0,
+        ALIGN_I = 0,
+        ALIGN_D = 0,
+        DISTANCE_FROM_BALL = 0;
+
     // subsystems
     private Drivetrain drivetrain;
 
     // devices
-    private Lemonlight ballDetectionLimelight;
+    private Lemonlight limelight;
 
-    // pathfinding objects
-    private FollowTrajectory followTrajectoryCommand;
-    private Pose2d ballPose = new Pose2d();
-    private Trajectory trajectory;
+    // PID controllers
+    private PIDController movePID;
+    private PIDController alignPID;
+
+    // tracker variables
+    private double limelightDistanceEstimate;
+    private boolean limelightHasTarget;
+    private double horizontalOffset;
 
     /**
      * Constructor.
      *
      * @param drivetrain The drivetrain subsystem
-     * @param ballDetectionLimelight The ball detection limelight
+     * @param limelight The ball detection limelight
      */
     public FullAutoIntake(Drivetrain drivetrain,
-        Lemonlight ballDetectionLimelight) {
+        Lemonlight limelight) {
 
         this.drivetrain = drivetrain;
-        this.ballDetectionLimelight = ballDetectionLimelight;
+        this.limelight = limelight;
+        this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
+        this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+
+        // TODO - set these
+        movePID.setTolerance(1, 1);
+        movePID.setSetpoint(DISTANCE_FROM_BALL);
+        alignPID.setTolerance(1, 1);
+        alignPID.setSetpoint(0);
+
+        addRequirements(drivetrain);
     }
 
     @Override
     public void initialize() {
-        // Gets the best ball.
-        CustomVisionData ball = getBestBall();
-
-        if (ball.isValid()) {
-
-            double angle = Units.degreesToRadians(ball.getXAngle());
-
-            ballPose = new Pose2d(
-                Units.inchesToMeters(ball.getDistance()) * Math.cos(angle),
-                Units.inchesToMeters(ball.getDistance()) * -Math.sin(angle),
-                Rotation2d.fromDegrees(0)
-            );
-
-
-            TrajectoryConfig config = new TrajectoryConfig(2.5, 2.5)
-                .setKinematics(Drivetrain.DriveKinimatics)
-                .addConstraint(drivetrain.getVoltageConstraint());
-
-            trajectory = TrajectoryGenerator.generateTrajectory(
-                List.of(new Pose2d(0, 0, new Rotation2d(0)), ballPose),
-                config);
-
-            followTrajectoryCommand = new FollowTrajectory(drivetrain,
-                trajectory.relativeTo(drivetrain.getPose()));
-        }
+        movePID.reset();
+        alignPID.reset();
     }
 
     @Override
     public void execute() {
-        if (trajectory == null) {
-            System.out.println("The trajectory is null!");
-        } else {
-            followTrajectoryCommand.execute();
+        limelightHasTarget = limelight.hasTarget();
+        limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
+            Lemonlight.BALL_MOUNT_HEIGHT,
+            Lemonlight.BALL_MOUNT_ANGLE,
+            Lemonlight.BALL_TARGET_HEIGHT,
+            limelight.getVerticalOffset());
+        horizontalOffset = limelight.getHorizontalOffset();
+
+        if (limelightHasTarget && !movePID.atSetpoint()) {
+            double alignPower = alignPID.calculate(horizontalOffset);
+            double movePower =  movePID.calculate(limelightDistanceEstimate);
+
+            drivetrain.setLeftMotorPower(movePower + alignPower);
+            drivetrain.setRightMotorPower(movePower - alignPower);
         }
     }
 
     @Override
     public boolean isFinished() {
-        return followTrajectoryCommand == null
-            || followTrajectoryCommand.isFinished();
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        if (followTrajectoryCommand != null) {
-            followTrajectoryCommand.end(interrupted);
-        }
-    }
-
-    private CustomVisionData getBestBall() {
-        return CustomVisionData.calculateBestBall(
-            Lemonlight.parseVisionData(ballDetectionLimelight.getCustomVisionData()), true);
+        return !limelight.hasTarget()
+            || movePID.atSetpoint();
     }
 }

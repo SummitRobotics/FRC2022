@@ -38,6 +38,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected boolean isDrivenAndAligned;
        
     // PID values
+    // TODO - configure
     protected static final double
         ALIGN_P = 0,
         ALIGN_I = 0,
@@ -195,7 +196,7 @@ public class FullAutoShooterAssembly extends CommandBase {
                 hasRecordedLimelightDistance = true;
             }
 
-            double movePower = movePID.calculate(horizontalOffset);
+            double movePower = movePID.calculate(limelightDistanceEstimate);
 
             leftPower += movePower;
             rightPower += movePower;
