@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
+import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -50,21 +51,21 @@ public class RobotContainer {
     private final CommandScheduler scheduler;
 
     private final ControllerDriver controller1;
-    private final LaunchpadDriver launchpad;
-    private final JoystickDriver joystick;
+    //private final LaunchpadDriver launchpad;
+    //private final JoystickDriver joystick;
 
     // Subsystems
     private final Drivetrain drivetrain;
-    private final Shooter shooter;
-    private final Conveyor conveyor;
-    private final Intake intake;
+    //private final Shooter shooter;
+    //private final Conveyor conveyor;
+    //private final Intake intake;
 
-    private final Lemonlight targetingLimelight, ballDetectionLimelight;
-    private final PDP pdp;
-    private final PCM pcm;
+    private final Lemonlight ballDetectionLimelight;
+    // private final PDP pdp;
+    // private final PCM pcm;
     private final AHRS gyro;
-    private final ColorSensor colorSensor;
-    private final LidarV3 lidarV3;
+    // private final ColorSensor colorSensor;
+    // private final LidarV3 lidarV3;
 
     private final Command teleInit;
     private final Command autoInit;
@@ -77,27 +78,27 @@ public class RobotContainer {
         scheduler = CommandScheduler.getInstance();
 
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
-        launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
-        joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
-        pdp = new PDP(Ports.PDP);
-        pcm = new PCM(Ports.PCM_1);
-        colorSensor = new ColorSensor();
-        lidarV3 = new LidarV3();
+        //launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
+        //joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
+        // pdp = new PDP(Ports.PDP);
+        // pcm = new PCM(Ports.PCM_1);
+        // colorSensor = new ColorSensor();
+        // lidarV3 = new LidarV3();
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
         ShuffleboardDriver.statusDisplay.addStatus(
             "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
-        targetingLimelight = new Lemonlight("limelight");
+        //targetingLimelight = new Lemonlight("limelight");
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("balldetect");
+        ballDetectionLimelight = new Lemonlight("limelight");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        shooter = new Shooter();
-        conveyor = new Conveyor(colorSensor, lidarV3);
-        intake = new Intake();
+        // shooter = new Shooter();
+        // conveyor = new Conveyor(colorSensor, lidarV3);
+        // intake = new Intake();
 
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -108,8 +109,8 @@ public class RobotContainer {
                             StatusPriorities.ENABLED)),
                 new InstantCommand(drivetrain::highGear),
                 new InstantCommand(() -> {
-                    launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
+                    //launchpad.bigLEDRed.set(false);
+                    //launchpad.bigLEDGreen.set(true);
                 }));
 
         teleInit =
@@ -119,8 +120,9 @@ public class RobotContainer {
                         // simulated robots don't have joysticks
                         if (RobotBase.isReal()) {
                             if (!controller1.isConnected()
-                                || !launchpad.isConnected()
-                                || !joystick.isConnected()) {
+                            //|| !launchpad.isConnected()
+                            //|| !joystick.isConnected()
+                            ) {
                                 System.out.println(
                                     "not enough joysticks connected,"
                                         + "please make sure the xbox controller,launchpad,"
@@ -134,7 +136,7 @@ public class RobotContainer {
                             }
                         }
                     }),
-                new InstantCommand(() -> pcm.enableCompressorDigital()),
+                // new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -142,13 +144,13 @@ public class RobotContainer {
                             "robot enabled",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
-                new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
+                //new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
                 new InstantCommand(drivetrain::highGear),
-                new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                //new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> {
-                    launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
+                    //launchpad.bigLEDRed.set(false);
+                    //launchpad.bigLEDGreen.set(true);
                 }));
 
         // Configure the button bindings
@@ -167,7 +169,7 @@ public class RobotContainer {
             controller1.leftTrigger,
             controller1.leftX));
 
-        intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
+        // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
     }
 
     /**
@@ -177,22 +179,24 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        controller1.buttonA.whileHeld(
+            new FullAutoIntake(drivetrain, ballDetectionLimelight));
     }
 
     /**
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        SmartDashboard.putData("PDP", pdp);
-        SmartDashboard.putData("PCM", pcm);
+        // SmartDashboard.putData("PDP", pdp);
+        // SmartDashboard.putData("PCM", pcm);
         SmartDashboard.putData("Drivetrain", drivetrain);
-        SmartDashboard.putData("Lemonlight", targetingLimelight);
+        // SmartDashboard.putData("Lemonlight", targetingLimelight);
         SmartDashboard.putData("BallLemonlight", ballDetectionLimelight);
-        SmartDashboard.putData("Shooter", shooter);
-        SmartDashboard.putData("Conveyor", conveyor);
-        SmartDashboard.putData("Intake", intake);
-        SmartDashboard.putData("Color Sensor", colorSensor);
-        SmartDashboard.putData("LidarV3", lidarV3);
+        // SmartDashboard.putData("Shooter", shooter);
+        // SmartDashboard.putData("Conveyor", conveyor);
+        // SmartDashboard.putData("Intake", intake);
+        // SmartDashboard.putData("Color Sensor", colorSensor);
+        // SmartDashboard.putData("LidarV3", lidarV3);
     }
 
     /**

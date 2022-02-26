@@ -56,7 +56,7 @@ public class ShuffleboardDriver {
 
     public static void init() {
         SmartDashboard.putData(ShuffleboardDriver.autoChooser);
-        removeBadItems();
+        //removeBadItems();
     }
 
     /**

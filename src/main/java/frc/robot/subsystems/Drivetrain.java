@@ -35,17 +35,17 @@ public class Drivetrain extends SubsystemBase {
         LOW_P = 2.29,
         LOW_I = 0.0,
         LOW_D = 0.0,
-        LOW_KS = 0.177,
-        LOW_KV = 1.55,
-        LOW_KA = 0.133,
+        LOW_KS = 0.12999,
+        LOW_KV = 2.9054,
+        LOW_KA = 0.40287,
         HIGH_P = 2.85,
         HIGH_I = 0.0,
         HIGH_D = 0.0,
-        HIGH_KS = 0.211,
-        HIGH_KV = 0.734,
-        HIGH_KA = 0.141,
-        HIGH_GEAR_RATIO = 9.1,
-        LOW_GEAR_RATIO = 19.65,
+        HIGH_KS = 0.12999,
+        HIGH_KV = 2.9054,
+        HIGH_KA = 0.40287,
+        HIGH_GEAR_RATIO = 10.7,
+        LOW_GEAR_RATIO = 10.7,
         WHEEL_RADIUS_IN_METERS = 0.0762,
         WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
@@ -56,22 +56,22 @@ public class Drivetrain extends SubsystemBase {
     private final CANSparkMax left =
         new CANSparkMax(Ports.LEFT_DRIVE_3, MotorType.kBrushless);
 
-    private final CANSparkMax leftMiddle =
-        new CANSparkMax(Ports.LEFT_DRIVE_2, MotorType.kBrushless);
+    // private final CANSparkMax leftMiddle =
+    //     new CANSparkMax(Ports.LEFT_DRIVE_2, MotorType.kBrushless);
 
-    private final CANSparkMax leftBack =
-        new CANSparkMax(Ports.LEFT_DRIVE_1, MotorType.kBrushless);
+    // private final CANSparkMax leftBack =
+    //     new CANSparkMax(Ports.LEFT_DRIVE_1, MotorType.kBrushless);
 
 
     // right motors
     private final CANSparkMax right =
         new CANSparkMax(Ports.RIGHT_DRIVE_3, MotorType.kBrushless);
 
-    private final CANSparkMax rightMiddle =
-        new CANSparkMax(Ports.RIGHT_DRIVE_2, MotorType.kBrushless);
+    // private final CANSparkMax rightMiddle =
+    //     new CANSparkMax(Ports.RIGHT_DRIVE_2, MotorType.kBrushless);
 
-    private final CANSparkMax rightBack =
-        new CANSparkMax(Ports.RIGHT_DRIVE_1, MotorType.kBrushless);
+    // private final CANSparkMax rightBack =
+    //     new CANSparkMax(Ports.RIGHT_DRIVE_1, MotorType.kBrushless);
 
 
     // pid controllers
@@ -101,7 +101,7 @@ public class Drivetrain extends SubsystemBase {
     public static DifferentialDriveVoltageConstraint LowVoltageConstraint =
         new DifferentialDriveVoltageConstraint(LowFeedFoward, DriveKinimatics, MAX_OUTPUT_VOLTAGE);
 
-    private final Solenoid shift;
+    //private final Solenoid shift;
 
     private boolean oldShift;
 
@@ -123,7 +123,7 @@ public class Drivetrain extends SubsystemBase {
 
         this.gyro = gyro;
 
-        shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
+        //shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
 
         odometryTime.reset();
         odometryTime.start();
@@ -132,15 +132,15 @@ public class Drivetrain extends SubsystemBase {
         odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
         // tells other two motors to follow the first
-        leftMiddle.follow(left);
-        leftBack.follow(left);
+        //leftMiddle.follow(left);
+        //leftBack.follow(left);
 
-        rightMiddle.follow(right);
-        rightBack.follow(right);
+        //rightMiddle.follow(right);
+        //rightBack.follow(right);
 
         // inverts right side
-        left.setInverted(true);
-        right.setInverted(false);
+        left.setInverted(false);
+        right.setInverted(true);
 
         // sets pid values
         zeroDistance();
@@ -157,41 +157,41 @@ public class Drivetrain extends SubsystemBase {
         rightPID.setOutputRange(-.25, .25);
 
         // pid for velocity
-        leftPID.setP(0.000278, 2);
+        leftPID.setP(0.00056928, 2);
         leftPID.setI(0, 2);
-        leftPID.setD(0.0001, 2);
+        leftPID.setD(0, 2);
 
-        rightPID.setP(0.000278, 2);
+        rightPID.setP(0.00056928, 2);
         rightPID.setI(0, 2);
-        rightPID.setD(0.0001, 2);
+        rightPID.setD(0, 2);
 
         left.disableVoltageCompensation();
         right.disableVoltageCompensation();
 
-        leftMiddle.disableVoltageCompensation();
-        rightMiddle.disableVoltageCompensation();
+        // leftMiddle.disableVoltageCompensation();
+        // rightMiddle.disableVoltageCompensation();
 
-        leftBack.disableVoltageCompensation();
-        rightBack.disableVoltageCompensation();
+        // leftBack.disableVoltageCompensation();
+        // rightBack.disableVoltageCompensation();
 
         setClosedRampRate(0);
         setOpenRampRate(0);
 
         left.setSmartCurrentLimit(40);
-        leftMiddle.setSmartCurrentLimit(40);
-        leftBack.setSmartCurrentLimit(40);
+        // leftMiddle.setSmartCurrentLimit(40);
+        // leftBack.setSmartCurrentLimit(40);
 
         right.setSmartCurrentLimit(40);
-        rightMiddle.setSmartCurrentLimit(40);
-        rightBack.setSmartCurrentLimit(40);
+        // rightMiddle.setSmartCurrentLimit(40);
+        // rightBack.setSmartCurrentLimit(40);
 
         left.setIdleMode(IdleMode.kBrake);
-        leftMiddle.setIdleMode(IdleMode.kBrake);
-        leftBack.setIdleMode(IdleMode.kBrake);
+        // leftMiddle.setIdleMode(IdleMode.kBrake);
+        // leftBack.setIdleMode(IdleMode.kBrake);
 
         right.setIdleMode(IdleMode.kBrake);
-        rightMiddle.setIdleMode(IdleMode.kBrake);
-        rightBack.setIdleMode(IdleMode.kBrake);
+        // rightMiddle.setIdleMode(IdleMode.kBrake);
+        // rightBack.setIdleMode(IdleMode.kBrake);
 
     }
 
@@ -203,7 +203,7 @@ public class Drivetrain extends SubsystemBase {
         lowShift.cancel();
         oldShift = true;
         updateDistanceAcum();
-        shift.set(true);
+        //shift.set(true);
     }
 
     /**
@@ -213,7 +213,7 @@ public class Drivetrain extends SubsystemBase {
         lowShift.activate();
         oldShift = false;
         updateDistanceAcum();
-        shift.set(false);
+        //shift.set(false);
     }
 
     /**
@@ -298,7 +298,7 @@ public class Drivetrain extends SubsystemBase {
      * @param right the left motor voltage
      */
     public void setMotorVolts(double left, double right) {
-        // System.out.println(String.format("left is: %f, right is %f", left, right));
+        //System.out.println(String.format("left is: %f, right is %f", left, right));
         setRightMotorVolts(right);
         setLeftMotorVolts(left);
     }
@@ -310,6 +310,8 @@ public class Drivetrain extends SubsystemBase {
      * @param rightMS the right motor MPS
      */
     public void setMotorTargetSpeed(double leftMS, double rightMS) {
+        //leftPID.setFF(getFeedForward().calculate(leftMS));
+        //rightPID.setFF(getFeedForward().calculate(rightMS));
         leftPID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
         rightPID.setReference(convertMPStoRPM(rightMS), ControlType.kVelocity, 2);
     }
@@ -594,6 +596,10 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    public double getRotation() {
+        return gyro.getRotation2d().getDegrees();
+    }
+
 
     /**
      * Method that runs once per scheduler cycle.
@@ -612,13 +618,14 @@ public class Drivetrain extends SubsystemBase {
 
         builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
         builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
-        builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
+        //builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
         builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
 
         builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
         builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
-        builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
+        //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
         builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
+        builder.addDoubleProperty("rotation", this::getRotation, null);
 
         builder.addBooleanProperty("shifterStatus", this::getShift, null);
         builder.addDoubleArrayProperty("pidValues", this::getPid, null);

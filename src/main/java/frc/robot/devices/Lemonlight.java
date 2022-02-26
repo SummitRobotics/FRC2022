@@ -5,7 +5,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import frc.robot.utilities.RollingAverage;
+import frc.robot.utilities.CustomVisionData;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -13,19 +13,18 @@ import java.util.Arrays;
  * Device driver for the limelight.
  */
 public class Lemonlight implements Sendable {
-
-    // TODO - make right
-    public static final int X_OFFSET = 0;
-
-    // TODO - set mountAngle and mountHeight
-    public static final double MOUNT_ANGLE = 0;
-
-    // in cm
-    public static final double MOUNT_HEIGHT = 0;
-
-    private static final double TARGET_HEIGHT = 0;
-
     private final NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline, llpython;
+
+    // VALUES SHOULD BE IN CM and DEGREES
+    // TODO - Set these
+    public static final double
+            MAIN_MOUNT_HEIGHT = 0.0,
+            MAIN_MOUNT_ANGLE = 0.0,
+            MAIN_TARGET_HEIGHT = 0.0,
+            BALL_MOUNT_HEIGHT = 22.0,
+            BALL_MOUNT_ANGLE = -20.0,
+            BALL_MOUNT_ANGLE_X = 0.0,
+            BALL_TARGET_HEIGHT = 12.065;
 
     /**
      * Creates a new limelight object.
@@ -146,14 +145,24 @@ public class Lemonlight implements Sendable {
      * gets a distance estimate IN INCHES of the target using the limelight and trig.
      * You need to check if the limelight has a target before running this
      *
+     * @param mountHeight Mounting height of the limelight
+     * @param mountAngle Mounting angle of the limelight
+     * @param targetHeight Target Height.
+     * @param targetYOffset The yOffset
      * @return the distance estimate or -1 if no target found
      */
-    //TODO check if the values coming out of this are acurate
-    public double getLimelightDistanceEstimateIN() {
-        if (!hasTarget()) {
-            return -1;
-        }
-        return ((TARGET_HEIGHT - MOUNT_HEIGHT) / Math.tan(((getVerticalOffset() + Lemonlight.MOUNT_ANGLE) * (Math.PI / 180)))) * 0.393701;
+    public static double getLimelightDistanceEstimateIN(
+            double mountHeight, double mountAngle, double targetHeight, double targetYOffset
+    ) {
+        return ((targetHeight - mountHeight)
+            / Math.tan((targetYOffset + mountAngle) * (Math.PI / 180))) 
+            * 0.393701;
+    }
+
+    public static double getXOOffsetDistanceEstimateIN(
+            double targetAngle, double mountAngle, double mountOffset, double targetDistance
+    ) {
+        return targetDistance * Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * 0.393701;
     }
 
     /**
@@ -174,14 +183,32 @@ public class Lemonlight implements Sendable {
      *
      * @return custom vision data as an ArrayList of Integers
      */
-    public ArrayList<Double> getCustomVisionData() {
+    public ArrayList<Integer> getCustomVisionData() {
         ArrayList<Number> customVisionData = getCustomVisionDataNumbers();
 
-        ArrayList<Double> output = new ArrayList<>();
+        ArrayList<Integer> output = new ArrayList<>();
 
-        customVisionData.forEach(ele -> output.add(ele.doubleValue()));
+        customVisionData.forEach(ele -> output.add(ele.intValue()));
 
         return output;
+    }
+
+    /**
+     * Parses the custom vision data and wraps it into a data class.
+     *
+     * @param data The custom vision data.
+     * @return The custom vision data wrapped in a data class.
+     */
+    public static ArrayList<CustomVisionData> parseVisionData(ArrayList<Integer> data) {
+        ArrayList<CustomVisionData> out = new ArrayList<>();
+
+        data.forEach((value) -> {
+            out.add(new CustomVisionData(
+                value,
+                    BALL_MOUNT_ANGLE, BALL_MOUNT_HEIGHT, BALL_MOUNT_ANGLE_X, BALL_TARGET_HEIGHT));
+        });
+
+        return out;
     }
 
     /**
@@ -190,7 +217,7 @@ public class Lemonlight implements Sendable {
      * @return Data in a primitive double array.
      */
     private double[] getCustomVisionDataForTelemetry() {
-        ArrayList<Double> data = getCustomVisionData();
+        ArrayList<Integer> data = getCustomVisionData();
         double[] out = new double[data.size()];
 
         for (int i = 0; i < data.size(); i++) {
@@ -200,12 +227,17 @@ public class Lemonlight implements Sendable {
         return out;
     }
 
+    private double getFirstInstanceCustomVisionData() {
+        return getCustomVisionDataForTelemetry()[0];
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Lemonlight");
         builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
         builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
-        builder.addDoubleProperty("distanceEstimate", this::getLimelightDistanceEstimateIN, null);
-        builder.addDoubleArrayProperty("", this::getCustomVisionDataForTelemetry, null);
+        builder.addDoubleArrayProperty(
+            "customDataArray", this::getCustomVisionDataForTelemetry, null);
+        builder.addDoubleProperty("customData", this::getFirstInstanceCustomVisionData, null);
     }
 }

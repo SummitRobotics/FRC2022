@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
         DOWN,
     }
 
-    public States state;
+    private States state;
 
     public static final double
             INTAKE_RATE = 0.5,

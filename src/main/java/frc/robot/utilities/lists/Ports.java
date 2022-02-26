@@ -22,14 +22,14 @@ public final class Ports {
 
             // Drivetrain
             // TODO: Set ports
-            LEFT_DRIVE_1 = 10,
-            LEFT_DRIVE_2 = 11,
-            LEFT_DRIVE_3 = 12,
-            RIGHT_DRIVE_1 = 13,
-            RIGHT_DRIVE_2 = 14,
-            RIGHT_DRIVE_3 = 15,
-            SHIFT_SOLENOID_UP = 1,
-            SHIFT_SOLENOID_DOWN = 2,
+            LEFT_DRIVE_1 = 30,
+            LEFT_DRIVE_2 = 30,
+            LEFT_DRIVE_3 = 30,
+            RIGHT_DRIVE_1 = 20,
+            RIGHT_DRIVE_2 = 20,
+            RIGHT_DRIVE_3 = 20,
+            SHIFT_SOLENOID_UP = 0,
+            SHIFT_SOLENOID_DOWN = 0,
 
             // Shooter
             SHOOTER_MOTOR = 16,
@@ -49,8 +49,7 @@ public final class Ports {
             // pneumatics
             PRESSURE_SENSOR = 0,
             PCM_1 = 1,
-
-            PDP = 2, 
+            PDP = 0, 
 
             // conveyor
             FRONT_CONVEYOR = 19,
