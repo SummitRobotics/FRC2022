@@ -90,7 +90,7 @@ public class ClimbMO extends CommandBase {
         prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
 
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
-        simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedPivotButton::get);
+        simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedLeftDetachButton::get);
         simplePrioritizedRightDetachButton = new SimpleButton(prioritizedRightDetachButton::get);
         simplePrioritizedBothDetachButton = new SimpleButton(prioritizedBothDetachButton::get);
 
@@ -109,14 +109,19 @@ public class ClimbMO extends CommandBase {
             climb.setMotorPower(prioritizedControlAxis.get());
         }
 
-        climb.setPivotPos(simplePrioritizedPivotButton.get());
+        if (simplePrioritizedPivotButton.get()) {
+            climb.setPivotPos(!climb.getPivotPos());
+        }
 
         if (simplePrioritizedBothDetachButton.get()) {
-            climb.setDetachPos(simplePrioritizedBothDetachButton.get());
-            climb.setDetachPos(simplePrioritizedBothDetachButton.get());
+            climb.setDetachPos(!(climb.getLeftDetachPos() && climb.getRightDetachPos()));
         } else {
-            climb.setLeftDetachPos(simplePrioritizedLeftDetachButton.get());
-            climb.setRightDetachPos(simplePrioritizedRightDetachButton.get());
+            if (simplePrioritizedLeftDetachButton.get()) {
+                climb.setLeftDetachPos(!climb.getLeftDetachPos());
+            }
+            if (simplePrioritizedRightDetachButton.get()) {
+                climb.setRightDetachPos(climb.getRightDetachPos());
+            }
         }
     }
 
