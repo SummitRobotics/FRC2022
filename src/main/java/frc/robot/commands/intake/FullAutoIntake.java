@@ -4,22 +4,14 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.utilities.lists.PIDValues;
 
 /**
  * Full auto intake mode.
  */
 public class FullAutoIntake extends CommandBase {
 
-    // PID values and constants
-    // TODO - configure
-    private static final double
-        MOVE_P = 0,
-        MOVE_I = 0,
-        MOVE_D = 0,
-        ALIGN_P = 0,
-        ALIGN_I = 0,
-        ALIGN_D = 0,
-        DISTANCE_FROM_BALL = 0;
+    private static final double DISTANCE_FROM_BALL = 0;
 
     // subsystems
     private Drivetrain drivetrain;
@@ -47,8 +39,8 @@ public class FullAutoIntake extends CommandBase {
 
         this.drivetrain = drivetrain;
         this.limelight = limelight;
-        this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
-        this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
+        this.movePID = new PIDController(PIDValues.MOVE_P, PIDValues.MOVE_I, PIDValues.MOVE_D);
+        this.alignPID = new PIDController(PIDValues.ALIGN_P, PIDValues.ALIGN_I, PIDValues.ALIGN_D);
 
         // TODO - set these
         movePID.setTolerance(1, 1);
