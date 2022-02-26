@@ -76,6 +76,7 @@ public class RobotContainer {
     //private final ColorSensor colorSensor;
     //private final LidarV3 lidarV3;
     private Supplier<Command> fullAutoShooterAssembly;
+    private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
     private final Command autoInit;
     private Command auto;
@@ -110,6 +111,7 @@ public class RobotContainer {
         intake = new Intake();
         climb = new Climb();
         fullAutoShooterAssembly =() -> new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
+        fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -251,9 +253,9 @@ public class RobotContainer {
                 autoInit,
                 fball1, 
                 fullAutoShooterAssembly.get(),
-                fball2, 
+                fullAutoIntake.get(),
                 fullAutoShooterAssembly.get(),
-                fball3, 
+                fullAutoIntake.get(),
                 fullAutoShooterAssembly.get()
             );
         
