@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
+import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
@@ -110,8 +111,8 @@ public class RobotContainer {
                             StatusPriorities.ENABLED)),
                 new InstantCommand(drivetrain::highGear),
                 new InstantCommand(() -> {
-                    launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
+                    //launchpad.bigLEDRed.set(false);
+                    //launchpad.bigLEDGreen.set(true);
                 }));
 
         teleInit =
@@ -121,8 +122,9 @@ public class RobotContainer {
                         // simulated robots don't have joysticks
                         if (RobotBase.isReal()) {
                             if (!controller1.isConnected()
-                                || !launchpad.isConnected()
-                                || !joystick.isConnected()) {
+                            //|| !launchpad.isConnected()
+                            //|| !joystick.isConnected()
+                            ) {
                                 System.out.println(
                                     "not enough joysticks connected,"
                                         + "please make sure the xbox controller,launchpad,"
@@ -136,7 +138,7 @@ public class RobotContainer {
                             }
                         }
                     }),
-                new InstantCommand(() -> pcm.enableCompressorDigital()),
+                // new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -144,13 +146,13 @@ public class RobotContainer {
                             "robot enabled",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
-                new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
+                //new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
                 new InstantCommand(drivetrain::highGear),
                 // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 // new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> {
-                    launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
+                    //launchpad.bigLEDRed.set(false);
+                    //launchpad.bigLEDGreen.set(true);
                 }));
 
         // Configure the button bindings
@@ -196,8 +198,8 @@ public class RobotContainer {
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        SmartDashboard.putData("PDP", pdp);
-        SmartDashboard.putData("PCM", pcm);
+        // SmartDashboard.putData("PDP", pdp);
+        // SmartDashboard.putData("PCM", pcm);
         SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
