@@ -8,29 +8,25 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.climb.ClimbAutomation;
+import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
-import frc.robot.commands.intake.DefaultIntake;
 import frc.robot.commands.intake.FullAutoIntake;
-import frc.robot.commands.intake.IntakeMO;
-import frc.robot.commands.intake.LowerIntake;
+import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.utilities.Functions;
-import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
-import frc.robot.devices.LidarV3;
 import frc.robot.devices.PCM;
 import frc.robot.devices.PDP;
 import frc.robot.oi.drivers.ControllerDriver;
@@ -75,7 +71,7 @@ public class RobotContainer {
     
     //private final ColorSensor colorSensor;
     //private final LidarV3 lidarV3;
-    private Supplier<Command> fullAutoShooterAssembly;
+    private Command fullAutoShooterAssembly;
     private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
     private final Command autoInit;
@@ -109,8 +105,10 @@ public class RobotContainer {
         shooter = new Shooter();
         conveyor = new Conveyor(null, null);
         intake = new Intake();
-        climb = new Climb();
-        fullAutoShooterAssembly =() -> new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
+        climb = new Climb(gyro);
+        fullAutoShooterAssembly = new ParallelCommandGroup(
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new ConveyorAutomation());
         fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -200,10 +198,19 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.toggleShift()));
-
+        
+        controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.highGear()));
+        controller1.leftBumper.whenReleased(new InstantCommand(()-> drivetrain.lowGear()));
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        controller1.buttonB.whenReleased(new IntakeToggle(intake));
+        // Auto commands
+        controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
+        controller1.buttonX.whileHeld(new ParallelCommandGroup(
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new ConveyorAutomation()));
+        launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
+        
     }
 
     /**
@@ -241,22 +248,17 @@ public class RobotContainer {
         //turning the json files into trajectorys when we want to run them
         //TODO make this run faster somehow
         String ball1 = "paths\1stBlue.path";
-        String ball2 = "paths\2ndBlue.path";
-        String ball3 = "paths\3rdBlue.path";
-
         try {
             Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
-            Command fball2 = Functions.splineCommandFromFile(drivetrain, ball2);
-            Command fball3 = Functions.splineCommandFromFile(drivetrain, ball3);
             //possible 4 ball auto
             auto = new SequentialCommandGroup(
                 autoInit,
                 fball1, 
-                fullAutoShooterAssembly.get(),
+                fullAutoShooterAssembly,
                 fullAutoIntake.get(),
-                fullAutoShooterAssembly.get(),
+                fullAutoShooterAssembly,
                 fullAutoIntake.get(),
-                fullAutoShooterAssembly.get()
+                fullAutoShooterAssembly
             );
         
         }catch (Exception e){
@@ -285,6 +287,6 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return null;
+        return auto;
     }
 }

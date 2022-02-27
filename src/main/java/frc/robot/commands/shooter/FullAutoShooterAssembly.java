@@ -316,6 +316,6 @@ public class FullAutoShooterAssembly extends CommandBase {
     }
 
     public boolean isFinished() {
-        return !conveyor.getDoesBallExist();
+        return !conveyor.getIsBallIndexed();
     }
 }

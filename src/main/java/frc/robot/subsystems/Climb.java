@@ -1,5 +1,5 @@
 package frc.robot.subsystems;
-
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
@@ -10,12 +10,13 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.lists.Ports;
-
+import frc.robot.utilities.RollingAverage;
 /**
  * Subsystem for the Climb Subsystem.
  */
 public class Climb extends SubsystemBase {
-
+    private AHRS gyro;
+    RollingAverage climbPitchAverage = new RollingAverage(10, true);
     public static final double
             P = 0,
             I = 0,
@@ -23,7 +24,8 @@ public class Climb extends SubsystemBase {
             FF = 0,
             IZ = 0,
             LEFT_MOTOR_RATE = 0.01,
-            RIGHT_MOTOR_RATE = 0.01;
+            RIGHT_MOTOR_RATE = 0.01,
+            CLIMB_ANGLE = 20;
 
     // Climb Motors
     private final CANSparkMax leftMotor =
@@ -62,7 +64,7 @@ public class Climb extends SubsystemBase {
     /**
      * Public Constructor for climb subsystem.
      */
-    public Climb() {
+    public Climb(AHRS gyro) {
         leftPidController.setP(P);
         leftPidController.setI(I);
         leftPidController.setD(D);
@@ -76,7 +78,8 @@ public class Climb extends SubsystemBase {
         rightPidController.setFF(FF);
         rightPidController.setIZone(IZ);
         rightPidController.setOutputRange(-1.0, 1.0);
-
+        this.gyro = gyro;
+        gyro.calibrate();
         zeroEncoders();
     }
 
@@ -238,7 +241,24 @@ public class Climb extends SubsystemBase {
         leftDetachPos = pos;
         leftDetach.set(pos);
     }
-
+    /**
+     * Checks to see if both arms are hooked, not sure if needed ¯\_(ツ)_/¯
+     */
+    public boolean isRollLevel(){
+        return (gyro.getRoll() < 10);
+    }
+    /**
+     * checks to see if the robot is hooked
+     */
+    public boolean isHooked(){
+        return climbPitchAverage.getAverage() < CLIMB_ANGLE;
+    }
+    /**
+     * Updating climb average
+     */
+    public void updateClimbAverage(){
+        climbPitchAverage.update(gyro.getPitch());
+    }
     /**
      * Toggles the position of the left detach piston.
      */
