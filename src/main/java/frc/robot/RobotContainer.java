@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.climb.ClimbAutomation;
+import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
@@ -204,6 +205,9 @@ public class RobotContainer {
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
         controller1.buttonB.whenReleased(new IntakeToggle(intake));
+        launchpad.missileB.whenPressed(new ClimbMO(climb, joystick.axisY, launchpad.buttonF, 
+        launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
+        launchpad.buttonH, launchpad.buttonG));
         // Auto commands
         controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
         controller1.buttonX.whileHeld(new ParallelCommandGroup(
