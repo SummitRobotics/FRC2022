@@ -60,7 +60,7 @@ public class RobotContainer {
     //private final Conveyor conveyor;
     //private final Intake intake;
 
-    private final Lemonlight ballDetectionLimelight;
+    // private final Lemonlight ballDetectionLimelight;
     // private final PDP pdp;
     // private final PCM pcm;
     private final AHRS gyro;
@@ -92,7 +92,7 @@ public class RobotContainer {
         gyro = new AHRS();
         //targetingLimelight = new Lemonlight("limelight");
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("limelight");
+        // ballDetectionLimelight = new Lemonlight("limelight");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
@@ -115,27 +115,27 @@ public class RobotContainer {
 
         teleInit =
             new SequentialCommandGroup(
-                new InstantCommand(
-                    () -> {
+                // new InstantCommand(
+                    // () -> {
                         // simulated robots don't have joysticks
-                        if (RobotBase.isReal()) {
-                            if (!controller1.isConnected()
-                            //|| !launchpad.isConnected()
-                            //|| !joystick.isConnected()
-                            ) {
-                                System.out.println(
-                                    "not enough joysticks connected,"
-                                        + "please make sure the xbox controller,launchpad,"
-                                        + "and joystick are connected to the driver-station");
-                                throw (new RuntimeException("not enough joysticks connected"));
-                            }
-                            
-                            if (!controller1.isXboxController()) {
-                                System.out.println("controller 0 is not the xbox controller");
-                                throw (new RuntimeException("incorrect joystick in port 0"));
-                            }
-                        }
-                    }),
+                        // if (RobotBase.isReal()) {
+                            // if (!controller1.isConnected()
+                            // || !launchpad.isConnected()
+                            // || !joystick.isConnected()
+                            // ) {
+                                // System.out.println(
+                                    // "not enough joysticks connected,"
+                                        // + "please make sure the xbox controller,launchpad,"
+                                        // + "and joystick are connected to the driver-station");
+                                // throw (new RuntimeException("not enough joysticks connected"));
+                            // }
+                            // 
+                            // if (!controller1.isXboxController()) {
+                                // System.out.println("controller 0 is not the xbox controller");
+                                // throw (new RuntimeException("incorrect joystick in port 0"));
+                            // }
+                        // }
+                    // }),
                 // new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
@@ -147,7 +147,7 @@ public class RobotContainer {
                 //new InstantCommand(() -> joystick.reEnableJoystickCalibrationCheck()),
                 new InstantCommand(drivetrain::highGear),
                 //new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
-                new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                // new InstantCommand(() -> ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 new InstantCommand(() -> {
                     //launchpad.bigLEDRed.set(false);
                     //launchpad.bigLEDGreen.set(true);
@@ -167,7 +167,8 @@ public class RobotContainer {
             drivetrain,
             controller1.rightTrigger,
             controller1.leftTrigger,
-            controller1.leftX));
+            controller1.leftX,
+            gyro));
 
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
     }
@@ -179,8 +180,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        controller1.buttonA.whileHeld(
-            new FullAutoIntake(drivetrain, ballDetectionLimelight));
+        // controller1.buttonA.whileHeld(
+        // new FullAutoIntake(drivetrain, ballDetectionLimelight));
     }
 
     /**
@@ -191,7 +192,7 @@ public class RobotContainer {
         // SmartDashboard.putData("PCM", pcm);
         SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
-        SmartDashboard.putData("BallLemonlight", ballDetectionLimelight);
+        // SmartDashboard.putData("BallLemonlight", ballDetectionLimelight);
         // SmartDashboard.putData("Shooter", shooter);
         // SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);

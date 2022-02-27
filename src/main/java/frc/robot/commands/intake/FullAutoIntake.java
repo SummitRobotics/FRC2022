@@ -73,7 +73,7 @@ public class FullAutoIntake extends CommandBase {
 
         if (limelightHasTarget) {
             double alignPower = alignPID.calculate(horizontalOffset);
-            double movePower =  -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
+            double movePower =  -movePID.calculate(limelightDistanceEstimate);
 
             System.out.println("align: " + alignPower + "   drive: " + movePower);
             drivetrain.setLeftMotorPower(movePower - alignPower);

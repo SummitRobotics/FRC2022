@@ -14,7 +14,7 @@ import java.util.Vector;
  */
 public class ChangeRateLimiter {
 
-    private final double rate;
+    private double rate;
     private double old;
 
     public static Vector<ChangeRateLimiter> allLimiters = new Vector<>();
@@ -60,6 +60,10 @@ public class ChangeRateLimiter {
         }
 
         return value;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
     }
 
     public void resetOld() {

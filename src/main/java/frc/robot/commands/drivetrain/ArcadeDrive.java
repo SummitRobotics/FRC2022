@@ -7,6 +7,8 @@
 
 package frc.robot.commands.drivetrain;
 
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.subsystems.Drivetrain;
@@ -19,23 +21,37 @@ import frc.robot.utilities.RollingAverage;
  */
 public class ArcadeDrive extends CommandBase {
 
+    public static final double
+        P = 0.02,
+        I = 0,
+        D = 0.05;
+
     private final Drivetrain drivetrain;
 
     private final OIAxis forwardPowerAxis;
     private OIAxis reversePowerAxis;
     private final OIAxis turnAxis;
 
-    private final ChangeRateLimiter limiter;
+    private final ChangeRateLimiter motorLimiter;
+    private final ChangeRateLimiter limiterLimiter;
 
     private static final double DEAD_ZONE = .01;
 
-    private static final double MAX_CHANGE_RATE = 0.05;
+    private static final double MAX_CHANGE_RATE = 0.01;
 
     private final RollingAverage avgSpeed = new RollingAverage(2, true);
 
     private final RollingAverage avgPower = new RollingAverage(2, true);
 
+    private final RollingAverage avgPIDResult = new RollingAverage(8, true);
+
     private final boolean isSingleAxis;
+
+    // gyroscope
+    private final AHRS gyro;
+
+    // PID controller
+    private PIDController adaptiveAccelPID;
 
     /**
      * teleop driver control.
@@ -44,20 +60,28 @@ public class ArcadeDrive extends CommandBase {
      * @param forwardPowerAxis control axis for forward power
      * @param reversePowerAxis control axis for reverse power
      * @param turnAxis         control axis for the drivetrain turn
+     * @param gyro The gyroscope
      */
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
-        OIAxis turnAxis) {
+        OIAxis turnAxis,
+        AHRS gyro) {
 
         this.drivetrain = drivetrain;
 
         this.forwardPowerAxis = forwardPowerAxis;
         this.reversePowerAxis = reversePowerAxis;
         this.turnAxis = turnAxis;
+        this.gyro = gyro;
+        this.adaptiveAccelPID = new PIDController(P, I, D);
 
-        limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
+        adaptiveAccelPID.setTolerance(5);
+        adaptiveAccelPID.setSetpoint(0);
+
+        motorLimiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
+        limiterLimiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
         addRequirements(drivetrain);
         isSingleAxis = false;
@@ -69,18 +93,26 @@ public class ArcadeDrive extends CommandBase {
      * @param drivetrain drivetrain instance
      * @param powerAxis  control axis for the drivetrain power
      * @param turnAxis   control axis for the drivetrain turn
+     * @param gyro The gyroscope
      */
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis powerAxis, 
-        OIAxis turnAxis) {
+        OIAxis turnAxis,
+        AHRS gyro) {
 
         this.drivetrain = drivetrain;
 
         this.forwardPowerAxis = powerAxis;
         this.turnAxis = turnAxis;
+        this.gyro = gyro;
+        this.adaptiveAccelPID = new PIDController(P, I, D);
 
-        limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
+        adaptiveAccelPID.setTolerance(5);
+        adaptiveAccelPID.setSetpoint(0);
+
+        motorLimiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
+        limiterLimiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
         addRequirements(drivetrain);
         isSingleAxis = true;
@@ -92,6 +124,8 @@ public class ArcadeDrive extends CommandBase {
         drivetrain.setOpenRampRate(0);
         avgPower.reset();
         avgSpeed.reset();
+        avgPIDResult.reset();
+        adaptiveAccelPID.reset();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -115,7 +149,14 @@ public class ArcadeDrive extends CommandBase {
             power = forwardPower - reversePower;
         }
 
-        power = limiter.getRateLimitedValue(power);
+        avgPIDResult.update(adaptiveAccelPID.calculate(gyro.getRoll()));
+        // motorLimiter.setRate(Math.abs(1 / (Functions.deadzone(3, gyro.getRoll()) + 0.01)));
+        // power = limiterLimiter.getRateLimitedValue(motorLimiter.getRateLimitedValue(power));
+        // double v = adaptiveAccelPID.calculate(gyro.getRoll());
+        // System.out.println(v);
+        if (!adaptiveAccelPID.atSetpoint()) {
+            power /= adaptiveAccelPID.calculate(gyro.getRoll());
+        }
 
         avgPower.update(Math.abs(power));
 
