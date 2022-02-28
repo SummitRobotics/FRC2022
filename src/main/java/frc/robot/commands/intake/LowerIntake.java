@@ -19,6 +19,5 @@ public class LowerIntake extends InstantCommand {
     public void initialize() {
         intake.setIntakeSolenoid(true);
         intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
-        intake.setState(Intake.States.DOWN);
     }
 }

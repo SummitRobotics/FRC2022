@@ -21,7 +21,6 @@ public class RaiseIntake extends SequentialCommandGroup {
 
                 new InstantCommand(() -> {
                     intake.stop();
-                    intake.setState(Intake.States.UP);
                 }, intake)
         );
     }

@@ -1,5 +1,9 @@
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
@@ -22,6 +26,7 @@ public class ShooterMO extends CommandBase {
     OIButton.PrioritizedButton prioritizedControlButton;
 
     SimpleButton prioritizedSimpleControlButton;
+    static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
 
 
     /**
@@ -37,6 +42,8 @@ public class ShooterMO extends CommandBase {
         this.shooter = shooter;
         this.controlAxis = controlAxis;
         this.controlButton = controlButton;
+        dumb.forceSetDouble(0);
+
     }
 
     @Override
@@ -51,10 +58,11 @@ public class ShooterMO extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.setMotorPower(controlAxis.get());
+        // shooter.setMotorPower(controlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();
         }
+        shooter.setMotorTargetSpeed(dumb.getDouble(0));
     }
 
     @Override

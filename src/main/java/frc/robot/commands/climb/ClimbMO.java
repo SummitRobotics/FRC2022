@@ -88,6 +88,7 @@ public class ClimbMO extends CommandBase {
         prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedBothDetachButton = bothDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
 
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedLeftDetachButton::get);
@@ -135,6 +136,7 @@ public class ClimbMO extends CommandBase {
         prioritizedPivotButton.destroy();
         prioritizedLeftDetachButton.destroy();
         prioritizedRightDetachButton.destroy();
+        prioritizedBothDetachButton.destroy();
     }
 
     @Override

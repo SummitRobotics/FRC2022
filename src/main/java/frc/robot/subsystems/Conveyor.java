@@ -7,7 +7,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
-import frc.robot.devices.LidarV3;
+import frc.robot.devices.Lidar;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -48,7 +48,7 @@ public class Conveyor extends SubsystemBase {
 
     // sensors
     private final ColorSensor colorSensor;
-    private final LidarV3 lidar;
+    private final Lidar lidar;
 
     // tracker variables
     private ConveyorState beltState;
@@ -67,11 +67,11 @@ public class Conveyor extends SubsystemBase {
     // TODO - set these
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 0,
-        MAX_EXISTS_LIDAR_DISTANCE = 0,
-        MAX_INDEXED_LIDAR_DISTANCE = 0,
-        MIN_INDEXED_LIDAR_DISTANCE = 0,
-        MIN_COLOR_SENSOR_DISTANCE = 0,
-        MAX_COLOR_SENSOR_DISTANCE = 0;
+        MAX_EXISTS_LIDAR_DISTANCE = 60,
+        MAX_INDEXED_LIDAR_DISTANCE = 37,
+        MIN_INDEXED_LIDAR_DISTANCE = 33,
+        MIN_COLOR_SENSOR_DISTANCE = 47,
+        MAX_COLOR_SENSOR_DISTANCE = 53;
 
     /**
      * Subsystem to control the conveyor of the robot.
@@ -79,7 +79,7 @@ public class Conveyor extends SubsystemBase {
      * @param colorSensor the color sensor
      * @param lidar the lidar
      */
-    public Conveyor(ColorSensor colorSensor, LidarV3 lidar) {
+    public Conveyor(ColorSensor colorSensor, Lidar lidar) {
         this.colorSensor = colorSensor;
         this.lidar = lidar;
         zeroEncoders();
@@ -331,6 +331,10 @@ public class Conveyor extends SubsystemBase {
         return beltState;
     }
 
+    public ConveyorState getIndexState() {
+        return indexState;
+    }
+
     /**
      * Returns the type of ball present in the position further away from the intake.
      * Note: To keep the logic simple, the conveyor code automatically assigns the
@@ -391,6 +395,7 @@ public class Conveyor extends SubsystemBase {
         builder.addDoubleProperty("belt_motor_speed", this::getBeltRPM, null);
         builder.addDoubleProperty("index_motor_speed", this::getIndexRPM, null);
         builder.addStringProperty("belt_ball", () -> this.getBeltState().toString(), null);
+        builder.addStringProperty("index_ball", () -> this.getIndexState().toString(), null);
         builder.addStringProperty("will_be_indexed_ball",
             () -> this.getWillBeIndexedState().toString(), null);
     }
