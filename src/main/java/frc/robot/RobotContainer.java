@@ -3,16 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
+import java.util.function.Supplier;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.PneumaticTestCommand;
 import frc.robot.commands.climb.ClimbMO;
@@ -21,8 +21,15 @@ import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
 import frc.robot.commands.intake.IntakeMO;
+import frc.robot.commands.climb.ClimbAutomation;
+import frc.robot.commands.conveyor.ConveyorAutomation;
+import frc.robot.commands.conveyor.ConveyorMO;
+import frc.robot.commands.drivetrain.ArcadeDrive;
+import frc.robot.commands.intake.FullAutoIntake;
+import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.shooter.ShooterMO;
-import frc.robot.devices.ColorSensor;
+import frc.robot.commands.shooter.FullAutoShooterAssembly;
+import frc.robot.utilities.Functions;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
@@ -56,7 +63,6 @@ import frc.robot.utilities.lists.StatusPriorities;
 public class RobotContainer {
 
     private final CommandScheduler scheduler;
-
     private final ControllerDriver controller1;
     private final LaunchpadDriver launchpad;
     private final JoystickDriver joystick;
@@ -68,15 +74,21 @@ public class RobotContainer {
     private final Intake intake;
     private final Climb climb;
 
-    // private final Lemonlight targetingLimelight, ballDetectionLimelight;
+    private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PDP pdp;
     private final PCM pcm;
     private final AHRS gyro;
     private final ColorSensor colorSensor;
     private final LidarV4 lidar;
 
+    
+    //private final ColorSensor colorSensor;
+    //private final LidarV3 lidarV3;
+    private Command fullAutoShooterAssembly;
+    private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
     private final Command autoInit;
+    private Command auto;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -84,7 +96,6 @@ public class RobotContainer {
     public RobotContainer() {
 
         scheduler = CommandScheduler.getInstance();
-
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
@@ -98,17 +109,20 @@ public class RobotContainer {
             "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
-        // targetingLimelight = new Lemonlight("limelight");
+        targetingLimelight = new Lemonlight("limelight");
         // TODO: need to ensure that this name is set on the limelight as well.
-        // ballDetectionLimelight = new Lemonlight("balldetect");
+        ballDetectionLimelight = new Lemonlight("balldetect");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
         shooter = new Shooter();
         conveyor = new Conveyor(colorSensor, lidar);
         intake = new Intake();
-        climb = new Climb();
-
+        climb = new Climb(gyro);
+        fullAutoShooterAssembly = new ParallelCommandGroup(
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new ConveyorAutomation(conveyor));
+        fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -117,10 +131,13 @@ public class RobotContainer {
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
                 new InstantCommand(drivetrain::highGear),
+                new InstantCommand(intake::lowerIntake),
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
-                }));
+                }),
+                new InstantCommand(climb::zeroClimb));
+                
 
         teleInit =
             new SequentialCommandGroup(
@@ -236,6 +253,27 @@ public class RobotContainer {
      */
     public void robotInit() {
         ShuffleboardDriver.init();
+        //sets up all the splines so we dont need to spend lots of time
+        //turning the json files into trajectorys when we want to run them
+        //TODO make this run faster somehow
+        String ball1 = "paths\1stBlue.path";
+        try {
+            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+            //possible 4 ball auto
+            auto = new SequentialCommandGroup(
+                autoInit,
+                fball1, 
+                fullAutoShooterAssembly,
+                fullAutoIntake.get(),
+                fullAutoShooterAssembly,
+                fullAutoIntake.get(),
+                fullAutoShooterAssembly
+            );
+        
+        }catch (Exception e){
+            System.out.println("An error occured when making autoInit: " + e);
+        }
+
     }
     
     /**
@@ -258,6 +296,6 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return null;
+        return auto;
     }
 }

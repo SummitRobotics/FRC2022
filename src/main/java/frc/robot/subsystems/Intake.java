@@ -69,7 +69,17 @@ public class Intake extends SubsystemBase {
     public double getIntakeEncoderPosition() {
         return intakeEncoder.getPosition();
     }
-
+    /**
+     * Lowers intake
+     * @return void
+     */
+    public void lowerIntake(){
+        if (state == States.UP){
+            setIntakeSolenoid(true);
+            setIntakeMotorPower(INTAKE_MOTOR_SPEED);
+            setState(States.DOWN);
+        }
+    }
     /**
      * Gets the intake motor's speed (in RPM).
      *
