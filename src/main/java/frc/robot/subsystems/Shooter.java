@@ -5,6 +5,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -20,12 +23,12 @@ public class Shooter extends SubsystemBase {
 
     // TODO - Set these
     public static final double
-            P = 0,
+            P = 9.6316E-6 * 60 * 2,
             I = 0,
-            D = 0,
+            D = 0.4,
             FF = 0,
             IZ = 0,
-            MAX_RPM = 0;
+            MAX_RPM = 5000;
 
 
     private final CANSparkMax shooterMotorMain = new CANSparkMax(
@@ -49,6 +52,10 @@ public class Shooter extends SubsystemBase {
 
     // Hood position false - Piston not extended : true - Piston extended
     private boolean hoodPos = false;
+
+
+    private final PIDController dumb = new PIDController(1.4217E-11, 0, 0);
+    private final SimpleMotorFeedforward dumb2 = new SimpleMotorFeedforward(0.5235, 0.068605, 0.011555);
 
     /**
      * Creates a new shooter instance.
@@ -97,6 +104,7 @@ public class Shooter extends SubsystemBase {
      */
     public void setMotorTargetSpeed(double speed) {
         speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
+        //setMotorVolts(dumb.calculate(speed) + dumb2.calculate(speed));
         shooterMotorPIDController.setReference(speed, CANSparkMax.ControlType.kVelocity);
     }
 

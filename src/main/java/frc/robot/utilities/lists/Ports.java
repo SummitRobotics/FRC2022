@@ -39,9 +39,9 @@ public final class Ports {
             // Climb
             LEFT_CLIMB_MOTOR = 20,
             RIGHT_CLIMB_MOTOR = 21,
-            PIVOT_CLIMB_SOLENOID = 4,
-            LEFT_DETACH_SOLENOID = 5,
-            RIGHT_DETACH_SOLENOID = 6,
+            PIVOT_CLIMB_SOLENOID = 6,
+            LEFT_DETACH_SOLENOID = 2,
+            RIGHT_DETACH_SOLENOID = 3,
 
             // LEDs
             LED_PORT = 0,
@@ -58,5 +58,5 @@ public final class Ports {
 
             // intake
             INTAKE_MOTOR = 50,
-            INTAKE_SOLENOID = 7;
+            INTAKE_SOLENOID = 1;
 }

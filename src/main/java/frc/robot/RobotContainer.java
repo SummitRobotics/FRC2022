@@ -14,10 +14,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.PneumaticTestCommand;
+import frc.robot.commands.climb.ClimbMO;
+import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
-import frc.robot.commands.intake.FullAutoIntake;
+import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
@@ -26,12 +29,14 @@ import frc.robot.devices.LEDs.LEDs;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.devices.LidarV3;
+import frc.robot.devices.LidarV4;
 import frc.robot.devices.PCM;
 import frc.robot.devices.PDP;
 import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
 import frc.robot.oi.drivers.ShuffleboardDriver;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
@@ -60,14 +65,15 @@ public class RobotContainer {
     private final Drivetrain drivetrain;
     private final Shooter shooter;
     private final Conveyor conveyor;
-    // private final Intake intake;
+    private final Intake intake;
+    private final Climb climb;
 
     // private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PDP pdp;
     private final PCM pcm;
     private final AHRS gyro;
-    //private final ColorSensor colorSensor;
-    //private final LidarV3 lidarV3;
+    private final ColorSensor colorSensor;
+    private final LidarV4 lidar;
 
     private final Command teleInit;
     private final Command autoInit;
@@ -84,8 +90,8 @@ public class RobotContainer {
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
         pdp = new PDP(Ports.PDP);
         pcm = new PCM(Ports.PCM_1);
-        //colorSensor = new ColorSensor();
-        //lidarV3 = new LidarV3();
+        colorSensor = new ColorSensor();
+        lidar = new LidarV4(0x62);
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
         ShuffleboardDriver.statusDisplay.addStatus(
@@ -99,8 +105,9 @@ public class RobotContainer {
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
         shooter = new Shooter();
-        conveyor = new Conveyor(null, null);
-        // intake = new Intake();
+        conveyor = new Conveyor(colorSensor, lidar);
+        intake = new Intake();
+        climb = new Climb();
 
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -166,6 +173,8 @@ public class RobotContainer {
 
     private void setLedButtons() {
         launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
+        launchpad.buttonB.pressBind();
+        launchpad.buttonA.pressBind();
     }
 
     private void setDefaultCommands() {
@@ -175,9 +184,9 @@ public class RobotContainer {
             controller1.rightTrigger,
             controller1.leftTrigger,
             controller1.leftX));
-
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
         shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
+        //conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake));
     }
 
     /**
@@ -188,25 +197,28 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.toggleShift()));
+        controller1.leftBumper.whenReleased(new InstantCommand(() -> drivetrain.toggleShift()));
 
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        launchpad.buttonA.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        launchpad.missileB.whileHeld(new ClimbMO(climb, joystick.axisY, joystick.button2, joystick.button3, launchpad.buttonD, launchpad.buttonI, launchpad.buttonH, launchpad.buttonG));
     }
 
     /**
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        SmartDashboard.putData("PDP", pdp);
-        SmartDashboard.putData("PCM", pcm);
-        SmartDashboard.putData("Drivetrain", drivetrain);
+        //SmartDashboard.putData("PDP", pdp);
+        //SmartDashboard.putData("PCM", pcm);
+        //SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         SmartDashboard.putData("Shooter", shooter);
-        SmartDashboard.putData("Conveyor", conveyor);
-        // SmartDashboard.putData("Intake", intake);
-        // SmartDashboard.putData("Color Sensor", colorSensor);
-        // SmartDashboard.putData("LidarV3", lidarV3);
+        //SmartDashboard.putData("Conveyor", conveyor);
+        //SmartDashboard.putData("Intake", intake);
+        //SmartDashboard.putData("Color Sensor", colorSensor);
+        //SmartDashboard.putData("Lidar", lidar);
     }
 
     /**

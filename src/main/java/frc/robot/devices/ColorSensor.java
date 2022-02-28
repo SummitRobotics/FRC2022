@@ -18,16 +18,20 @@ public class ColorSensor implements Sendable {
 
     private final Color blueTarget;
     private final Color redTarget;
+    private final Color noTarget;
 
     // The target RGB values for the specific shades of blue and red used for the balls.
     // We may need to re-adjust these later.
     private static final double
-        BLUE_TARGET_RED = 0.13989,
-        BLUE_TARGET_GREEN = 0.3818,
-        BLUE_TARGET_BLUE = 0.4787,
-        RED_TARGET_RED = 0.5510,
-        RED_TARGET_GREEN = 0.33178,
-        RED_TARGET_BLUE = 0.1176;
+        BLUE_TARGET_RED = 0.144,
+        BLUE_TARGET_GREEN = 0.383,
+        BLUE_TARGET_BLUE = 0.473,
+        RED_TARGET_RED = 0.565,
+        RED_TARGET_GREEN = 0.319,
+        RED_TARGET_BLUE = 0.116,
+        NO_TARGET_RED = 0.250,
+        NO_TARGET_GREEN = 0.475,
+        NO_TARGET_BLUE = 0.274;
 
 
     /**
@@ -39,9 +43,11 @@ public class ColorSensor implements Sendable {
 
         blueTarget = new Color(BLUE_TARGET_RED, BLUE_TARGET_GREEN, BLUE_TARGET_BLUE);
         redTarget = new Color(RED_TARGET_RED, RED_TARGET_GREEN, RED_TARGET_BLUE);
+        noTarget = new Color(NO_TARGET_RED, NO_TARGET_GREEN, NO_TARGET_BLUE);
 
         colorMatcher.addColorMatch(blueTarget);
         colorMatcher.addColorMatch(redTarget);
+        colorMatcher.addColorMatch(noTarget);
     }
 
     /**
@@ -109,6 +115,8 @@ public class ColorSensor implements Sendable {
             return "Blue";
         } else if (getColorMatch().color == redTarget) {
             return "Red";
+        } else if (getColorMatch().color == noTarget) {
+            return "NoTarget";
         } else {
             return "Unknown";
         }

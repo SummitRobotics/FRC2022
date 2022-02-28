@@ -106,8 +106,7 @@ public class Intake extends SubsystemBase {
      * Toggles the intake solenoid.
      */
     public void toggleIntakeSolenoid() {
-        intakeSolenoidPosition = !intakeSolenoidPosition;
-        intakeSolenoid.toggle();
+        setIntakeSolenoid(!intakeSolenoidPosition);
     }
 
     /**
@@ -118,6 +117,7 @@ public class Intake extends SubsystemBase {
     public void setIntakeSolenoid(boolean value) {
         intakeSolenoidPosition = value;
         intakeSolenoid.set(value);
+        updateState();
     }
 
     /**
@@ -138,15 +138,10 @@ public class Intake extends SubsystemBase {
         return state;
     }
 
-    /**
-     * Sets the state of the intake.
-     *
-     * @param state The state the intake is in.
-     */
-    public void setState(States state) {
-        this.state = state;
+    private void updateState() {
+        state = intakeSolenoidPosition ? States.DOWN : States.UP;
     }
-
+    
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");
