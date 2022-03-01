@@ -54,6 +54,7 @@ public class ConveyorAutomation extends CommandBase {
         if (numOfBalls == 0 && intake.getState() == Intake.States.DOWN) {
             conveyor.setBeltMotorPower(BELT_SPEED);
             conveyor.setIndexMotorPower(0);
+            return;
         }
         if (numOfBalls == 1 && indexState != ConveyorState.NONE) {
             conveyor.setBeltMotorPower(BELT_SPEED);

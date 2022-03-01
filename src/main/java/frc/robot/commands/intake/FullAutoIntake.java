@@ -9,6 +9,7 @@ import frc.robot.utilities.lists.PIDValues;
 /**
  * Full auto intake mode.
  */
+
 public class FullAutoIntake extends CommandBase {
 
     private static final double DISTANCE_FROM_BALL = 0;
@@ -34,9 +35,10 @@ public class FullAutoIntake extends CommandBase {
      * @param drivetrain The drivetrain subsystem
      * @param limelight The ball detection limelight
      */
+
     public FullAutoIntake(Drivetrain drivetrain,
         Lemonlight limelight) {
-        timeStart = System.currentTimeMillis()/1000;
+        timeStart = System.currentTimeMillis() / 1000;
         this.drivetrain = drivetrain;
         this.limelight = limelight;
         this.movePID = new PIDController(PIDValues.MOVE_P, PIDValues.MOVE_I, PIDValues.MOVE_D);
@@ -77,8 +79,8 @@ public class FullAutoIntake extends CommandBase {
             System.out.println("align: " + alignPower + "   drive: " + movePower);
             drivetrain.setLeftMotorPower(movePower - alignPower);
             drivetrain.setRightMotorPower(movePower + alignPower);
-        }else{
-            timeStart = System.currentTimeMillis()/1000;
+        } else {
+            timeStart = System.currentTimeMillis() / 1000;
             drivetrain.stop();
             drivetrain.setLeftMotorPower(.1);
             drivetrain.setRightMotorPower(-.1);
@@ -87,7 +89,7 @@ public class FullAutoIntake extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return (!limelight.hasTarget()&&System.currentTimeMillis()/1000 - timeStart > 5)
+        return (!limelight.hasTarget() && System.currentTimeMillis() / 1000 - timeStart > 5)
             || movePID.atSetpoint();
     }
 }

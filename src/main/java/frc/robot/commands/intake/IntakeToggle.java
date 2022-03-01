@@ -6,26 +6,27 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
+
+/**
+ * Intake Toggle Command.
+ */
 public class IntakeToggle extends CommandBase {
+    private final Intake intake;
 
-  private final Intake intake;
-
-  /** Creates a new IntakeToggle. */
-  public IntakeToggle(Intake intake) {
-    this.intake = intake;
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
+    /** Creates a new IntakeToggle. 
+     *
+     * @param intake the intake
+    */
+    public IntakeToggle(Intake intake) {
+        this.intake = intake;
+    }
 
     @Override
     public void initialize() {
-      if (intake.getState() == Intake.States.UP){
-        intake.setIntakeSolenoid(true);
-        intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
-        intake.setState(Intake.States.DOWN);
-      }else{
-        intake.setIntakeSolenoid(false);
-        intake.setIntakeMotorPower(0);
-        intake.setState(Intake.States.UP);
-      }
+        if (intake.getState() == Intake.States.UP) {
+            new LowerIntake(intake).schedule();
+        } else {
+            new RaiseIntake(intake).schedule();
+        }
     }
 }

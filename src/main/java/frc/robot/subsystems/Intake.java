@@ -70,14 +70,13 @@ public class Intake extends SubsystemBase {
         return intakeEncoder.getPosition();
     }
     /**
-     * Lowers intake
-     * @return void
+     * Lowers intake.
      */
-    public void lowerIntake(){
-        if (state == States.UP){
+
+    public void lowerIntake() {
+        if (state == States.UP) {
             setIntakeSolenoid(true);
             setIntakeMotorPower(INTAKE_MOTOR_SPEED);
-            setState(States.DOWN);
         }
     }
     /**
@@ -85,15 +84,17 @@ public class Intake extends SubsystemBase {
      *
      * @return speed
      */
+
     public double getIntakeRPM() {
         return intakeEncoder.getVelocity();
     }
     /**
-     * sets Intake State
-     * @param States
-     * @return void
+     * sets Intake State.
+     *
+     * @param states Sets the intake state
      */
-    public void setState(States states){
+
+    public void setState(States states) {
         state = states;
     }
     /**
@@ -101,6 +102,7 @@ public class Intake extends SubsystemBase {
      *
      * @param position The desired position of the intake motor's encoder.
      */
+    
     public void setIntakeEncoder(double position) {
         intakeEncoder.setPosition(position);
     }

@@ -5,14 +5,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
@@ -104,8 +102,8 @@ public class Shooter extends SubsystemBase {
      */
     public void setMotorTargetSpeed(double speed) {
         speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
-        //setMotorVolts(dumb.calculate(speed) + dumb2.calculate(speed));
-        shooterMotorPIDController.setReference(speed, CANSparkMax.ControlType.kVelocity);
+        setMotorVolts(dumb.calculate(shooterEncoder.getVelocity(), speed) + dumb2.calculate(speed));
+        //shooterMotorPIDController.setReference(speed, CANSparkMax.ControlType.kVelocity);
     }
 
     /**
