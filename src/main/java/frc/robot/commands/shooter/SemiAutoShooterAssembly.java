@@ -53,9 +53,11 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     }
 
     @Override
-    public void fire() {
+    public void fire(Shooter shooter) {
         if (prioritizedShootButton.get()) {
-            super.fire();
+            super.fire(shooter);
+        } else {
+            shooter.setState(Shooter.ShooterState.NOT_SHOOTING);
         }
     }
 
@@ -76,4 +78,8 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         prioritizedControlAxis.destroy();
     }
 
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

@@ -19,6 +19,21 @@ import frc.robot.utilities.lists.Ports;
  */
 public class Shooter extends SubsystemBase {
 
+    /**
+     * Enum describing shooter state.
+     */
+    public enum ShooterState {
+        NOT_SHOOTING,
+        NO_BALL,
+        NO_TARGET,
+        DRIVING_AND_ALIGNING,
+        SETTING_HOOD,
+        SPOOLING,
+        READY_TO_FIRE
+    }
+
+    private ShooterState shooterState = ShooterState.NOT_SHOOTING;
+
     // TODO - Set these
     public static final double
             P = 9.6316E-6 * 60 * 2,
@@ -68,6 +83,14 @@ public class Shooter extends SubsystemBase {
         
         zeroEncoders();
         shooterMotorFollow.follow(shooterMotorMain, true);
+    }
+
+    public void setState(ShooterState state) {
+        shooterState = state;
+    }
+
+    public ShooterState getState() {
+        return shooterState;
     }
 
     /**

@@ -2,7 +2,6 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
@@ -49,14 +48,10 @@ public class FullAutoShooterAssembly extends CommandBase {
         TARGET_WRONG_COLOR_MISS = 45,
         TARGET_MOTOR_SPEED_ACCURACY = 3,
         IDEAL_SHOOTING_DISTANCE = 1000,
-        SHOOT_DELAY_SECONDS = 1,
         SHOOTER_IDLE_SPEED = 3000;
 
     // devices
     protected Lemonlight limelight;
-
-    // timer
-    protected Timer shootDelayTimer;
 
     protected boolean hasRecordedLimelightDistance = false;
 
@@ -86,8 +81,6 @@ public class FullAutoShooterAssembly extends CommandBase {
         movePID.setTolerance(1, 1);
         alignPID.setSetpoint(0);
         movePID.setSetpoint(IDEAL_SHOOTING_DISTANCE);
-
-        this.shootDelayTimer = new Timer();
 
         addRequirements(shooter, drivetrain, conveyor);
     }
@@ -132,12 +125,11 @@ public class FullAutoShooterAssembly extends CommandBase {
 
     /**
      * Spins the index motor 360 degrees, moving a ball into the shooter.
+     *
+     * @param shooter The shooter subsystem
      */
-    public void fire() {
-        if (shootDelayTimer.get() > SHOOT_DELAY_SECONDS) {
-            conveyor.setIndexTargetPosition(conveyor.getIndexEncoderPosition() + 50);
-            shootDelayTimer.reset();
-        }
+    public void fire(Shooter shooter) {
+        shooter.setState(Shooter.ShooterState.READY_TO_FIRE);
     }
 
     /**
@@ -262,8 +254,6 @@ public class FullAutoShooterAssembly extends CommandBase {
         teamColor = getTeamColor();
         alignPID.reset();
         movePID.reset();
-        shootDelayTimer.reset();
-        shootDelayTimer.start();
         hasRecordedLimelightDistance = false;
     }
 
@@ -291,15 +281,27 @@ public class FullAutoShooterAssembly extends CommandBase {
                 limelightDistanceEstimate);
 
             if (isDrivenAndAligned && isHoodSet && isSpooled && isBallReady()) {
-                fire();
+                fire(shooter);
             }
-        }
-        
-        if (!limelightHasTarget) {
+
+            if (!isDrivenAndAligned) {
+                shooter.setState(Shooter.ShooterState.DRIVING_AND_ALIGNING);
+            } else if (!isHoodSet) {
+                shooter.setState(Shooter.ShooterState.SETTING_HOOD);
+            } else if (!isSpooled) {
+                shooter.setState(Shooter.ShooterState.SPOOLING);
+            } else if (!isBallReady()) {
+                shooter.setState(Shooter.ShooterState.NO_BALL);
+            } else {
+                fire(shooter);
+            }
+
+        } else {
             shooter.setMotorTargetSpeed(SHOOTER_IDLE_SPEED);
             alignPID.reset();
             movePID.reset();
             findTarget(drivetrain);
+            shooter.setState(Shooter.ShooterState.NO_TARGET);
         }
     }
 
@@ -311,11 +313,15 @@ public class FullAutoShooterAssembly extends CommandBase {
         movePID.reset();
         alignPID.close();
         movePID.close();
-
-        shootDelayTimer.stop();
+        shooter.setState(Shooter.ShooterState.NOT_SHOOTING);
     }
 
+    /**
+     * Returns whether or not the command should end.
+     *
+     * @return whether or not the command should end
+     */
     public boolean isFinished() {
-        return !conveyor.getIsBallIndexed();
+        return !conveyor.getDoesBallExist();
     }
 }
