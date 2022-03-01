@@ -37,8 +37,8 @@ public final class Ports {
             HOOD_SOLENOID = 7,
 
             // Climb
-            LEFT_CLIMB_MOTOR = 20,
-            RIGHT_CLIMB_MOTOR = 21,
+            LEFT_CLIMB_MOTOR = 21,
+            RIGHT_CLIMB_MOTOR = 20,
             PIVOT_CLIMB_SOLENOID = 6,
             LEFT_DETACH_SOLENOID = 2,
             RIGHT_DETACH_SOLENOID = 3,

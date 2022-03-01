@@ -129,7 +129,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @param shooter The shooter subsystem
      */
     public void fire(Shooter shooter) {
-        shooter.setState(Shooter.ShooterState.READY_TO_FIRE);
+        shooter.setState(Shooter.States.READY_TO_FIRE);
     }
 
     /**
@@ -138,7 +138,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return Whether or not there is a ball ready to be fired.
      */
     public boolean isBallReady() {
-        return (indexState != ConveyorState.NONE && conveyor.getIsBallIndexed());
+        return (indexState != ConveyorState.NONE && conveyor.isBallIndexed());
     }
 
     /**
@@ -285,13 +285,13 @@ public class FullAutoShooterAssembly extends CommandBase {
             }
 
             if (!isDrivenAndAligned) {
-                shooter.setState(Shooter.ShooterState.DRIVING_AND_ALIGNING);
+                shooter.setState(Shooter.States.DRIVING_AND_ALIGNING);
             } else if (!isHoodSet) {
-                shooter.setState(Shooter.ShooterState.SETTING_HOOD);
+                shooter.setState(Shooter.States.SETTING_HOOD);
             } else if (!isSpooled) {
-                shooter.setState(Shooter.ShooterState.SPOOLING);
+                shooter.setState(Shooter.States.SPOOLING);
             } else if (!isBallReady()) {
-                shooter.setState(Shooter.ShooterState.NO_BALL);
+                shooter.setState(Shooter.States.NO_BALL);
             } else {
                 fire(shooter);
             }
@@ -301,7 +301,7 @@ public class FullAutoShooterAssembly extends CommandBase {
             alignPID.reset();
             movePID.reset();
             findTarget(drivetrain);
-            shooter.setState(Shooter.ShooterState.NO_TARGET);
+            shooter.setState(Shooter.States.NO_TARGET);
         }
     }
 
@@ -313,7 +313,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         movePID.reset();
         alignPID.close();
         movePID.close();
-        shooter.setState(Shooter.ShooterState.NOT_SHOOTING);
+        shooter.setState(Shooter.States.NOT_SHOOTING);
     }
 
     /**
@@ -322,6 +322,6 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return whether or not the command should end
      */
     public boolean isFinished() {
-        return !conveyor.getDoesBallExist();
+        return !conveyor.doesBallExist();
     }
 }

@@ -29,8 +29,6 @@ public class Climb extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            LEFT_MOTOR_RATE = 0.01,
-            RIGHT_MOTOR_RATE = 0.01,
             CLIMB_ANGLE = 20;
 
     // Climb Motors
@@ -63,10 +61,6 @@ public class Climb extends SubsystemBase {
     private final RelativeEncoder leftMotorEncoder = leftMotor.getEncoder();
     private final RelativeEncoder rightMotorEncoder = rightMotor.getEncoder();
 
-    // Rate Limiters
-    private final ChangeRateLimiter leftMotorRateLimiter = new ChangeRateLimiter(LEFT_MOTOR_RATE);
-    private final ChangeRateLimiter rightMotorRateLimiter = new ChangeRateLimiter(RIGHT_MOTOR_RATE);
-
     /**
      * Public Constructor for climb subsystem.
      *
@@ -92,6 +86,9 @@ public class Climb extends SubsystemBase {
         zeroEncoders();
         leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
         rightClimbLimit = new DigitalInput(Ports.RIGHT_LIMIT_SWITCH);
+
+        leftMotor.setInverted(true);
+        rightMotor.setInverted(true);
     }
 
     /**
@@ -187,7 +184,7 @@ public class Climb extends SubsystemBase {
      * @param power The power to set the left motor.
      */
     public void setLeftMotorPower(double power) {
-        leftMotor.set(leftMotorRateLimiter.getRateLimitedValue(power));
+        leftMotor.set(power);
     }
 
     /**
@@ -196,7 +193,7 @@ public class Climb extends SubsystemBase {
      * @param power The power to set the right motor.
      */
     public void setRightMotorPower(double power) {
-        rightMotor.set(rightMotorRateLimiter.getRateLimitedValue(power));
+        rightMotor.set(power);
     }
 
     /**
