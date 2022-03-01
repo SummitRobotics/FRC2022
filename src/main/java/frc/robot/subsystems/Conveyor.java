@@ -19,7 +19,6 @@ public class Conveyor extends SubsystemBase {
     public static final double
             BELT_RATE = 0.01,
             INDEX_RATE = 0.01,
-            MAX_INDEX_RPM = 0,
             P = 0,
             I = 0,
             D = 0,
@@ -97,8 +96,8 @@ public class Conveyor extends SubsystemBase {
         colorSensorMeasurement = "Unknown";
         lidarDistance = -1.0;
         wasBallIndexed = false;
-        isBallIndexed = getIsBallIndexed();
-        doesBallExist = getDoesBallExist();
+        isBallIndexed = isBallIndexed();
+        doesBallExist = doesBallExist();
         beltRPM = 0;
         indexRPM = 0;
         index.setInverted(true);
@@ -215,8 +214,8 @@ public class Conveyor extends SubsystemBase {
         lidarDistance = lidar.getAverageDistance();
         colorSensorDistance = colorSensor.getProximity();
         wasBallIndexed = isBallIndexed;
-        isBallIndexed = getIsBallIndexed();
-        doesBallExist = getDoesBallExist();
+        isBallIndexed = isBallIndexed();
+        doesBallExist = doesBallExist();
         beltRPM = getBeltRPM();
         indexRPM = getIndexRPM();
 
@@ -353,7 +352,7 @@ public class Conveyor extends SubsystemBase {
      *
      * @return whether or not there is a ball ready to be fired
      */
-    public boolean getIsBallIndexed() {
+    public boolean isBallIndexed() {
         if (lidar == null || colorSensor == null) {
             return false;
         }
@@ -371,7 +370,7 @@ public class Conveyor extends SubsystemBase {
      *
      * @return whether or not there is a single ball in the conveyor
      */
-    public boolean getDoesBallExist() {
+    public boolean doesBallExist() {
         if (lidar == null || colorSensor == null) {
             return false;
         }

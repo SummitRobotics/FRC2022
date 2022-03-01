@@ -112,7 +112,7 @@ public class RobotContainer {
         climb = new Climb(gyro);
         fullAutoShooterAssembly = new ParallelCommandGroup(
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor, intake));
+            new ConveyorAutomation(conveyor, intake, shooter));
         fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -217,7 +217,7 @@ public class RobotContainer {
         controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
         controller1.buttonX.whileHeld(new ParallelCommandGroup(
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor, intake)));
+            new ConveyorAutomation(conveyor, intake, shooter)));
         launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
         
     }

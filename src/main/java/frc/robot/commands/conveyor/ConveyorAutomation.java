@@ -4,17 +4,21 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 /**
  * Command to automatically control the conveyor based on sensor measurements.
  */
 public class ConveyorAutomation extends CommandBase {
+
+    // subsystems
     private Conveyor conveyor;
     private Intake intake;
+    private Shooter shooter;
 
     public static double
-        BELT_SPEED = 0.1,
-        INDEX_SPEED = 0.1;
+        BELT_SPEED = 0.5,
+        INDEX_SPEED = 0.25;
 
     /**
      * Conveyor Automation Constructor.
@@ -22,26 +26,26 @@ public class ConveyorAutomation extends CommandBase {
      * @param conveyor The Conveyor subsystem
      * @param intake The intake subsystem
      */
-    public ConveyorAutomation(Conveyor conveyor, Intake intake) {
+    public ConveyorAutomation(Conveyor conveyor, Intake intake, Shooter shooter) {
         this.conveyor = conveyor;
         this.intake = intake;
+        this.shooter = shooter;
         addRequirements(conveyor);
     }
 
     @Override
-    public void initialize() {
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
-        if (!conveyor.getDoesBallExist() && intake.getState() == Intake.States.UP) {
-            conveyor.setBeltMotorPower(0);
-            conveyor.setIndexMotorPower(0);
-            return;
-        }
 
         ConveyorState beltState = conveyor.getBeltState();
         ConveyorState indexState = conveyor.getIndexState();
+        boolean doesBallExist = conveyor.doesBallExist();
+        boolean isBallIndexed = conveyor.isBallIndexed();
+        Intake.States intakeState = intake.getState();
+        Shooter.States shooterState = shooter.getState();
+
         int numOfBalls = 0;
 
         if (indexState != ConveyorState.NONE) {
@@ -51,22 +55,22 @@ public class ConveyorAutomation extends CommandBase {
             numOfBalls++;
         }
 
-        if (numOfBalls == 0 && intake.getState() == Intake.States.DOWN) {
-            conveyor.setBeltMotorPower(BELT_SPEED);
+        if (!doesBallExist && intakeState == Intake.States.UP) {
+            conveyor.setBeltMotorPower(0);
             conveyor.setIndexMotorPower(0);
-            return;
+        } else {
+            if (isBallIndexed && shooterState != Shooter.States.READY_TO_FIRE) {
+                conveyor.setIndexMotorPower(0);
+            } else if (doesBallExist) {
+                conveyor.setIndexMotorPower(INDEX_SPEED);
+            }
+    
+            if (numOfBalls == 1) {
+                conveyor.setBeltMotorPower(BELT_SPEED);
+            } else {
+                conveyor.setBeltMotorPower(0);
+            }
         }
-        if (numOfBalls == 1 && indexState != ConveyorState.NONE) {
-            conveyor.setBeltMotorPower(BELT_SPEED);
-            conveyor.setIndexMotorPower(0);
-            return;
-        } else if (numOfBalls == 1) {
-            conveyor.setIndexMotorPower(INDEX_SPEED);
-            conveyor.setBeltMotorPower(BELT_SPEED);
-            return;
-        }
-        conveyor.setIndexMotorPower(0);
-        conveyor.setBeltMotorPower(0);
     }
 
     @Override
