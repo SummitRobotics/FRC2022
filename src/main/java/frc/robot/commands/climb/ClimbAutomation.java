@@ -189,7 +189,6 @@ public class ClimbAutomation extends CommandBase {
         }
     }
 
-    // TODO add gyro code
     // retracting screws
     private void retract() {
         if (climb.isHooked() && motorRight == MotorStates.TESTING) {
@@ -237,7 +236,17 @@ public class ClimbAutomation extends CommandBase {
     }
     // set camera height in pixels
     // update with network tables code
-    
+
+    private boolean touchingBar() {
+        if (climb.getRightLimit() && climb.getLeftLimit()) {
+            drivetrain.setBothMotorPower(0);
+            return true;
+        } else {
+            drivetrain.setBothMotorPower(.1);
+            return false;
+        }
+    }
+
     private boolean aligned() {
         double angle = angleToTurn.getDouble(0.0);
         double dist = distToMove.getDouble(0.0);
@@ -278,7 +287,7 @@ public class ClimbAutomation extends CommandBase {
             if (barNumber == 0) {
                 if (climbSystem == ClimbStates.DONE && aligned()) {
                     extend();
-                } else if (climbSystem == ClimbStates.EXTENDED) {
+                } else if (climbSystem == ClimbStates.EXTENDED && touchingBar()) {
                     retract();
                 } else if (climbSystem == ClimbStates.LATCHED) {
                     cycle();

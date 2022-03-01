@@ -1,22 +1,28 @@
 package frc.robot.subsystems;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.ChangeRateLimiter;
-import frc.robot.utilities.lists.Ports;
 import frc.robot.utilities.RollingAverage;
+import frc.robot.utilities.lists.Ports;
+
 /**
  * Subsystem for the Climb Subsystem.
  */
 public class Climb extends SubsystemBase {
     private AHRS gyro;
+    private DigitalInput leftClimbLimit;
+    private DigitalInput rightClimbLimit;
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
+    //TODO set these
     public static final double
             P = 0,
             I = 0,
@@ -63,6 +69,9 @@ public class Climb extends SubsystemBase {
 
     /**
      * Public Constructor for climb subsystem.
+     *
+     * @param gyro
+     * 
      */
     public Climb(AHRS gyro) {
         leftPidController.setP(P);
@@ -81,6 +90,8 @@ public class Climb extends SubsystemBase {
         this.gyro = gyro;
         gyro.calibrate();
         zeroEncoders();
+        leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
+        rightClimbLimit = new DigitalInput(Ports.RIGHT_LIMIT_SWITCH);
     }
 
     /**
@@ -241,27 +252,58 @@ public class Climb extends SubsystemBase {
         leftDetachPos = pos;
         leftDetach.set(pos);
     }
+
     /**
-     * Checks to see if both arms are hooked, not sure if needed ¯\_(ツ)_/¯
+     * Checks to see if both arms are hooked, not sure if needed ¯\_(ツ)_/¯.
+     *
+     * @return rollIsLevel
+     * 
      */
-    public boolean isRollLevel(){
+
+    public boolean isRollLevel() {
         return (gyro.getRoll() < 10);
     }
+
     /**
-     * checks to see if the robot is hooked
+     * checks to see if the robot is hooked.
+     *
+     * @return isHooked
      */
-    public boolean isHooked(){
+
+    public boolean isHooked() {
         return climbPitchAverage.getAverage() < CLIMB_ANGLE;
     }
     /**
-     * Updating climb average
+     * checks if touching limit switch.
+     *
+     * @return is left climb touching limit switch
      */
-    public void updateClimbAverage(){
+
+    public boolean getLeftLimit() {
+        return leftClimbLimit.get();
+    }
+
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is right climb touching limit switch
+     */
+
+    public boolean getRightLimit() {
+        return rightClimbLimit.get();
+    }
+    /**
+     * Updating climb average.
+     * 
+     */
+
+    public void updateClimbAverage() {
         climbPitchAverage.update(gyro.getPitch());
     }
     /**
      * Toggles the position of the left detach piston.
      */
+
     public void toggleLeftDetachPos() {
         setLeftDetachPos(!leftDetachPos);
     }
@@ -292,15 +334,17 @@ public class Climb extends SubsystemBase {
         setRightDetachPos(pos);
         setLeftDetachPos(pos);
     }
+
     /** 
-     * zeros climb at the beginning of the match
+     * zeros climb at the beginning of the match.
     */
-    public void zeroClimb(){
+    public void zeroClimb() {
         setLeftMotorPower(-.01);
     }
     /**
      * Stops the motors.
      */
+
     public void stop() {
         setLeftMotorPower(0);
         setRightMotorPower(0);
