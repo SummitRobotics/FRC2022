@@ -21,11 +21,24 @@ import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.DefaultIntake;
+<<<<<<< HEAD
+=======
+import frc.robot.commands.intake.IntakeMO;
+import frc.robot.commands.climb.ClimbAutomation;
+import frc.robot.commands.climb.ClimbMO;
+import frc.robot.commands.conveyor.ConveyorAutomation;
+import frc.robot.commands.conveyor.ConveyorMO;
+import frc.robot.commands.drivetrain.ArcadeDrive;
+>>>>>>> 1dec0aa167f961429b2b279f6b32dfe65763b21e
 import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
+<<<<<<< HEAD
 import frc.robot.commands.shooter.ShooterMO;
+=======
+import frc.robot.utilities.Functions;
+>>>>>>> 1dec0aa167f961429b2b279f6b32dfe65763b21e
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -119,8 +132,13 @@ public class RobotContainer {
         intake = new Intake();
         climb = new Climb(gyro);
         fullAutoShooterAssembly = new ParallelCommandGroup(
+<<<<<<< HEAD
                 new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
                 new ConveyorAutomation(conveyor, intake));
+=======
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new ConveyorAutomation(conveyor, intake));
+>>>>>>> 1dec0aa167f961429b2b279f6b32dfe65763b21e
         fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -217,9 +235,23 @@ public class RobotContainer {
 
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+<<<<<<< HEAD
         launchpad.buttonA.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
         launchpad.missileB.whileHeld(new ClimbMO(climb, joystick.axisY, joystick.button2, joystick.button3,
                 launchpad.buttonD, launchpad.buttonI, launchpad.buttonH, launchpad.buttonG));
+=======
+        controller1.buttonB.whenReleased(new IntakeToggle(intake));
+        launchpad.missileB.whenPressed(new ClimbMO(climb, joystick.axisY, launchpad.buttonF, 
+        launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
+        launchpad.buttonH, launchpad.buttonG));
+        // Auto commands
+        controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
+        controller1.buttonX.whileHeld(new ParallelCommandGroup(
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new ConveyorAutomation(conveyor, intake)));
+        launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
+        
+>>>>>>> 1dec0aa167f961429b2b279f6b32dfe65763b21e
     }
 
     /**
