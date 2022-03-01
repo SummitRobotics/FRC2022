@@ -214,17 +214,10 @@ public class Conveyor extends SubsystemBase {
         lidarDistance = lidar.getAverageDistance();
         colorSensorDistance = colorSensor.getProximity();
         wasBallIndexed = isBallIndexed;
-<<<<<<< HEAD
-        isBallIndexed = getIsBallIndexed();
-        doesBallExist = getDoesBallExist();
-        beltRPM = -getBeltRPM();
-        indexRPM = -getIndexRPM();
-=======
         isBallIndexed = isBallIndexed();
         doesBallExist = doesBallExist();
-        beltRPM = getBeltRPM();
-        indexRPM = getIndexRPM();
->>>>>>> 6540af06b6b01cff40c8bfb0988d75e00b74ffb7
+        beltRPM = -getBeltRPM();
+        indexRPM = -getIndexRPM();
 
         if (!doesBallExist) {
 
