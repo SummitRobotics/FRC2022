@@ -235,8 +235,9 @@ public class ClimbAutomation extends CommandBase {
         }
 
     }
-
+    // set camera height in pixels
     // update with network tables code
+    
     private boolean aligned() {
         double angle = angleToTurn.getDouble(0.0);
         double dist = distToMove.getDouble(0.0);
