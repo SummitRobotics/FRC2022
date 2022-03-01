@@ -25,7 +25,6 @@ public class ShooterMO extends CommandBase {
     SimpleButton prioritizedSimpleControlButton;
     static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
 
-
     /**
      * Manual override for the shooter.
      *
@@ -49,8 +48,8 @@ public class ShooterMO extends CommandBase {
 
         prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedControlButton = controlButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-
         prioritizedSimpleControlButton = new SimpleButton(prioritizedControlButton::get);
+        shooter.retractHood();
     }
 
     @Override
