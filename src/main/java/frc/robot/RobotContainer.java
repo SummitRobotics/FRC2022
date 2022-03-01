@@ -115,15 +115,9 @@ public class RobotContainer {
         conveyor = new Conveyor(colorSensor, lidar);
         intake = new Intake();
         climb = new Climb(gyro);
-<<<<<<< HEAD
-        // fullAutoShooterAssembly = new ParallelCommandGroup(
-        //     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-        //     new ConveyorAutomation(conveyor, intake));
-=======
         fullAutoShooterAssembly = new ParallelCommandGroup(
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
             new ConveyorAutomation(conveyor, intake, shooter));
->>>>>>> 6540af06b6b01cff40c8bfb0988d75e00b74ffb7
         fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -234,20 +228,11 @@ public class RobotContainer {
             launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
             launchpad.buttonH, launchpad.buttonG));
         // Auto commands
-<<<<<<< HEAD
-        //controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
-        // controller1.buttonX.whileHeld(new ParallelCommandGroup(
-        //     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-        //     new ConveyorAutomation(conveyor, intake)));
-        // launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
-=======
         controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
         controller1.buttonX.whileHeld(new ParallelCommandGroup(
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
             new ConveyorAutomation(conveyor, intake, shooter)));
         launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
->>>>>>> 6540af06b6b01cff40c8bfb0988d75e00b74ffb7
-        
     }
 
     /**

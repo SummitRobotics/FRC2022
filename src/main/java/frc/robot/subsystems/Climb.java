@@ -146,6 +146,20 @@ public class Climb extends SubsystemBase {
         return pivotPos;
     }
 
+    public void setLeftMotorVelocity(double speed) {
+        leftMotor.set(speed);
+    }
+
+    public void setRightMotorVelocity(double speed) {
+
+        leftMotor.set(speed);
+    }
+
+    public void setBothMotorVelocity(double speed) {
+        leftMotor.set(speed);
+        rightMotor.set(speed);
+    }
+
     /**
      * Gets the current position of the pneumatic detach for the left side.
      *
