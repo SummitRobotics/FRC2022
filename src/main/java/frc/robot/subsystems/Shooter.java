@@ -22,7 +22,7 @@ public class Shooter extends SubsystemBase {
     /**
      * Enum describing shooter state.
      */
-    public enum ShooterState {
+    public enum States {
         NOT_SHOOTING,
         NO_BALL,
         NO_TARGET,
@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase {
         READY_TO_FIRE
     }
 
-    private ShooterState shooterState = ShooterState.NOT_SHOOTING;
+    private States shooterState = States.NOT_SHOOTING;
 
     // TODO - Set these
     public static final double
@@ -85,11 +85,11 @@ public class Shooter extends SubsystemBase {
         shooterMotorFollow.follow(shooterMotorMain, true);
     }
 
-    public void setState(ShooterState state) {
+    public void setState(States state) {
         shooterState = state;
     }
 
-    public ShooterState getState() {
+    public States getState() {
         return shooterState;
     }
 

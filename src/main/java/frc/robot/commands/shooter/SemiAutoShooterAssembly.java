@@ -57,7 +57,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         if (prioritizedShootButton.get()) {
             super.fire(shooter);
         } else {
-            shooter.setState(Shooter.ShooterState.NOT_SHOOTING);
+            shooter.setState(Shooter.States.NOT_SHOOTING);
         }
     }
 
