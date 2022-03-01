@@ -31,6 +31,7 @@ import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.utilities.Functions;
+import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
@@ -122,7 +123,7 @@ public class RobotContainer {
         climb = new Climb(gyro);
         fullAutoShooterAssembly = new ParallelCommandGroup(
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor));
+            new ConveyorAutomation(conveyor, intake));
         fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -227,7 +228,7 @@ public class RobotContainer {
         controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
         controller1.buttonX.whileHeld(new ParallelCommandGroup(
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor)));
+            new ConveyorAutomation(conveyor, intake)));
         launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
         
     }

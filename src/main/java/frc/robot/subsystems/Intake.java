@@ -88,7 +88,14 @@ public class Intake extends SubsystemBase {
     public double getIntakeRPM() {
         return intakeEncoder.getVelocity();
     }
-
+    /**
+     * sets Intake State
+     * @param States
+     * @return void
+     */
+    public void setState(States states){
+        state = states;
+    }
     /**
      * Manually overrides the intake motor's encoder position.
      *
