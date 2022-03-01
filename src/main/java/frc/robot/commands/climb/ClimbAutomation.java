@@ -21,6 +21,8 @@ import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 
+
+
 /**
  * Climb automation command.
  */
@@ -101,6 +103,7 @@ public class ClimbAutomation extends CommandBase {
     boolean hasHorizonalDistance;
     double turnAngle;
     double moveDist;
+    String barMisaligned; 
     private final LEDCall climbingLedCall = new LEDCall(LEDPriorities.ARMS_UP, LEDRange.All).sine(Colors.ORANGE);
     // OI
     OIButton climbButton;
@@ -123,6 +126,7 @@ public class ClimbAutomation extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        barMisaligned = "";
         this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
         this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
         climb.stop();
@@ -277,6 +281,24 @@ public class ClimbAutomation extends CommandBase {
 
         return alignPID.atSetpoint() && movePID.atSetpoint();
     }
+    /**
+     * aligns climb using limit switches.
+     */
+
+    public void alignByLimit() {
+        if (!climb.getLeftLimit() && barMisaligned == "" && climb.getRightLimit()) {
+            barMisaligned = "left";
+            drivetrain.setLeftMotorPower(0);
+        } else if (!climb.getRightLimit() && barMisaligned == "" && climb.getLeftLimit()) {
+            barMisaligned = "right";
+            drivetrain.setRightMotorPower(0);
+        } else if (climb.getLeftLimit() && climb.getRightLimit()) {
+            drivetrain.setBothMotorPower(-.5);
+            barMisaligned = "";
+        } else {
+            drivetrain.setBothMotorPower(0);
+        }
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
@@ -285,8 +307,10 @@ public class ClimbAutomation extends CommandBase {
         if (prioritizedClimbButton.get() && barNumber < 3) {
             climbingLedCall.activate();
             if (barNumber == 0) {
+                // get rid of aligned() here if using alignByLimit()
                 if (climbSystem == ClimbStates.DONE && aligned()) {
                     extend();
+                //replace touchingBar() with alignByLimit() if using it
                 } else if (climbSystem == ClimbStates.EXTENDED && touchingBar()) {
                     retract();
                 } else if (climbSystem == ClimbStates.LATCHED) {
