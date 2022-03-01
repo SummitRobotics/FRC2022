@@ -35,7 +35,11 @@ public class FullAutoIntake extends CommandBase {
      * @param drivetrain The drivetrain subsystem
      * @param limelight The ball detection limelight
      */
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     public FullAutoIntake(Drivetrain drivetrain,
         Lemonlight limelight) {
         timeStart = System.currentTimeMillis() / 1000;
