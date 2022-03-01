@@ -14,15 +14,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.PneumaticTestCommand;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
-import frc.robot.commands.intake.DefaultIntake;
 import frc.robot.commands.intake.FullAutoIntake;
-import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterMO;
@@ -31,11 +28,8 @@ import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
-import frc.robot.devices.LidarV3;
 import frc.robot.devices.LidarV4;
 import frc.robot.devices.PCM;
-import frc.robot.devices.PDP;
 import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
@@ -77,7 +71,6 @@ public class RobotContainer {
     private final Climb climb;
 
     private final Lemonlight targetingLimelight, ballDetectionLimelight;
-    private final PDP pdp;
     private final PCM pcm;
     private final AHRS gyro;
 
@@ -98,7 +91,6 @@ public class RobotContainer {
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
-        pdp = new PDP(Ports.PDP);
         pcm = new PCM(Ports.PCM_1);
         colorSensor = new ColorSensor();
         lidar = new LidarV4(0x62);
@@ -263,7 +255,6 @@ public class RobotContainer {
         ShuffleboardDriver.init();
         // sets up all the splines so we dont need to spend lots of time
         // turning the json files into trajectorys when we want to run them
-        // TODO make this run faster somehow
         String ball1 = "paths\1stBlue.path";
         try {
             Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);

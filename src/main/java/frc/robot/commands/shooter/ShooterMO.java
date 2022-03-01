@@ -1,11 +1,8 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Shooter;
