@@ -170,19 +170,20 @@ public class ClimbAutomation extends CommandBase {
 
     // Extending to grab bar using screws
     private void extend() {
-        if ((climb.getRightEncoderValue() < 66.66 || climb.getLeftEncoderValue() < 66.66)
+        if ((climb.getRightEncoderValue() < 65 || climb.getLeftEncoderValue() < 65)
                 && motorRight == MotorStates.IDLE && motorLeft == MotorStates.IDLE) {
-            climb.setMotorPower(1);
+            climb.setBothMotorVelocity(1);
+            climb.setMotorPosition(66);
             motorLeft = MotorStates.EXTENDING;
             motorRight = MotorStates.EXTENDING;
 
         }
-        if (climb.getLeftEncoderValue() >= 66.66 && motorLeft == MotorStates.EXTENDING) {
-            climb.setLeftMotorPower(0);
+        if (climb.getLeftEncoderValue() >= 65 && motorLeft == MotorStates.EXTENDING) {
+            climb.setLeftMotorVelocity(0);
             motorLeft = MotorStates.IDLE;
         }
-        if (climb.getRightEncoderValue() >= 66.66 && motorRight == MotorStates.EXTENDING) {
-            climb.setRightMotorPower(0);
+        if (climb.getRightEncoderValue() >= 65 && motorRight == MotorStates.EXTENDING) {
+            climb.setRightMotorVelocity(0);
             motorRight = MotorStates.IDLE;
             if (motorRight == MotorStates.IDLE && motorLeft == MotorStates.IDLE) {
                 climbSystem = ClimbStates.EXTENDED;
@@ -196,13 +197,13 @@ public class ClimbAutomation extends CommandBase {
     // retracting screws
     private void retract() {
         if (climb.isHooked() && motorRight == MotorStates.TESTING) {
-            climb.setMotorPower(-1);
+            climb.setBothMotorVelocity(-1);
             climb.setLeftDetachPos(false);
             climb.setRightDetachPos(false);
             motorLeft = MotorStates.RETRACTING;
             motorRight = MotorStates.RETRACTING;
         } else if (motorRight == MotorStates.IDLE) {
-            climb.setMotorPower(-.1);
+            climb.setBothMotorVelocity(-.1);
             motorLeft = MotorStates.TESTING;
             motorRight = MotorStates.TESTING;
         } else if (motorRight == MotorStates.TESTING && climb.getRightEncoderValue() < 30) {
@@ -213,7 +214,7 @@ public class ClimbAutomation extends CommandBase {
         }
 
         if (climb.getRightEncoderValue() <= 0 && climb.getLeftEncoderValue() <= 0) {
-            climb.setMotorPower(0);
+            climb.setBothMotorVelocity(0);
             climb.setRightDetachPos(true);
             climb.setLeftDetachPos(true);
             climbSystem = ClimbStates.LATCHED;
@@ -223,14 +224,14 @@ public class ClimbAutomation extends CommandBase {
     // cycling bot, making sure that latches are on by using power detection
     private void cycle() {
         if (motorRight != MotorStates.EXTENDING) {
-            climb.setRightMotorPower(1);
-            climb.setLeftMotorPower(1);
+            climb.setLeftMotorVelocity(1);
+            climb.setLeftMotorVelocity(1);
             motorRight = MotorStates.EXTENDING;
             motorLeft = MotorStates.EXTENDING;
         }
         if (climb.getRightEncoderValue() > 10 && climb.getLeftEncoderValue() > 10) {
-            climb.setLeftMotorPower(0);
-            climb.setRightMotorPower(0);
+            climb.setRightMotorVelocity(0);
+            climb.setLeftMotorVelocity(0);
             climb.setPivotPos(true);
             climbSystem = ClimbStates.DONE;
             motorRight = MotorStates.IDLE;
