@@ -29,7 +29,6 @@ import java.util.Vector;
 public class ShuffleboardDriver {
 
     private static final String[] BAD_SHUFFLE_HELL_ITEMS = {"navX", "Solenoid", "Compressor"};
-
     private static NetworkTable InfoTable = NetworkTableInstance.getDefault().getTable("RobotInfo"),
             ButtonTable = NetworkTableInstance.getDefault().getTable("Buttons");
     public static ShuffleboardLEDButton

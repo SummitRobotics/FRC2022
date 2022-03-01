@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +32,7 @@ import frc.robot.devices.LEDs.LEDs;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.LidarV4;
 import frc.robot.devices.PCM;
+import frc.robot.devices.PDP;
 import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.drivers.JoystickDriver;
 import frc.robot.oi.drivers.LaunchpadDriver;
@@ -73,6 +76,7 @@ public class RobotContainer {
     private final Lemonlight targetingLimelight, ballDetectionLimelight;
     private final PCM pcm;
     private final AHRS gyro;
+    private final PowerDistribution pdp;
 
     private final ColorSensor colorSensor;
     private final LidarV4 lidar;
@@ -94,6 +98,7 @@ public class RobotContainer {
         pcm = new PCM(Ports.PCM_1);
         colorSensor = new ColorSensor();
         lidar = new LidarV4(0x62);
+        pdp = new PowerDistribution(1, ModuleType.kRev);
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
         ShuffleboardDriver.statusDisplay.addStatus(
@@ -110,9 +115,9 @@ public class RobotContainer {
         conveyor = new Conveyor(colorSensor, lidar);
         intake = new Intake();
         climb = new Climb(gyro);
-        fullAutoShooterAssembly = new ParallelCommandGroup(
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor, intake));
+        // fullAutoShooterAssembly = new ParallelCommandGroup(
+        //     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+        //     new ConveyorAutomation(conveyor, intake));
         fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -178,9 +183,17 @@ public class RobotContainer {
     }
 
     private void setLedButtons() {
-        launchpad.buttonC.booleanSupplierBind(shooter::getHoodPos);
+        launchpad.buttonA.booleanSupplierBind(shooter::getHoodPos);
         launchpad.buttonB.pressBind();
-        launchpad.buttonA.pressBind();
+
+        launchpad.buttonD.booleanSupplierBind(climb::getPivotPos);
+        launchpad.buttonE.pressBind();
+        launchpad.buttonF.pressBind();
+        launchpad.buttonG.booleanSupplierBind(() -> {
+            return climb.getLeftDetachPos() && climb.getRightDetachPos();
+        });
+        launchpad.buttonH.booleanSupplierBind(climb::getRightDetachPos);
+        launchpad.buttonI.booleanSupplierBind(climb::getLeftDetachPos);
     }
 
     private void setDefaultCommands() {
@@ -191,7 +204,7 @@ public class RobotContainer {
                 controller1.leftTrigger,
                 controller1.leftX));
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
-        shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonC));
+        shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA));
         // conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake));
     }
 
@@ -209,16 +222,17 @@ public class RobotContainer {
 
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
-        controller1.buttonB.whenReleased(new IntakeToggle(intake));
+
+        //controller1.buttonB.whenReleased(new IntakeToggle(intake));
         launchpad.missileB.whenPressed(new ClimbMO(climb, joystick.axisY, launchpad.buttonF, 
             launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
             launchpad.buttonH, launchpad.buttonG));
         // Auto commands
-        controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
-        controller1.buttonX.whileHeld(new ParallelCommandGroup(
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor, intake)));
-        launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
+        //controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
+        // controller1.buttonX.whileHeld(new ParallelCommandGroup(
+        //     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+        //     new ConveyorAutomation(conveyor, intake)));
+        // launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
         
     }
 
@@ -226,7 +240,7 @@ public class RobotContainer {
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        // SmartDashboard.putData("PDP", pdp);
+        SmartDashboard.putData("PDP", pdp);
         // SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
         // SmartDashboard.putData("Lemonlight", targetingLimelight);
@@ -234,8 +248,9 @@ public class RobotContainer {
         // SmartDashboard.putData("Shooter", shooter);
         SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
-        // SmartDashboard.putData("Color Sensor", colorSensor);
+        SmartDashboard.putData("Color Sensor", colorSensor);
         // SmartDashboard.putData("Lidar", lidar);
+        SmartDashboard.putData("Climb", climb);
     }
 
     /**

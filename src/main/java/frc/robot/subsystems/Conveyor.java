@@ -70,8 +70,8 @@ public class Conveyor extends SubsystemBase {
         MAX_EXISTS_LIDAR_DISTANCE = 60,
         MAX_INDEXED_LIDAR_DISTANCE = 37,
         MIN_INDEXED_LIDAR_DISTANCE = 33,
-        MIN_COLOR_SENSOR_DISTANCE = 47,
-        MAX_COLOR_SENSOR_DISTANCE = 53;
+        MIN_COLOR_SENSOR_DISTANCE = 1000,
+        MAX_COLOR_SENSOR_DISTANCE = 1400;
 
     /**
      * Subsystem to control the conveyor of the robot.
@@ -217,8 +217,8 @@ public class Conveyor extends SubsystemBase {
         wasBallIndexed = isBallIndexed;
         isBallIndexed = getIsBallIndexed();
         doesBallExist = getDoesBallExist();
-        beltRPM = getBeltRPM();
-        indexRPM = getIndexRPM();
+        beltRPM = -getBeltRPM();
+        indexRPM = -getIndexRPM();
 
         if (!doesBallExist) {
 

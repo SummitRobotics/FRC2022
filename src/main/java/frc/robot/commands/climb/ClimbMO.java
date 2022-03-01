@@ -96,6 +96,9 @@ public class ClimbMO extends CommandBase {
         simplePrioritizedBothDetachButton = new SimpleButton(prioritizedBothDetachButton::get);
 
         climb.stop();
+
+        climb.setDetachPos(false);
+        climb.setPivotPos(false);
     }
 
     @Override
