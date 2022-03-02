@@ -29,7 +29,7 @@ public class Climb extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            CLIMB_ANGLE = 20;
+            CLIMB_ANGLE = 0;
 
     // Climb Motors
     private final CANSparkMax leftMotor =
