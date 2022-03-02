@@ -267,7 +267,7 @@ public class FullAutoShooterAssembly extends CommandBase {
             limelight.getVerticalOffset());
 
         smoothedHorizontalOffset = limelight.getHorizontalOffset();
-        indexState = conveyor.getWillBeIndexedState();
+        indexState = conveyor.getIndexState();
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterRPM();
 
