@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 
 // TODO - Find better documentation and figure out what more of these methods do
 /** Contains methods for interfacing with the PCM (Pneumatics Control Module). */
-public class PCM implements Sendable{
+public class PCM implements Sendable {
 
     private PneumaticHub hub;
 
@@ -94,7 +94,7 @@ public class PCM implements Sendable{
         return hub.getModuleNumber();
     }
 
-    public boolean getPressureSwitch(){
+    public boolean getPressureSwitch() {
         return hub.getPressureSwitch();
     }
 
