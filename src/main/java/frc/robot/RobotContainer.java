@@ -221,27 +221,32 @@ public class RobotContainer {
 
         // MOs
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
-        launchpad.funLeft.whenPressed(new InstantCommand(() -> {
+        launchpad.missileB.whenInactive(new InstantCommand(() -> {
             if (climb.getDefaultCommand() != null) {
                 climb.getDefaultCommand().cancel();
             }
-            climb.setDefaultCommand(new ClimbMO(climb, joystick.axisY, launchpad.buttonF, 
-                launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
-                launchpad.buttonH, launchpad.buttonG));
         }));
-        launchpad.funMiddle.whenPressed(new InstantCommand(() -> {
+        launchpad.buttonI.whenPressed(new InstantCommand(() -> {
             if (climb.getDefaultCommand() != null) {
                 climb.getDefaultCommand().cancel();
             }
-            climb.setDefaultCommand(new ClimbManual(climb, joystick.axisY, launchpad.buttonF, 
-                launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
-                launchpad.buttonH, launchpad.buttonG));
+            climb.setDefaultCommand(new ClimbMO(climb, joystick.axisY, joystick.button4, 
+                joystick.button5, joystick.button2, joystick.button2, 
+                joystick.button6, joystick.button11));
         }));
-        launchpad.funRight.whenPressed(new InstantCommand(() -> {
+        launchpad.buttonH.whenPressed(new InstantCommand(() -> {
             if (climb.getDefaultCommand() != null) {
                 climb.getDefaultCommand().cancel();
             }
-            climb.setDefaultCommand(new ClimbAutomation(climb, drivetrain, launchpad.missileB));
+            climb.setDefaultCommand(new ClimbManual(climb, joystick.axisY, joystick.button4, 
+                joystick.button5, joystick.button2, joystick.button2, 
+                joystick.button6, joystick.button11));
+        }));
+        launchpad.buttonG.whenPressed(new InstantCommand(() -> {
+            if (climb.getDefaultCommand() != null) {
+                climb.getDefaultCommand().cancel();
+            }
+            climb.setDefaultCommand(new ClimbAutomation(climb, drivetrain, launchpad.buttonG));
         }));
         // Auto commands
         // controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));

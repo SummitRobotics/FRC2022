@@ -190,7 +190,6 @@ public class ClimbAutomation extends CommandBase {
             climbRightPID.setSetpoint(66);
             climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
-
         }
         if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
             climbSystem = ClimbStates.EXTENDED;
@@ -302,6 +301,9 @@ public class ClimbAutomation extends CommandBase {
                 // get rid of aligned() here if using alignByLimit()
                 if (climbSystem == ClimbStates.DONE && aligned()) {
                     extend();
+                    if (!climb.getLeftDetachPos() && !climb.getRightDetachPos()){
+                        climb.setDetachPos(true);
+                    }
                 //replace touchingBar() with alignByLimit() if using it
                 } else if (climbSystem == ClimbStates.EXTENDED && touchingBar()) {
                     climbLeftPID.reset();

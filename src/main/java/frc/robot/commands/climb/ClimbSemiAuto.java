@@ -4,24 +4,39 @@
 
 package frc.robot.commands.climb;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.oi.inputs.OIAxis;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.utilities.Functions;
+import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
+import frc.robot.utilities.lists.PIDValues;
+import frc.robot.utilities.lists.Ports;
+
+
 
 /**
- * Like climbMo, but with safety features.
+ * ClimbSemiAuto.
  */
 
-public class ClimbManual extends CommandBase {
-    // the climb subsystem
+public class ClimbSemiAuto extends ClimbAutomation {
+    protected static final double 
+              CLIMB_P = PIDValues.CLIMB_P,
+              CLIMB_I = PIDValues.CLIMB_I,
+              CLIMB_D = PIDValues.CLIMB_D;
+    // subsystems
     Climb climb;
-
+    Drivetrain drivetrain;
     // control axis for raising and lowering arms
-    OIAxis controlAxis;
-    OIAxis.PrioritizedAxis prioritizedControlAxis;
 
     // button for the pivot solenoid
     OIButton pivotButton;
@@ -32,19 +47,18 @@ public class ClimbManual extends CommandBase {
     OIButton leftDetachButton;
     OIButton.PrioritizedButton prioritizedLeftDetachButton;
     SimpleButton simplePrioritizedLeftDetachButton;
-
     // button for only the right detach solenoid
     OIButton rightDetachButton;
     OIButton.PrioritizedButton prioritizedRightDetachButton;
     SimpleButton simplePrioritizedRightDetachButton;
 
     // button for LeftMotorPower
-    OIButton leftMotorButton;
-    OIButton.PrioritizedButton prioritizedLeftMotorButton;
+    OIButton zeroPositionButton;
+    OIButton.PrioritizedButton prioritizedZeroPositionButton;
 
     // button for rightMotorPower
-    OIButton rightMotorButton;
-    OIButton.PrioritizedButton prioritizedRightMotorButton;
+    OIButton fullMotorButton;
+    OIButton.PrioritizedButton prioritizedFullMotorButton;
 
     // button for both detach solenoids
     OIButton bothDetachButton;
@@ -55,41 +69,45 @@ public class ClimbManual extends CommandBase {
      * Manual override for the climber. Many parameters!
      *
      * @param climb the climb subsystem
-     * @param controlAxis control axis for raising and lowering arms
-     * @param leftMotorButton Button to make the axis control the left motor.
-     * @param rightMotorButton Button to make the axis control the right motor.
+     * @param zeroPositionButton Button to make the arms go to 0.
+     * @param fullMotorButton Button to make the arms go to full extension.
      * @param pivotButton button for the pivot solenoid
      * @param leftDetachButton button for only the left detach solenoid
      * @param rightDetachButton button for only the right detach solenoid
      * @param bothDetachButton button for both detach solenoids
+     * @param drivetrain drivetrain
+     * @param mainButton main button for ClimbAutomation
      */
-    public ClimbManual(
+    public ClimbSemiAuto(
         Climb climb,
-        OIAxis controlAxis,
-        OIButton leftMotorButton,
-        OIButton rightMotorButton,
+        OIButton zeroPositionButton,
+        OIButton fullMotorButton,
         OIButton pivotButton,
         OIButton leftDetachButton,
         OIButton rightDetachButton,
-        OIButton bothDetachButton
+        OIButton bothDetachButton, 
+        Drivetrain drivetrain, 
+        OIButton mainButton
     ) {
+        
+        super(climb, drivetrain, mainButton);
+        this.drivetrain = drivetrain;
         addRequirements(climb);
         this.climb = climb;
-        this.controlAxis = controlAxis;
-        this.leftMotorButton = leftMotorButton;
-        this.rightMotorButton = rightMotorButton;
+        this.zeroPositionButton = zeroPositionButton;
+        this.fullMotorButton = fullMotorButton;
         this.pivotButton = pivotButton;
         this.leftDetachButton = leftDetachButton;
         this.rightDetachButton = rightDetachButton;
         this.bothDetachButton = bothDetachButton;
+        // Use addRequirements() here to declare subsystem dependencies.
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedZeroPositionButton = zeroPositionButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedFullMotorButton = fullMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
@@ -109,49 +127,14 @@ public class ClimbManual extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        climb.updateClimbAverage();
-        if (prioritizedLeftMotorButton.get() && prioritizedRightMotorButton.get()) {
-            climb.setMotorPower(prioritizedControlAxis.get());
-        } else if (prioritizedLeftMotorButton.get()) {
-            climb.setLeftMotorPower(prioritizedControlAxis.get());
-        } else if (prioritizedRightMotorButton.get()) {
-            climb.setRightMotorPower(prioritizedControlAxis.get());
-        } else {
-            climb.setMotorPower(prioritizedControlAxis.get());
-        }
-
-        if (simplePrioritizedPivotButton.get()) {
-            climb.togglePivotPos();
-        }
-
-        if (simplePrioritizedBothDetachButton.get()) {
-            if (!climb.getLeftDetachPos()) {
-                climb.setDetachPos(!(climb.getLeftDetachPos() && climb.getRightDetachPos()));
-            } else if (climb.getLeftDetachPos() && climb.getRightDetachPos() && climb.isHooked()) {
-                climb.setDetachPos(!(climb.getLeftDetachPos() && climb.getRightDetachPos()));
-            }
-        } else {
-            if (simplePrioritizedLeftDetachButton.get()) {
-                climb.toggleLeftDetachPos();
-            }
-            if (simplePrioritizedRightDetachButton.get()) {
-                climb.toggleRightDetachPos();
-            }
+        if (prioritizedZeroPositionButton.get()) {
+            
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {
-        climb.stop();
-        prioritizedControlAxis.destroy();
-        prioritizedLeftMotorButton.destroy();
-        prioritizedRightMotorButton.destroy();
-        prioritizedPivotButton.destroy();
-        prioritizedLeftDetachButton.destroy();
-        prioritizedRightDetachButton.destroy();
-        prioritizedBothDetachButton.destroy();
-    }
+    public void end(boolean interrupted) {}
 
     // Returns true when the command should end.
     @Override
