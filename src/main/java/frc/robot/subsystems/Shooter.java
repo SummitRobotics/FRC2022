@@ -37,10 +37,10 @@ public class Shooter extends SubsystemBase {
 
     // TODO - Set these
     public static final double
-            P = 1.4217E-11 * 60 / 12,
+            P = 1.4217E-9,
             I = 0,
             D = 0,
-            FF = 0.068605 / 12,
+            FF = 0.068605 / 12 / 30,
             IZ = 0,
             MAX_RPM = 5000;
 
