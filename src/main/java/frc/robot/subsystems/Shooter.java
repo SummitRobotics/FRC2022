@@ -217,6 +217,10 @@ public class Shooter extends SubsystemBase {
         setHoodPos(!hoodPos);
     }
 
+    private String getShooterStateAsText() {
+        return shooterState.toString();
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Shooter");
@@ -224,5 +228,6 @@ public class Shooter extends SubsystemBase {
         builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
         builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
         builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

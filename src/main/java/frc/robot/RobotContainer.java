@@ -73,7 +73,9 @@ public class RobotContainer {
     private final Intake intake;
     private final Climb climb;
 
-    private final Lemonlight targetingLimelight, ballDetectionLimelight;
+    private final Lemonlight
+        targetingLimelight;
+    // ballDetectionLimelight;
     private final PCM pcm;
     private final AHRS gyro;
     private final PowerDistribution pdp;
@@ -107,7 +109,7 @@ public class RobotContainer {
         gyro = new AHRS();
         targetingLimelight = new Lemonlight("limelight");
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("balldetect");
+        //ballDetectionLimelight = new Lemonlight("balldetect");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
@@ -115,10 +117,6 @@ public class RobotContainer {
         conveyor = new Conveyor(colorSensor, lidar);
         intake = new Intake();
         climb = new Climb(gyro);
-        fullAutoShooterAssembly = new ParallelCommandGroup(
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor, intake, shooter));
-        fullAutoIntake = () -> new FullAutoIntake(drivetrain, ballDetectionLimelight);
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -205,7 +203,7 @@ public class RobotContainer {
                 controller1.leftX));
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
         shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA));
-        // conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake));
+        // conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
 
     /**
@@ -228,11 +226,11 @@ public class RobotContainer {
             launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
             launchpad.buttonH, launchpad.buttonG));
         // Auto commands
-        controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
-        controller1.buttonX.whileHeld(new ParallelCommandGroup(
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-            new ConveyorAutomation(conveyor, intake, shooter)));
-        launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
+        // controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
+        // controller1.buttonX.whileHeld(new ParallelCommandGroup(
+        //     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+        //     new ConveyorAutomation(conveyor, intake, shooter)));
+        // launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
     }
 
     /**

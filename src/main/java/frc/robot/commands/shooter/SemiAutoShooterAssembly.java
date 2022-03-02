@@ -42,7 +42,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         this.shootButton = shootButton;
         this.controlAxis = controlAxis;
 
-        addRequirements(shooter, drivetrain, conveyor);
+        addRequirements(shooter, drivetrain);
     }
 
     @Override

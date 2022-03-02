@@ -82,7 +82,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         alignPID.setSetpoint(0);
         movePID.setSetpoint(IDEAL_SHOOTING_DISTANCE);
 
-        addRequirements(shooter, drivetrain, conveyor);
+        addRequirements(shooter, drivetrain);
     }
 
     /**

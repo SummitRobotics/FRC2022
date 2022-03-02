@@ -25,6 +25,7 @@ public class ConveyorAutomation extends CommandBase {
      *
      * @param conveyor The Conveyor subsystem
      * @param intake The intake subsystem
+     * @param shooter The shooter subsystem
      */
     public ConveyorAutomation(Conveyor conveyor, Intake intake, Shooter shooter) {
         this.conveyor = conveyor;
