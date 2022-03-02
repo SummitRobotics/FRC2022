@@ -22,6 +22,7 @@ import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.intake.FullAutoIntake;
+import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterMO;
@@ -107,7 +108,7 @@ public class RobotContainer {
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
-        targetingLimelight = new Lemonlight("limelight");
+        targetingLimelight = new Lemonlight("gloworm", false, true);
         // TODO: need to ensure that this name is set on the limelight as well.
         //ballDetectionLimelight = new Lemonlight("balldetect");
 
@@ -174,24 +175,9 @@ public class RobotContainer {
         // Configure the button bindings
         setDefaultCommands();
         configureButtonBindings();
-        setLedButtons();
 
         // Init Telemetry
         initTelemetry();
-    }
-
-    private void setLedButtons() {
-        launchpad.buttonA.booleanSupplierBind(shooter::getHoodPos);
-        launchpad.buttonB.pressBind();
-
-        launchpad.buttonD.booleanSupplierBind(climb::getPivotPos);
-        launchpad.buttonE.pressBind();
-        launchpad.buttonF.pressBind();
-        launchpad.buttonG.booleanSupplierBind(() -> {
-            return climb.getLeftDetachPos() && climb.getRightDetachPos();
-        });
-        launchpad.buttonH.booleanSupplierBind(climb::getRightDetachPos);
-        launchpad.buttonI.booleanSupplierBind(climb::getLeftDetachPos);
     }
 
     private void setDefaultCommands() {
@@ -201,8 +187,6 @@ public class RobotContainer {
                 controller1.rightTrigger,
                 controller1.leftTrigger,
                 controller1.leftX));
-        // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
-        shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA));
         conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
 
@@ -215,22 +199,23 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        controller1.rightBumper.whenReleased(new InstantCommand(() -> drivetrain.toggleShift()));
-        controller1.leftBumper.whenReleased(new InstantCommand(() -> drivetrain.toggleShift()));
+        controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
+        controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 
-        // MOs
+        // Conveyor
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
 
-        //controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        launchpad.missileB.whenPressed(new ClimbMO(climb, joystick.axisY, launchpad.buttonF, 
-            launchpad.buttonE, launchpad.buttonD, launchpad.buttonI, 
+        // Intake
+        // controller1.buttonB.whenReleased(new IntakeToggle(intake));
+        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+
+        // Climb
+        launchpad.missileA.whileHeld(new ClimbMO(climb, joystick.axisY, launchpad.buttonF,
+            launchpad.buttonE, launchpad.buttonD, launchpad.buttonI,
             launchpad.buttonH, launchpad.buttonG));
-        // Auto commands
-        // controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));
-        // controller1.buttonX.whileHeld(new ParallelCommandGroup(
-        //     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-        //     new ConveyorAutomation(conveyor, intake, shooter)));
-        // launchpad.missileA.whenPressed(new ClimbAutomation(climb, drivetrain, launchpad.missileA));
+
+        // Shooter
+        launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA, null));
     }
 
     /**
@@ -240,14 +225,14 @@ public class RobotContainer {
         SmartDashboard.putData("PDP", pdp);
         // SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
-        // SmartDashboard.putData("Lemonlight", targetingLimelight);
+        SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         SmartDashboard.putData("Shooter", shooter);
-        // SmartDashboard.putData("Conveyor", conveyor);
+        SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
-        SmartDashboard.putData("Color Sensor", colorSensor);
-        SmartDashboard.putData("Lidar", lidar);
-        SmartDashboard.putData("Climb", climb);
+        //SmartDashboard.putData("Color Sensor", colorSensor);
+        //SmartDashboard.putData("Lidar", lidar);
+        //SmartDashboard.putData("Climb", climb);
     }
 
     /**

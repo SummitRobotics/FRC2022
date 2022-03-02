@@ -62,7 +62,6 @@ public class FullAutoIntake extends CommandBase {
     @Override
     public void execute() {
         limelightHasTarget = limelight.hasTarget();
-        System.out.println(limelightHasTarget);
         limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
             Lemonlight.BALL_MOUNT_HEIGHT,
             Lemonlight.BALL_MOUNT_ANGLE,

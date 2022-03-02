@@ -14,13 +14,14 @@ import java.util.Arrays;
  */
 public class Lemonlight implements Sendable {
     private final NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline, llpython;
+    private final boolean forBall;
 
     // VALUES SHOULD BE IN CM and DEGREES
     // TODO - Set these
     public static final double
-            MAIN_MOUNT_HEIGHT = 0.0,
-            MAIN_MOUNT_ANGLE = 0.0,
-            MAIN_TARGET_HEIGHT = 0.0,
+            MAIN_MOUNT_HEIGHT = 78.105,
+            MAIN_MOUNT_ANGLE = 37.7,
+            MAIN_TARGET_HEIGHT = 238.76,
             BALL_MOUNT_HEIGHT = 22.0,
             BALL_MOUNT_ANGLE = -20.0,
             BALL_MOUNT_ANGLE_X = 0.0,
@@ -30,17 +31,36 @@ public class Lemonlight implements Sendable {
      * Creates a new limelight object.
      *
      * @param tableName The table of the limelight. Default is "limelight"
+     * @param forBall If the limelight is for a ball
+     * @param photonVision If the vision is running photonVision.
      */
-    public Lemonlight(String tableName) {
-        NetworkTable limelight = NetworkTableInstance.getDefault().getTable(tableName);
+    public Lemonlight(String tableName, boolean forBall, boolean photonVision) {
+        NetworkTable limelight;
+        if (!photonVision) {
+            limelight = NetworkTableInstance.getDefault().getTable(tableName);
+        } else {
+            limelight = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable(tableName);
+        }
 
-        tv = limelight.getEntry("tv");
-        tx = limelight.getEntry("tx");
-        ty = limelight.getEntry("ty");
-        ta = limelight.getEntry("ta");
+        this.forBall = forBall;
 
-        llpython = limelight.getEntry("llpython");
+        if (!photonVision) {
+            tv = limelight.getEntry("tv");
+            tx = limelight.getEntry("tx");
+            ty = limelight.getEntry("ty");
+            ta = limelight.getEntry("ta");
+        } else {
+            tv = limelight.getEntry("hasTarget");
+            tx = limelight.getEntry("targetYaw");
+            ty = limelight.getEntry("targetPitch");
+            ta = limelight.getEntry("targetArea");
+        }
 
+        if (forBall) {
+            llpython = limelight.getEntry("llpython");
+        } else {
+            llpython = null;
+        }
         ledMode = limelight.getEntry("ledMode");
         camMode = limelight.getEntry("camMode");
 
@@ -172,6 +192,9 @@ public class Lemonlight implements Sendable {
      * @return custom vision data as an ArrayList of Numbers
      */
     public ArrayList<Number> getCustomVisionDataNumbers() {
+        if (!forBall) {
+            return new ArrayList<>();
+        }
         // For some reason I get errors if I put {} straight into getNumberArray.
         Number[] defaultArray = {};
         return new ArrayList<>(Arrays.asList(llpython.getNumberArray(defaultArray)));
@@ -184,6 +207,9 @@ public class Lemonlight implements Sendable {
      * @return custom vision data as an ArrayList of Integers
      */
     public ArrayList<Integer> getCustomVisionData() {
+        if (!forBall) {
+            return new ArrayList<>();
+        }
         ArrayList<Number> customVisionData = getCustomVisionDataNumbers();
 
         ArrayList<Integer> output = new ArrayList<>();
@@ -217,6 +243,9 @@ public class Lemonlight implements Sendable {
      * @return Data in a primitive double array.
      */
     private double[] getCustomVisionDataForTelemetry() {
+        if (!forBall) {
+            return new double[0];
+        }
         ArrayList<Integer> data = getCustomVisionData();
         double[] out = new double[data.size()];
 
@@ -228,6 +257,9 @@ public class Lemonlight implements Sendable {
     }
 
     private double getFirstInstanceCustomVisionData() {
+        if (!forBall) {
+            return 0;
+        }
         return getCustomVisionDataForTelemetry()[0];
     }
 
@@ -236,8 +268,14 @@ public class Lemonlight implements Sendable {
         builder.setSmartDashboardType("Lemonlight");
         builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
         builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
-        builder.addDoubleArrayProperty(
-            "customDataArray", this::getCustomVisionDataForTelemetry, null);
-        builder.addDoubleProperty("customData", this::getFirstInstanceCustomVisionData, null);
+        builder.addDoubleProperty("distance Estimate", () -> {
+            return Lemonlight.getLimelightDistanceEstimateIN(MAIN_MOUNT_HEIGHT, MAIN_MOUNT_ANGLE, MAIN_TARGET_HEIGHT, this.getVerticalOffset());
+        }, null);
+        builder.addBooleanProperty("hasTarget", this::hasTarget, null);
+        if (forBall) {
+            builder.addDoubleArrayProperty(
+                    "customDataArray", this::getCustomVisionDataForTelemetry, null);
+            builder.addDoubleProperty("customData", this::getFirstInstanceCustomVisionData, null);
+        }
     }
 }
