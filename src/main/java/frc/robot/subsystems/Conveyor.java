@@ -69,8 +69,8 @@ public class Conveyor extends SubsystemBase {
         MAX_EXISTS_LIDAR_DISTANCE = 60,
         MAX_INDEXED_LIDAR_DISTANCE = 37,
         MIN_INDEXED_LIDAR_DISTANCE = 33,
-        MIN_COLOR_SENSOR_DISTANCE = 1000,
-        MAX_COLOR_SENSOR_DISTANCE = 1400;
+        MIN_COLOR_SENSOR_DISTANCE = 150,
+        MAX_COLOR_SENSOR_DISTANCE = 2000;
 
     /**
      * Subsystem to control the conveyor of the robot.
@@ -219,6 +219,18 @@ public class Conveyor extends SubsystemBase {
         beltRPM = -getBeltRPM();
         indexRPM = -getIndexRPM();
 
+        System.out.println("START OF DATA");
+        System.out.println(previousColorSensorMeasurement);
+        System.out.println(colorSensorMeasurement);
+        System.out.println(lidarDistance);
+        System.out.println(colorSensorDistance);
+        System.out.println(wasBallIndexed);
+        System.out.println(isBallIndexed);
+        System.out.println(doesBallExist);
+        System.out.println(beltRPM);
+        System.out.println(indexRPM);
+        System.out.println("END OF DATA");
+
         if (!doesBallExist) {
 
             // If no balls are detected, both states are set to none.
@@ -227,6 +239,7 @@ public class Conveyor extends SubsystemBase {
 
         } else if (beltRPM > 0) {
             // If the belt is moving forwards...
+            System.out.println("BELT MOVING");
 
             if (colorSensorMeasurement != previousColorSensorMeasurement
                 && MIN_COLOR_SENSOR_DISTANCE <= colorSensorDistance
@@ -397,5 +410,6 @@ public class Conveyor extends SubsystemBase {
         builder.addStringProperty("index_ball", () -> this.getIndexState().toString(), null);
         builder.addStringProperty("will_be_indexed_ball",
             () -> this.getWillBeIndexedState().toString(), null);
+        builder.addBooleanProperty("ball_exists", this::doesBallExist, null);
     }
 }

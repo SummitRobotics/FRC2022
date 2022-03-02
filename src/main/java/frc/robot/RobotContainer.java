@@ -246,7 +246,7 @@ public class RobotContainer {
         SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
         SmartDashboard.putData("Color Sensor", colorSensor);
-        // SmartDashboard.putData("Lidar", lidar);
+        SmartDashboard.putData("Lidar", lidar);
         SmartDashboard.putData("Climb", climb);
     }
 
