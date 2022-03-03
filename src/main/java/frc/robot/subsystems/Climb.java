@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.ChangeRateLimiter;
+import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.lists.Ports;
 
@@ -29,7 +30,7 @@ public class Climb extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            CLIMB_ANGLE = 20;
+            CLIMB_ANGLE = 0;
 
     // Climb Motors
     private final CANSparkMax leftMotor =

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
+import frc.robot.commands.climb.ClimbManual;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
@@ -209,13 +210,23 @@ public class RobotContainer {
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
         launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
-        // Climb
-        launchpad.missileA.whileHeld(new ClimbMO(climb, joystick.axisY, launchpad.buttonF,
-            launchpad.buttonE, launchpad.buttonD, launchpad.buttonI,
-            launchpad.buttonH, launchpad.buttonG));
-
         // Shooter
         launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA, null));
+
+        //Climb
+        ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
+                joystick.button5, joystick.button2, joystick.button2,
+                joystick.button6, joystick.button11);
+        launchpad.buttonA.toggleWhenPressed(climbMO);
+        launchpad.buttonA.commandBind(climbMO);
+
+        ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
+                joystick.button5, joystick.button2, joystick.button2,
+                joystick.button6, joystick.button11);
+        launchpad.missileA.whileHeld(climbManual);
+
+        //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
+        //launchpad.missileB.whileHeld(climbAutomation);
     }
 
     /**

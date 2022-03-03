@@ -9,7 +9,8 @@ import frc.robot.utilities.Functions;
  */
 public class JoystickDriver extends GenericDriver {
 
-    public OIButton button5, button2, button3, button4, trigger;
+    public OIButton button5, button2, button3, button4, button6, 
+        trigger, button7, button8, button9, button10, button11;
     public OIAxis axisX, axisY, axisZ;
     private boolean assureZUp = false, assureZDown = false;
 
@@ -27,7 +28,12 @@ public class JoystickDriver extends GenericDriver {
         button3 = generateOIButton(3);
         button4 = generateOIButton(4);
         button5 = generateOIButton(5);
-
+        button6 = generateOIButton(6);
+        button7 = generateOIButton(7);
+        button8 = generateOIButton(8);
+        button9 = generateOIButton(9);
+        button10 = generateOIButton(10);
+        button11 = generateOIButton(11);
         axisX = generateOIAxis(0);
         axisY = generateOIAxis(1);
         // axisZ = generateOIAxis(2);
