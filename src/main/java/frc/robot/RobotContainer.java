@@ -22,6 +22,7 @@ import frc.robot.commands.climb.ClimbManual;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
+import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
@@ -82,6 +83,9 @@ public class RobotContainer {
     private final AHRS gyro;
     private final PowerDistribution pdp;
 
+    private final HomeByCurrent homeLeftArm;
+    private final HomeByCurrent homeRightArm;
+
     private final ColorSensor colorSensor;
     private final LidarV4 lidar;
     private Command fullAutoShooterAssembly;
@@ -119,6 +123,11 @@ public class RobotContainer {
         conveyor = new Conveyor(colorSensor, lidar);
         intake = new Intake();
         climb = new Climb(gyro);
+
+        // TODO - set these values
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.15, 20, Climb.backLimit, Climb.forwardLimit);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.15, 20, Climb.backLimit, Climb.forwardLimit);
+        
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -168,6 +177,7 @@ public class RobotContainer {
                 // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 // new InstantCommand(() ->
                 // ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+                new ParallelCommandGroup(homeLeftArm, homeRightArm),
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
