@@ -44,6 +44,8 @@ public class Shooter extends SubsystemBase {
             IZ = 0,
             MAX_RPM = 5000;
 
+    PIDController pidDum = new PIDController(1.4217E-11, 0, 0);
+    SimpleMotorFeedforward ffDum = new SimpleMotorFeedforward(0.5235, 0.066605, 0.011555);
 
     private final CANSparkMax shooterMotorMain = new CANSparkMax(
             Ports.SHOOTER_MOTOR_1,
@@ -159,6 +161,11 @@ public class Shooter extends SubsystemBase {
      */
     public double getShooterRPM() {
         return shooterEncoder.getVelocity();
+    }
+
+    public double calculateVoltageFromPid(double velocity) {
+        velocity /= 30;
+        return Functions.clampDouble(pidDum.calculate(getShooterRPM(), velocity) + ffDum.calculate(velocity), 12, -12);
     }
 
     /**

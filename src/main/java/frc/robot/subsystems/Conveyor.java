@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lidar;
@@ -67,7 +68,7 @@ public class Conveyor extends SubsystemBase {
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 1,
         MAX_EXISTS_LIDAR_DISTANCE = 60,
-        MAX_INDEXED_LIDAR_DISTANCE = 33,
+        MAX_INDEXED_LIDAR_DISTANCE = 35,
         MIN_INDEXED_LIDAR_DISTANCE = 1;
 
     /**
@@ -233,7 +234,7 @@ public class Conveyor extends SubsystemBase {
         } else if (beltRPM > 0) {
             // If the belt is moving forwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement) {
+            if (colorSensorMeasurement != previousColorSensorMeasurement || (colorSensorMeasurement != "NoTarget" && colorSensorState == null)) {
                 // If we detect a different measurement
 
                 if (colorSensor.getColorString() == "Blue") {

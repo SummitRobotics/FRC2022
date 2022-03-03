@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -9,8 +10,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utilities.ChangeRateLimiter;
+import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.lists.Ports;
 
@@ -18,6 +20,7 @@ import frc.robot.utilities.lists.Ports;
  * Subsystem for the Climb Subsystem.
  */
 public class Climb extends SubsystemBase {
+
     private AHRS gyro;
     private DigitalInput leftClimbLimit;
     private DigitalInput rightClimbLimit;
@@ -29,7 +32,9 @@ public class Climb extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            CLIMB_ANGLE = 0;
+            CLIMB_ANGLE = 0,
+            forwardLimit = 10.5,
+            backLimit = 2.5;
 
     // Climb Motors
     private final CANSparkMax leftMotor =
@@ -350,8 +355,9 @@ public class Climb extends SubsystemBase {
      * zeros climb at the beginning of the match.
     */
     public void zeroClimb() {
-        setLeftMotorPower(-.01);
+        setMotorPower(-.01);
     }
+
     /**
      * Stops the motors.
      */
@@ -380,6 +386,116 @@ public class Climb extends SubsystemBase {
         builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
         builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
         builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
+    }
+
+    /**
+     * Returns the homeable object for the left pivoting climb arm.
+     *
+     * @return the homeable object for the left pivoting climb arm
+     */
+    public Homeable getLeftArmHomeable() {
+        return new Homeable() {
+
+            @Override
+            public double getCurrent() {
+                return leftMotor.getOutputCurrent();
+            }
+
+            @Override
+            public double getVelocity() {
+                return leftMotorEncoder.getVelocity();
+            }
+
+            @Override
+            public void setHomingPower(double power) {
+                setLeftMotorPower(power);
+            }
+
+            @Override
+            public void setHome(double position) {
+                leftMotorEncoder.setPosition(position);
+            }
+
+            @Override
+            public void setSoftLimits(double reverse, double forward) {
+                leftMotor.setSoftLimit(SoftLimitDirection.kForward, (float) forward);
+                leftMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) reverse);
+            }
+
+            @Override
+            public void disableSoftLimits() {
+                leftMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+                leftMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+            }
+
+            @Override
+            public void enableSoftLimits() {
+                leftMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+                leftMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+            }
+
+            @Override
+            public Subsystem getSubsystemObject() {
+                return null;
+            }
+        };
+    }
+
+    /**
+     * Returns the homeable object for the right pivoting arm.
+     *
+     * @return the homeable object for the right pivoting arm
+     */
+    public Homeable getRightArmHomeable() {
+        return new Homeable() {
+
+            @Override
+            public double getCurrent() {
+                return rightMotor.getOutputCurrent();
+            }
+
+            @Override
+            public double getVelocity() {
+                return rightMotorEncoder.getVelocity();
+            }
+
+            @Override
+            public void setHomingPower(double power) {
+                setRightMotorPower(power);
+            }
+
+            @Override
+            public void setHome(double position) {
+                rightMotorEncoder.setPosition(position);
+                
+            }
+
+            @Override
+            public void setSoftLimits(double reverse, double forward) {
+                rightMotor.setSoftLimit(SoftLimitDirection.kForward, (float) forward);
+                rightMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) reverse);
+                
+            }
+
+            @Override
+            public void disableSoftLimits() {
+                rightMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+                rightMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+                
+            }
+
+            @Override
+            public void enableSoftLimits() {
+                rightMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+                rightMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+                
+            }
+
+            @Override
+            public Subsystem getSubsystemObject() {
+                return null;
+            }
+        };
     }
 }
 
