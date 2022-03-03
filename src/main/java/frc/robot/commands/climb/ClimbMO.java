@@ -1,6 +1,7 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
@@ -78,6 +79,49 @@ public class ClimbMO extends CommandBase {
         this.leftDetachButton = leftDetachButton;
         this.rightDetachButton = rightDetachButton;
         this.bothDetachButton = bothDetachButton;
+    }
+
+    /**
+     * Manual override for the climber. Many parameters!
+     *
+     * @param climb the climb subsystem
+     * @param controlAxis control axis for raising and lowering arms
+     * @param leftMotorButton Button to make the axis control the left motor.
+     * @param rightMotorButton Button to make the axis control the right motor.
+     * @param pivotButton button for the pivot solenoid
+     * @param leftDetachButton button for only the left detach solenoid
+     * @param rightDetachButton button for only the right detach solenoid
+     * @param bothDetachButton button for both detach solenoids
+     */
+    public ClimbMO(
+            Climb climb,
+            OIAxis controlAxis,
+            LEDButton leftMotorButton,
+            LEDButton rightMotorButton,
+            LEDButton pivotButton,
+            LEDButton leftDetachButton,
+            LEDButton rightDetachButton,
+            LEDButton bothDetachButton
+    ) {
+
+        this(
+                climb,
+                controlAxis,
+                (OIButton) leftMotorButton,
+                (OIButton) rightMotorButton,
+                (OIButton) pivotButton,
+                (OIButton) leftDetachButton,
+                (OIButton) rightDetachButton,
+                (OIButton) bothDetachButton
+        );
+
+        leftMotorButton.pressBind();
+        rightMotorButton.pressBind();
+        pivotButton.booleanSupplierBind(climb::getPivotPos);
+        leftDetachButton.booleanSupplierBind(() -> !climb.getLeftDetachPos());
+        rightDetachButton.booleanSupplierBind(() -> !climb.getRightDetachPos());
+
+        bothDetachButton.booleanSupplierBind(() -> !(climb.getLeftDetachPos() || climb.getRightDetachPos()));
     }
 
     @Override

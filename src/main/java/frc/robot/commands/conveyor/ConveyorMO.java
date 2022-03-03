@@ -1,6 +1,7 @@
 package frc.robot.commands.conveyor;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
@@ -41,6 +42,25 @@ public class ConveyorMO extends CommandBase {
         this.controlAxis = controlAxis;
         this.beltMotor = beltMotor;
         this.indexMotor = indexMotor;
+    }
+
+    /**
+     * Manual override for the conveyor.
+     *
+     * @param conveyor the conveyor subsystem
+     * @param controlAxis the controller axis used to manually control the conveyor
+     * @param beltMotor the button to only more the belt motor. Takes a LED button
+     * @param indexMotor the button to only move the index motor. Takes a LED button
+     */
+    public ConveyorMO(
+            Conveyor conveyor,
+            OIAxis controlAxis,
+            LEDButton beltMotor,
+            LEDButton indexMotor
+    ) {
+        this(conveyor, controlAxis, (OIButton) beltMotor, (OIButton) indexMotor);
+        beltMotor.pressBind();
+        beltMotor.pressBind();
     }
 
     @Override

@@ -18,7 +18,7 @@ public class ConveyorAutomation extends CommandBase {
 
     public static double
         BELT_SPEED = -0.5,
-        INDEX_SPEED = -0.25;
+        INDEX_SPEED = -0.2;
 
     /**
      * Conveyor Automation Constructor.
@@ -77,8 +77,12 @@ public class ConveyorAutomation extends CommandBase {
                 conveyor.setIndexMotorPower(0);
                 return;
             }
-            if (numOfBalls == 1 && indexState != ConveyorState.NONE) {
+            if (numOfBalls == 1 && indexState != ConveyorState.NONE && intakeState == Intake.States.DOWN) {
                 conveyor.setBeltMotorPower(BELT_SPEED);
+                conveyor.setIndexMotorPower(0);
+                return;
+            } else if (numOfBalls == 1 && intakeState == Intake.States.UP && indexState != ConveyorState.NONE) {
+                conveyor.setBeltMotorPower(0);
                 conveyor.setIndexMotorPower(0);
                 return;
             } else if (numOfBalls == 1) {
@@ -97,7 +101,7 @@ public class ConveyorAutomation extends CommandBase {
     }
 
     @Override
-    public void end(boolean interupted) {
+    public void end(boolean interrupted) {
         conveyor.stop();
     }
 }

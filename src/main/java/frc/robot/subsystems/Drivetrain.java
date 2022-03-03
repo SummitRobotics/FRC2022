@@ -120,7 +120,6 @@ public class Drivetrain extends SubsystemBase {
      * @param gyro       odimetry is bad
      */
     public Drivetrain(AHRS gyro) {
-
         this.gyro = gyro;
 
         shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
