@@ -211,7 +211,8 @@ public class RobotContainer {
         launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA, null));
+        launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
         //Climb
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
@@ -233,15 +234,15 @@ public class RobotContainer {
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        SmartDashboard.putData("PDP", pdp);
+        //SmartDashboard.putData("PDP", pdp);
         // SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
         SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
-        SmartDashboard.putData("Shooter", shooter);
-        SmartDashboard.putData("Conveyor", conveyor);
+        //SmartDashboard.putData("Shooter", shooter);
+        //SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
-        //SmartDashboard.putData("Color Sensor", colorSensor);
+        SmartDashboard.putData("Color Sensor", colorSensor);
         //SmartDashboard.putData("Lidar", lidar);
         //SmartDashboard.putData("Climb", climb);
     }

@@ -18,7 +18,7 @@ public class ConveyorAutomation extends CommandBase {
 
     public static double
         BELT_SPEED = -0.5,
-        INDEX_SPEED = -0.25;
+        INDEX_SPEED = -0.2;
 
     /**
      * Conveyor Automation Constructor.
