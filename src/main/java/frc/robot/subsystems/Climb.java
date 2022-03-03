@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.ChangeRateLimiter;
+import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.lists.Ports;
 
@@ -18,6 +19,7 @@ import frc.robot.utilities.lists.Ports;
  * Subsystem for the Climb Subsystem.
  */
 public class Climb extends SubsystemBase {
+
     private AHRS gyro;
     private DigitalInput leftClimbLimit;
     private DigitalInput rightClimbLimit;
@@ -350,8 +352,9 @@ public class Climb extends SubsystemBase {
      * zeros climb at the beginning of the match.
     */
     public void zeroClimb() {
-        setLeftMotorPower(-.01);
+        setMotorPower(-.01);
     }
+
     /**
      * Stops the motors.
      */

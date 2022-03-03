@@ -246,7 +246,7 @@ public class RobotContainer {
             if (climb.getDefaultCommand() != null) {
                 climb.getDefaultCommand().cancel();
             }
-            climb.setDefaultCommand(new ClimbAutomation(climb, drivetrain, launchpad.buttonG));
+            climb.setDefaultCommand(new ClimbAutomation(climb, drivetrain));
         }));
         // Auto commands
         // controller1.buttonA.whileHeld(new FullAutoIntake(drivetrain, ballDetectionLimelight));

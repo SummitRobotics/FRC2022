@@ -113,9 +113,6 @@ public class ClimbAutomation extends CommandBase {
     String barMisaligned; 
     boolean stateChanged;
     private final LEDCall climbingLedCall = new LEDCall(LEDPriorities.ARMS_UP, LEDRange.All).sine(Colors.ORANGE);
-    // OI
-    OIButton climbButton;
-    OIButton.PrioritizedButton prioritizedClimbButton;
 
     /** Creates a new ClimbAutomation. 
      *
@@ -123,8 +120,7 @@ public class ClimbAutomation extends CommandBase {
      * @param drivetrain Drivetrain subsystem
      * @param climbButton climb button.
     */
-    public ClimbAutomation(Climb climb, Drivetrain drivetrain, OIButton climbButton) {
-        this.climbButton = climbButton;
+    public ClimbAutomation(Climb climb, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
         this.climb = climb;
         // Use addRequirements() here to declare subsystem dependencies.
@@ -141,7 +137,6 @@ public class ClimbAutomation extends CommandBase {
         this.climbLeftPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
         this.climbRightPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
         climb.stop();
-        prioritizedClimbButton = climbButton.prioritize(AxisPriorities.DEFAULT);
         motorLeft = MotorStates.IDLE;
         motorRight = MotorStates.IDLE;
         climb.setPivotPos(false);
@@ -307,7 +302,7 @@ public class ClimbAutomation extends CommandBase {
             climbLeftPID.reset();
             climbRightPID.reset();
         }
-        if (prioritizedClimbButton.get() && barNumber < 3) {
+        if (barNumber < 3) {
             climbingLedCall.activate();
             if (barNumber == 0) {
                 // get rid of aligned() here if using alignByLimit()
@@ -348,7 +343,6 @@ public class ClimbAutomation extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         climb.stop();
-        prioritizedClimbButton.destroy();
     }
 
     // Returns true when the command should end.
