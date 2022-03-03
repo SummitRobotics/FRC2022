@@ -197,7 +197,7 @@ public class RobotContainer {
                 drivetrain,
                 controller1.rightTrigger,
                 controller1.leftTrigger,
-                controller1.leftX, launchpad.buttonD));
+                controller1.leftX, controller1.dPadUp, controller1.dPadDown, controller1.dPadRight, controller1.dPadLeft));
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
         conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
