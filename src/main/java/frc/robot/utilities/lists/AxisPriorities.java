@@ -6,5 +6,6 @@ package frc.robot.utilities.lists;
 public final class AxisPriorities {
     public static final int
             MANUAL_OVERRIDE = 10,
+            CLIMB = 9,
             DEFAULT = 0;
 }

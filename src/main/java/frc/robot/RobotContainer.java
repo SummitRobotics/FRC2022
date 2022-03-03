@@ -140,8 +140,8 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
-                }),
-                new InstantCommand(climb::zeroClimb));
+                })
+                );
 
         teleInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -224,19 +224,23 @@ public class RobotContainer {
 
         // Shooter
         launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+
         launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
         //Climb
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
-        launchpad.buttonA.toggleWhenPressed(climbMO);
-        launchpad.buttonA.commandBind(climbMO);
+        launchpad.missileA.toggleWhenPressed(climbMO);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
-        launchpad.missileA.whileHeld(climbManual);
+
+        launchpad.buttonA.whileHeld(climbManual);
+        launchpad.buttonA.commandBind(climbManual);
+
+        launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
         //launchpad.missileB.whileHeld(climbAutomation);
@@ -273,6 +277,7 @@ public class RobotContainer {
      * runs when the robot is powered on.
      */
     public void robotInit() {
+        gyro.calibrate();
         ShuffleboardDriver.init();
         // sets up all the splines so we dont need to spend lots of time
         // turning the json files into trajectorys when we want to run them

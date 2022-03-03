@@ -70,15 +70,7 @@ public class ClimbMO extends CommandBase {
         OIButton rightDetachButton,
         OIButton bothDetachButton
     ) {
-        addRequirements(climb);
-        this.climb = climb;
-        this.controlAxis = controlAxis;
-        this.leftMotorButton = leftMotorButton;
-        this.rightMotorButton = rightMotorButton;
-        this.pivotButton = pivotButton;
-        this.leftDetachButton = leftDetachButton;
-        this.rightDetachButton = rightDetachButton;
-        this.bothDetachButton = bothDetachButton;
+        
     }
 
     /**

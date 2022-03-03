@@ -22,9 +22,11 @@ import frc.robot.utilities.lists.Ports;
 public class Climb extends SubsystemBase {
 
     private AHRS gyro;
-    private DigitalInput leftClimbLimit;
-    private DigitalInput rightClimbLimit;
+
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
+    private double oldGyroAngle = 0;
+    private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
+
     //TODO set these
     public static final double
             P = 0,
@@ -32,9 +34,14 @@ public class Climb extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            CLIMB_ANGLE = 0,
+            //TODO tune these values
+            CLIMB_TILT_ANGLE = 0,
+            CLIMB_ROLL_ANGLE = 5,
+            CLIMB_DRIVITIVE = 1,
             forwardLimit = 64,
-            backLimit = 2;
+            backLimit = 2,
+            grabPoint = 40;
+
 
     // Climb Motors
     private final CANSparkMax leftMotor =
@@ -87,10 +94,8 @@ public class Climb extends SubsystemBase {
         rightPidController.setIZone(IZ);
         rightPidController.setOutputRange(-1.0, 1.0);
         this.gyro = gyro;
-        gyro.calibrate();
         zeroEncoders();
-        leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
-        rightClimbLimit = new DigitalInput(Ports.RIGHT_LIMIT_SWITCH);
+   
 
         leftMotor.setInverted(true);
         rightMotor.setInverted(true);
@@ -277,7 +282,7 @@ public class Climb extends SubsystemBase {
      */
 
     public boolean isRollLevel() {
-        return (gyro.getRoll() < 10);
+        return (gyro.getRoll() < CLIMB_ROLL_ANGLE);
     }
 
     /**
@@ -287,35 +292,33 @@ public class Climb extends SubsystemBase {
      */
 
     public boolean isHooked() {
-        return climbPitchAverage.getAverage() < CLIMB_ANGLE;
-    }
-    /**
-     * checks if touching limit switch.
-     *
-     * @return is left climb touching limit switch
-     */
-
-    public boolean getLeftLimit() {
-        return leftClimbLimit.get();
+        return (climbPitchAverage.getAverage() < CLIMB_TILT_ANGLE) && !isSwinging();
     }
 
-    /**
-     * checks if touching limit switch.
-     *
-     * @return is right climb touching limit switch
-     */
-
-    public boolean getRightLimit() {
-        return rightClimbLimit.get();
+    public boolean isSwinging(){
+        return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
     }
-    /**
-     * Updating climb average.
-     * 
-     */
 
-    public void updateClimbAverage() {
-        climbPitchAverage.update(gyro.getPitch());
-    }
+    // /**
+    //  * checks if touching limit switch.
+    //  *
+    //  * @return is left climb touching limit switch
+    //  */
+
+    // public boolean getLeftLimit() {
+    //     return leftClimbLimit.get();
+    // }
+
+    // /**
+    //  * checks if touching limit switch.
+    //  *
+    //  * @return is right climb touching limit switch
+    //  */
+
+    // public boolean getRightLimit() {
+    //     return rightClimbLimit.get();
+    // }
+
     /**
      * Toggles the position of the left detach piston.
      */
@@ -351,12 +354,12 @@ public class Climb extends SubsystemBase {
         setLeftDetachPos(pos);
     }
 
-    /** 
-     * zeros climb at the beginning of the match.
-    */
-    public void zeroClimb() {
-        setMotorPower(-.01);
-    }
+    // /** 
+    //  * zeros climb at the beginning of the match.
+    // */
+    // public void zeroClimb() {
+    //     setMotorPower(-.01);
+    // }
 
     /**
      * Stops the motors.
@@ -369,6 +372,15 @@ public class Climb extends SubsystemBase {
 
     public double[] getPID() {
         return new double[] {P, I, D, FF, IZ};
+    }
+
+    @Override
+    public void periodic() {
+        double pa = gyro.getPitch();
+        //updates drivitive calculation
+        climbPitchAverage.update(pa);
+        climbDrivitiveAvrage.update(Math.abs(pa - oldGyroAngle));
+        oldGyroAngle = pa;
     }
 
     /**

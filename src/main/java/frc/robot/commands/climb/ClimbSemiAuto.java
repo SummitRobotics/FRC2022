@@ -5,12 +5,15 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.math.controller.PIDController;
+import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
+import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.PIDValues;
+import frc.robot.utilities.lists.StatusPriorities;
 
 /**
  * ClimbSemiAuto.
@@ -50,6 +53,8 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // PID
     PIDController leftPID;
     PIDController rightPID;
+
+    int bad_climbs = 0;
 
     /**
      * Manual override for the climber. Many parameters!
@@ -98,11 +103,11 @@ public class ClimbSemiAuto extends ClimbAutomation {
     @Override
     public void initialize() {
 
-        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedDetachButton = detachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedRetractButton = retractButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedExtendButton = extendButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedMidpointButton = midpointButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedDetachButton = detachButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedRetractButton = retractButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedExtendButton = extendButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedMidpointButton = midpointButton.prioritize(AxisPriorities.CLIMB);
 
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedDetachButton = new SimpleButton(prioritizedDetachButton::get);
@@ -113,6 +118,8 @@ public class ClimbSemiAuto extends ClimbAutomation {
 
         climb.setDetachPos(false);
         climb.setPivotPos(false);
+
+        bad_climbs = 0;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -120,25 +127,43 @@ public class ClimbSemiAuto extends ClimbAutomation {
     public void execute() {
 
         if (prioritizedExtendButton.get()) {
-            leftPID.setSetpoint(66);
-            rightPID.setSetpoint(66);
+            leftPID.setSetpoint(climb.forwardLimit);
+            rightPID.setSetpoint(climb.forwardLimit);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
         } else if (prioritizedMidpointButton.get()) {
-            leftPID.setSetpoint(33);
-            rightPID.setSetpoint(33);
+            leftPID.setSetpoint(climb.grabPoint);
+            rightPID.setSetpoint(climb.grabPoint);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
         } else if (prioritizedRetractButton.get()) {
-            leftPID.setSetpoint(0);
-            rightPID.setSetpoint(0);
+            leftPID.setSetpoint(climb.backLimit);
+            rightPID.setSetpoint(climb.backLimit);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
         } else {
             climb.setMotorPower(0);
+        }
+
+        if (simplePrioritizedPivotButton.get()) {
+            climb.togglePivotPos();
+        }
+
+        if (simplePrioritizedDetachButton.get()) {
+            if (climb.getLeftDetachPos() || climb.getRightDetachPos()) {
+                climb.setDetachPos(false);
+            } else {
+                if (climb.isHooked()) {
+                    climb.setDetachPos(true);
+                    ShuffleboardDriver.statusDisplay.removeStatus("bad_climb_sa");
+                } else {
+                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb_sa", "climb is not safe to relice " + bad_climbs, Colors.RED, StatusPriorities.BAD_CLIMB);
+                }
+            }
+            
         }
     }
 
@@ -149,6 +174,12 @@ public class ClimbSemiAuto extends ClimbAutomation {
         rightPID.reset();
         leftPID.close();
         rightPID.close();
+        climb.stop();
+        prioritizedDetachButton.destroy();
+        prioritizedExtendButton.destroy();
+        prioritizedMidpointButton.destroy();
+        prioritizedPivotButton.destroy();
+        prioritizedRetractButton.destroy();
     }
 
     // Returns true when the command should end.

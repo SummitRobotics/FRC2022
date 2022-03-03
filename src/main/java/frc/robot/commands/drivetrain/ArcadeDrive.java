@@ -110,8 +110,6 @@ public class ArcadeDrive extends CommandBase {
         if (isSingleAxis) {
             power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
         } else {
-            reversePower = forwardPowerAxis.get();
-            forwardPower = reversePowerAxis.get();
             forwardPower = forwardPowerAxis.get();
             reversePower = reversePowerAxis.get();   
 
@@ -141,6 +139,7 @@ public class ArcadeDrive extends CommandBase {
         // calculates power to the motors
         double leftPower = power + turn;
         double rightPower = power - turn;
+
         if (switchfoot.get()) {
             activateSwitchfoot = !activateSwitchfoot;
         }
