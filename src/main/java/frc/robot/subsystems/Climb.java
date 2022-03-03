@@ -33,8 +33,8 @@ public class Climb extends SubsystemBase {
             FF = 0,
             IZ = 0,
             CLIMB_ANGLE = 0,
-            forwardLimit = 10.5,
-            backLimit = 2.5;
+            forwardLimit = 64,
+            backLimit = 2;
 
     // Climb Motors
     private final CANSparkMax leftMotor =
@@ -380,8 +380,8 @@ public class Climb extends SubsystemBase {
 
         builder.addDoubleProperty("leftEncoderPosition", this::getLeftEncoderValue, null);
         builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
-        builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
-        builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
+        //builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
+        //builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
 
         builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
         builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
@@ -436,7 +436,9 @@ public class Climb extends SubsystemBase {
 
             @Override
             public Subsystem getSubsystemObject() {
-                return null;
+                return new Subsystem() {
+                    
+                };
             }
         };
     }
@@ -493,7 +495,9 @@ public class Climb extends SubsystemBase {
 
             @Override
             public Subsystem getSubsystemObject() {
-                return null;
+                return new Subsystem() {
+                    
+                };
             }
         };
     }

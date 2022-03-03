@@ -17,6 +17,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -113,6 +114,8 @@ public class Drivetrain extends SubsystemBase {
     private double rightDistanceAcum = 0;
 
     private final Timer odometryTime = new Timer();
+
+    private final Field2d f2d;
     
     /**
      * i am in PAIN wow this is BAD.
@@ -129,6 +132,8 @@ public class Drivetrain extends SubsystemBase {
 
 
         odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
+
+        f2d = new Field2d();
 
         // tells other two motors to follow the first
         leftMiddle.follow(left);
@@ -603,6 +608,7 @@ public class Drivetrain extends SubsystemBase {
             odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
             odometryTime.reset();
         }
+        f2d.setRobotPose(odometry.getPoseMeters());
     }
 
     public double getRotation() {
@@ -625,18 +631,19 @@ public class Drivetrain extends SubsystemBase {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Drivetrain");
 
-        builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
-        builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
+        //builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
+        //builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
         //builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
-        builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
+        //builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
 
-        builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
-        builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
+        //builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
+        //builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
         //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
-        builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
-        builder.addDoubleProperty("rotation", this::getRotation, null);
+        //builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
+        //builder.addDoubleProperty("rotation", this::getRotation, null);
+        f2d.initSendable(builder);
 
         builder.addBooleanProperty("shifterStatus", this::getShift, null);
-        builder.addDoubleArrayProperty("pidValues", this::getPid, null);
+        //builder.addDoubleArrayProperty("pidValues", this::getPid, null);
     }
 }

@@ -125,8 +125,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.15, 20, Climb.backLimit, Climb.forwardLimit);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.15, 20, Climb.backLimit, Climb.forwardLimit);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.10, 12, Climb.backLimit, Climb.forwardLimit);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.10, 12, Climb.backLimit, Climb.forwardLimit);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(

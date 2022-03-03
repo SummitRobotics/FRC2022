@@ -164,8 +164,8 @@ public class Intake extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");
-        builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
-        builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
+        //builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
+        //builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
         builder.addBooleanProperty("intake_solenoid_position", this::getIntakeSolenoid, null);
     }
 }
