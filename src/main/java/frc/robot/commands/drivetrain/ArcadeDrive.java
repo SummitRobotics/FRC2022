@@ -9,6 +9,7 @@ package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIAxis;
+import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
@@ -20,9 +21,11 @@ import frc.robot.utilities.RollingAverage;
 public class ArcadeDrive extends CommandBase {
 
     private final Drivetrain drivetrain;
-
+    private double forwardPower;
+    private double reversePower;
     private final OIAxis forwardPowerAxis;
     private OIAxis reversePowerAxis;
+    private final OIButton switchfoot;
     private final OIAxis turnAxis;
 
     private final ChangeRateLimiter limiter;
@@ -44,15 +47,17 @@ public class ArcadeDrive extends CommandBase {
      * @param forwardPowerAxis control axis for forward power
      * @param reversePowerAxis control axis for reverse power
      * @param turnAxis         control axis for the drivetrain turn
+     * @param switchfoot         drive in reverse
      */
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
-        OIAxis turnAxis) {
+        OIAxis turnAxis,
+        OIButton switchfoot) {
 
         this.drivetrain = drivetrain;
-
+        this.switchfoot = switchfoot;
         this.forwardPowerAxis = forwardPowerAxis;
         this.reversePowerAxis = reversePowerAxis;
         this.turnAxis = turnAxis;
@@ -73,10 +78,10 @@ public class ArcadeDrive extends CommandBase {
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis powerAxis, 
-        OIAxis turnAxis) {
+        OIAxis turnAxis, OIButton switchfoot) {
 
         this.drivetrain = drivetrain;
-
+        this.switchfoot = switchfoot;
         this.forwardPowerAxis = powerAxis;
         this.turnAxis = turnAxis;
 
@@ -101,10 +106,19 @@ public class ArcadeDrive extends CommandBase {
         double power;
 
         if (isSingleAxis) {
-            power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
+            if (switchfoot.get()) {
+                power = Math.pow(Functions.deadzone(DEAD_ZONE, -forwardPowerAxis.get()), 3);
+            } else {
+                power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
+            }
         } else {
-            double forwardPower = forwardPowerAxis.get();
-            double reversePower = reversePowerAxis.get();
+            if (switchfoot.get()) {
+                reversePower = forwardPowerAxis.get();
+                forwardPower = reversePowerAxis.get();
+            } else {
+                forwardPower = forwardPowerAxis.get();
+                reversePower = reversePowerAxis.get();   
+            }
 
             forwardPower = Functions.deadzone(DEAD_ZONE, forwardPower);
             reversePower = Functions.deadzone(DEAD_ZONE, reversePower);

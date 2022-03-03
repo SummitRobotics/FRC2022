@@ -201,7 +201,7 @@ public class RobotContainer {
                 drivetrain,
                 controller1.rightTrigger,
                 controller1.leftTrigger,
-                controller1.leftX));
+                controller1.leftX, launchpad.buttonD));
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
         shooter.setDefaultCommand(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonA));
         conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));

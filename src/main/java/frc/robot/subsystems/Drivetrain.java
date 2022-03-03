@@ -374,7 +374,6 @@ public class Drivetrain extends SubsystemBase {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
         }
     }
-
     /**
      * The position you want the left side to register.
      * When it is in the position it is currently in
