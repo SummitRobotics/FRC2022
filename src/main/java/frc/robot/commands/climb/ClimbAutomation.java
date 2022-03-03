@@ -118,7 +118,6 @@ public class ClimbAutomation extends CommandBase {
      *
      * @param climb climb subsystem
      * @param drivetrain Drivetrain subsystem
-     * @param climbButton climb button.
     */
     public ClimbAutomation(Climb climb, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
