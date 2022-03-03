@@ -6,15 +6,15 @@
       "style": "0",
       "userScale": "2",
       "width": "1893",
-      "xpos": "-320",
-      "ypos": "-173"
+      "xpos": "14",
+      "ypos": "61"
     }
   },
   "Window": {
     "###FMS": {
       "Collapsed": "0",
       "Pos": "30,705",
-      "Size": "235,169"
+      "Size": "283,146"
     },
     "###Joysticks": {
       "Collapsed": "0",
