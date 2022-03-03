@@ -52,7 +52,8 @@ public class ControllerDriver extends GenericDriver {
             dPadUp,
             dPadDown,
             dPadLeft,
-            dPadRight;
+            dPadRight,
+            dPadAny;
     public OIAxis leftX, leftY, leftTrigger, rightX, rightY, rightTrigger;
 
     /**
@@ -77,6 +78,12 @@ public class ControllerDriver extends GenericDriver {
         dPadDown = new OIButton(getDPadValue(DPadValues.DOWN), "down");
         dPadLeft = new OIButton(getDPadValue(DPadValues.LEFT), "left");
         dPadRight = new OIButton(getDPadValue(DPadValues.RIGHT), "right");
+        dPadAny = new OIButton(new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return !(getPOV() == -1);
+            }
+        }, "any");
 
         leftX = generateOIAxis(0);
         leftY = generateOIAxis(1);

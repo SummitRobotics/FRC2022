@@ -28,9 +28,6 @@ public class ArcadeDrive extends CommandBase {
     private final OIAxis forwardPowerAxis;
     private OIAxis reversePowerAxis;
     private final SimpleButton switchfoot;
-    private final SimpleButton switchfoot1;
-    private final SimpleButton switchfoot2;
-    private final SimpleButton switchfoot3;
     private final OIAxis turnAxis;
 
     private final ChangeRateLimiter limiter;
@@ -59,11 +56,8 @@ public class ArcadeDrive extends CommandBase {
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
         OIAxis turnAxis,
-        OIButton switchfootr, OIButton switchfoot2r, OIButton switchfoot3r, OIButton switchfoot1r) {
-        switchfoot = new SimpleButton(switchfootr);
-        switchfoot1 = new SimpleButton(switchfoot1r);
-        switchfoot2 = new SimpleButton(switchfoot2r);
-        switchfoot3 = new SimpleButton(switchfoot3r);
+        OIButton switchfoot) {
+        this.switchfoot = new SimpleButton(switchfoot);
         this.drivetrain = drivetrain;
         this.forwardPowerAxis = forwardPowerAxis;
         this.reversePowerAxis = reversePowerAxis;
@@ -86,11 +80,9 @@ public class ArcadeDrive extends CommandBase {
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis powerAxis, 
-        OIAxis turnAxis, OIButton switchfootr, OIButton switchfoot2r, OIButton switchfoot3r, OIButton switchfoot1r) {
-        switchfoot = new SimpleButton(switchfootr);
-        switchfoot1 = new SimpleButton(switchfoot1r);
-        switchfoot2 = new SimpleButton(switchfoot2r);
-        switchfoot3 = new SimpleButton(switchfoot3r);
+        OIAxis turnAxis, 
+        OIButton switchfoot) {
+        this.switchfoot = new SimpleButton(switchfoot);
         this.drivetrain = drivetrain;
         this.forwardPowerAxis = powerAxis;
         this.turnAxis = turnAxis;
@@ -149,7 +141,7 @@ public class ArcadeDrive extends CommandBase {
         // calculates power to the motors
         double leftPower = power + turn;
         double rightPower = power - turn;
-        if (switchfoot.get() || switchfoot1.get() || switchfoot2.get() || switchfoot3.get()) {
+        if (switchfoot.get()) {
             activateSwitchfoot = !activateSwitchfoot;
         }
         if (activateSwitchfoot) {
