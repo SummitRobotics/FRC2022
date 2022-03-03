@@ -74,6 +74,7 @@ public class ArcadeDrive extends CommandBase {
      * @param drivetrain drivetrain instance
      * @param powerAxis  control axis for the drivetrain power
      * @param turnAxis   control axis for the drivetrain turn
+     * @param switchfoot swaps direction
      */
     public ArcadeDrive(
         Drivetrain drivetrain, 
@@ -106,19 +107,12 @@ public class ArcadeDrive extends CommandBase {
         double power;
 
         if (isSingleAxis) {
-            if (switchfoot.get()) {
-                power = Math.pow(Functions.deadzone(DEAD_ZONE, -forwardPowerAxis.get()), 3);
-            } else {
-                power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
-            }
+            power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
         } else {
-            if (switchfoot.get()) {
-                reversePower = forwardPowerAxis.get();
-                forwardPower = reversePowerAxis.get();
-            } else {
-                forwardPower = forwardPowerAxis.get();
-                reversePower = reversePowerAxis.get();   
-            }
+            reversePower = forwardPowerAxis.get();
+            forwardPower = reversePowerAxis.get();
+            forwardPower = forwardPowerAxis.get();
+            reversePower = reversePowerAxis.get();   
 
             forwardPower = Functions.deadzone(DEAD_ZONE, forwardPower);
             reversePower = Functions.deadzone(DEAD_ZONE, reversePower);
@@ -147,8 +141,13 @@ public class ArcadeDrive extends CommandBase {
         double leftPower = power + turn;
         double rightPower = power - turn;
 
-        drivetrain.setLeftMotorPower(leftPower);
-        drivetrain.setRightMotorPower(rightPower);
+        if (!switchfoot.get()) {
+            drivetrain.setLeftMotorPower(leftPower);
+            drivetrain.setRightMotorPower(rightPower);
+        } else {
+            drivetrain.setLeftMotorPower(-leftPower);
+            drivetrain.setRightMotorPower(-rightPower);
+        }
     }
 
     // Called once the command ends or is interrupted.
