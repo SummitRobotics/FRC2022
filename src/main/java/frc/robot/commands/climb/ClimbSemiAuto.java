@@ -133,8 +133,8 @@ public class ClimbSemiAuto extends ClimbAutomation {
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
         } else if (prioritizedMidpointButton.get()) {
-            leftPID.setSetpoint(climb.GRAD_POINT);
-            rightPID.setSetpoint(climb.GRAD_POINT);
+            leftPID.setSetpoint(climb.GRAB_POINT);
+            rightPID.setSetpoint(climb.GRAB_POINT);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 

@@ -29,6 +29,7 @@ import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.intake.LowerIntake;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
+import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
@@ -115,6 +116,7 @@ public class RobotContainer {
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
+        
         targetingLimelight = new Lemonlight("gloworm", false, true);
         // TODO: need to ensure that this name is set on the limelight as well.
         //ballDetectionLimelight = new Lemonlight("balldetect");
@@ -127,8 +129,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -179,7 +181,9 @@ public class RobotContainer {
                 // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 // new InstantCommand(() ->
                 // ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+
                 // new ParallelCommandGroup(homeLeftArm, homeRightArm),
+
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
@@ -233,19 +237,24 @@ public class RobotContainer {
 
         launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
+        launchpad.buttonH.whenPressed(new ParallelCommandGroup(homeLeftArm, homeRightArm));
+
         //Climb
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
         launchpad.missileA.toggleWhenPressed(climbMO);
+
         ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button3, joystick.button7, joystick.button4, joystick.button5, joystick.button3);
         launchpad.missileB.toggleWhenPressed(climbSemiAuto);
+
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
 
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
+
         launchpad.missileB.whileHeld(climbSemiAuto);
         launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
 
@@ -294,12 +303,14 @@ public class RobotContainer {
             // possible 4 ball auto
             auto = new SequentialCommandGroup(
                     autoInit,
-                    fball1,
-                    fullAutoShooterAssembly,
-                    fullAutoIntake.get(),
-                    fullAutoShooterAssembly,
-                    fullAutoIntake.get(),
-                    fullAutoShooterAssembly);
+                    new ShooterAtStart(shooter, conveyor).withTimeout(10),
+                    fball1
+                    // fullAutoShooterAssembly,
+                    // fullAutoIntake.get(),
+                    // fullAutoShooterAssembly,
+                    // fullAutoIntake.get(),
+                    // fullAutoShooterAssembly
+                    );
 
         } catch (Exception e) {
             System.out.println("An error occured when making autoInit: " + e);
