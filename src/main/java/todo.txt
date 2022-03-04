@@ -2,3 +2,8 @@ tune climb safty angles
 
 tune climb pid
 
+tune conveyer lidar values
+
+tune shooter values
+
+make conveyer work when run backwards

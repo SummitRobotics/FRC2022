@@ -32,16 +32,16 @@ public class ShuffleboardDriver {
     private static NetworkTable InfoTable = NetworkTableInstance.getDefault().getTable("RobotInfo"),
             ButtonTable = NetworkTableInstance.getDefault().getTable("Buttons");
     public static ShuffleboardLEDButton
-            recordStart = new ShuffleboardLEDButton(ButtonTable.getEntry("record Start")),
+            //recordStart = new ShuffleboardLEDButton(ButtonTable.getEntry("record Start")),
             intake = new ShuffleboardLEDButton(ButtonTable.getEntry("record Intake")),
             shoot = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shoot")),
-            shift = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shift")),
-            finish = new ShuffleboardLEDButton(ButtonTable.getEntry("record Stop")),
-            homeTurret = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Turret")),
-            homeHood = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Hood"));
-    public static DoubleDisplayWidget
-            hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
-            turretIndicator = new DoubleDisplayWidget(InfoTable.getEntry("turret"));
+            shift = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shift"));
+            //finish = new ShuffleboardLEDButton(ButtonTable.getEntry("record Stop")),
+            //homeTurret = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Turret")),
+            //homeHood = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Hood"));
+    // public static DoubleDisplayWidget
+    //         hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
+    //         turretIndicator = new DoubleDisplayWidget(InfoTable.getEntry("turret"));
 
     public static StatusDisplayWidget statusDisplay =
             new StatusDisplayWidget(InfoTable.getEntry("status"));

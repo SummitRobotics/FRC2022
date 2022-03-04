@@ -54,7 +54,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
     PIDController leftPID;
     PIDController rightPID;
 
-    int bad_climbs = 0;
+    int badClimbs = 0;
 
     /**
      * Manual override for the climber. Many parameters!
@@ -119,7 +119,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
         climb.setDetachPos(false);
         climb.setPivotPos(false);
 
-        bad_climbs = 0;
+        badClimbs = 0;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -160,7 +160,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
                     climb.setDetachPos(true);
                     ShuffleboardDriver.statusDisplay.removeStatus("bad_climb_sa");
                 } else {
-                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb_sa", "climb is not safe to relice " + bad_climbs, Colors.RED, StatusPriorities.BAD_CLIMB);
+                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb_sa", "climb is not safe to relice " + badClimbs, Colors.RED, StatusPriorities.BAD_CLIMB);
                 }
             }
             

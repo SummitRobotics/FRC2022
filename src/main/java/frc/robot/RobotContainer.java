@@ -26,6 +26,7 @@ import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
+import frc.robot.commands.intake.LowerIntake;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
@@ -181,7 +182,9 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
-                }));
+                }), 
+                new LowerIntake(intake)
+                );
 
         // Configure the button bindings
         setDefaultCommands();
@@ -214,6 +217,8 @@ public class RobotContainer {
     private void configureButtonBindings() {
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
+
+        controller1.buttonA.whenPressed(new IntakeToggle(intake));
 
         // Conveyor
         launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));

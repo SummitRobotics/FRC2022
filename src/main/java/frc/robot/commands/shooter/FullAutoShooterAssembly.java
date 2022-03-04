@@ -39,8 +39,8 @@ public class FullAutoShooterAssembly extends CommandBase {
        
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 100,
-        MIN_SHOOTER_RANGE = 20,
+        MAX_SHOOTER_RANGE = 150,
+        MIN_SHOOTER_RANGE = 50,
         OK_TO_MOVE_OFSET = 5,
         HOOD_UP_RANGE = 5,
         RANGE_OVERLAP = 1,
@@ -48,7 +48,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         TARGET_WRONG_COLOR_MISS = 45,
         TARGET_MOTOR_SPEED_ACCURACY = 3,
         IDEAL_SHOOTING_DISTANCE = 1000,
-        SHOOTER_IDLE_SPEED = 3000;
+        SHOOTER_IDLE_SPEED = 1400;
 
     // devices
     protected Lemonlight limelight;

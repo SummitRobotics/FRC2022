@@ -15,6 +15,7 @@ import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.SimpleButton;
+import frc.robot.utilities.lists.AxisPriorities;
 
 /**
  * Command for Arcade Drive.
@@ -25,10 +26,12 @@ public class ArcadeDrive extends CommandBase {
     private double forwardPower;
     private double reversePower;
     private boolean activateSwitchfoot;
-    private final OIAxis forwardPowerAxis;
-    private OIAxis reversePowerAxis;
+
+    private final OIAxis.PrioritizedAxis forwardPowerAxis;
+    private final OIAxis.PrioritizedAxis reversePowerAxis;
+    private final OIButton.PrioritizedButton switchfootPRI;
     private final SimpleButton switchfoot;
-    private final OIAxis turnAxis;
+    private final OIAxis.PrioritizedAxis turnAxis;
 
     private final ChangeRateLimiter limiter;
 
@@ -57,11 +60,12 @@ public class ArcadeDrive extends CommandBase {
         OIAxis reversePowerAxis, 
         OIAxis turnAxis,
         OIButton switchfoot) {
-        this.switchfoot = new SimpleButton(switchfoot);
+        switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
+        this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
-        this.forwardPowerAxis = forwardPowerAxis;
-        this.reversePowerAxis = reversePowerAxis;
-        this.turnAxis = turnAxis;
+        this.forwardPowerAxis = forwardPowerAxis.prioritize(AxisPriorities.DRIVE);
+        this.reversePowerAxis = reversePowerAxis.prioritize(AxisPriorities.DRIVE);
+        this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
@@ -82,10 +86,12 @@ public class ArcadeDrive extends CommandBase {
         OIAxis powerAxis, 
         OIAxis turnAxis, 
         OIButton switchfoot) {
-        this.switchfoot = new SimpleButton(switchfoot);
+        switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
+        this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
-        this.forwardPowerAxis = powerAxis;
-        this.turnAxis = turnAxis;
+        this.forwardPowerAxis = powerAxis.prioritize(AxisPriorities.DRIVE);
+        this.reversePowerAxis = null;
+        this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 

@@ -162,6 +162,11 @@ public class Intake extends SubsystemBase {
     }
     
     @Override
+    public void periodic() {
+        updateState();
+    }
+
+    @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");
         //builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);

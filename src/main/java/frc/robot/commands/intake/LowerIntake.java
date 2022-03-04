@@ -10,7 +10,7 @@ public class LowerIntake extends InstantCommand {
 
     private final Intake intake;
 
-    LowerIntake(Intake intake) {
+    public LowerIntake(Intake intake) {
         this.intake = intake;
         addRequirements(intake);
     }
