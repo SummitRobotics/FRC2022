@@ -4,57 +4,57 @@
 
 package frc.robot.commands.drivetrain;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 
 /**
- * drive by time.
+ * Drive by time.
  */
-public class driveByTime extends CommandBase {
+public class DriveByTime extends CommandBase {
     Drivetrain drivetrain;
-    double timeToBe;
+    double targetTime;
     double time;
     double power;
     boolean done;
-    /** Creates a new driveByTime.
-     *
-     * @param drivetrain drivetrain
-     * @param time time to drive
-     * @param power power to drive, between -1, 1
-    */
+    Timer timer;
 
-    public driveByTime(Drivetrain drivetrain, double time, double power) {
+    /** Creates a new driveByTime command.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param time Time to drive, in seconds
+     * @param power Power to drive, between -1 and 1
+    */
+    public DriveByTime(Drivetrain drivetrain, double time, double power) {
         this.drivetrain = drivetrain;
         this.power = power;
-        timeToBe = time;
+        targetTime = time;
         done = false;
+        timer = new Timer();
         addRequirements(drivetrain);
-        // Use addRequirements() here to declare subsystem dependencies.
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        time = System.currentTimeMillis() * 1000;
+        timer.start();
         drivetrain.setBothMotorPower(power);
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (time - System.currentTimeMillis() * 1000 > timeToBe) {
+        if (timer.get() >= targetTime) {
             done = true;
+            timer.stop();
             drivetrain.stop();
         }
     }
 
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        timer.stop();
         drivetrain.stop();
     }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return done;
