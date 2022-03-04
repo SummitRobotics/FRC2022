@@ -9,6 +9,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.Homeable;
@@ -98,6 +99,7 @@ public class Climb extends SubsystemBase {
 
         leftMotor.setInverted(true);
         rightMotor.setInverted(true);
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     /**
@@ -281,7 +283,7 @@ public class Climb extends SubsystemBase {
      */
 
     public boolean isRollLevel() {
-        return (gyro.getRoll() < CLIMB_ROLL_ANGLE);
+        return (gyro.getYaw() < CLIMB_ROLL_ANGLE);
     }
 
     /**
@@ -375,7 +377,8 @@ public class Climb extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double pa = gyro.getPitch();
+        double pa = gyro.getRoll();
+        System.out.println(pa);
         //updates drivitive calculation
         climbPitchAverage.update(pa);
         climbDrivitiveAvrage.update(Math.abs(pa - oldGyroAngle));

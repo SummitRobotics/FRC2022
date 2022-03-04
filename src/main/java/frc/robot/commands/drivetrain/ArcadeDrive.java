@@ -141,6 +141,10 @@ public class ArcadeDrive extends CommandBase {
 
         double turn = Math.pow(turnAxis.get(), 3);
 
+        if (!activateSwitchfoot) {
+            turn = -turn;
+        }
+
 
         // calculates power to the motors
         double leftPower = power + turn;
@@ -149,7 +153,7 @@ public class ArcadeDrive extends CommandBase {
         if (switchfoot.get()) {
             activateSwitchfoot = !activateSwitchfoot;
         }
-        if (activateSwitchfoot) {
+        if (!activateSwitchfoot) {
             drivetrain.setLeftMotorPower(leftPower);
             drivetrain.setRightMotorPower(rightPower);
         } else {

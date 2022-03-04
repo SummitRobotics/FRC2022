@@ -129,8 +129,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -243,9 +243,10 @@ public class RobotContainer {
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
+                
         launchpad.missileA.toggleWhenPressed(climbMO);
 
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button3, joystick.button7, joystick.button4, joystick.button5, joystick.button3);
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
         launchpad.missileB.toggleWhenPressed(climbSemiAuto);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
@@ -267,7 +268,7 @@ public class RobotContainer {
      */
     private void initTelemetry() {
         //SmartDashboard.putData("PDP", pdp);
-        // SmartDashboard.putData("PCM", pcm);
+        SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
         SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);

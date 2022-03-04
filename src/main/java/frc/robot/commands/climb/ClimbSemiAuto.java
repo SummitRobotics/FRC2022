@@ -9,6 +9,7 @@ import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.utilities.Functions;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
 import frc.robot.utilities.lists.Colors;
@@ -127,22 +128,22 @@ public class ClimbSemiAuto extends ClimbAutomation {
     public void execute() {
 
         if (prioritizedExtendButton.get()) {
-            leftPID.setSetpoint(climb.FOWARD_LIMIT);
-            rightPID.setSetpoint(climb.FOWARD_LIMIT);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            leftPID.setSetpoint(climb.BACK_LIMIT);
+            rightPID.setSetpoint(climb.BACK_LIMIT);
+            climb.setLeftMotorPower(Functions.clampDouble(leftPID.calculate(climb.getLeftEncoderValue()), 0.8, -0.8));
+            climb.setRightMotorPower(Functions.clampDouble(rightPID.calculate(climb.getLeftEncoderValue()), 0.8, -0.8));
 
         } else if (prioritizedMidpointButton.get()) {
             leftPID.setSetpoint(climb.GRAB_POINT);
             rightPID.setSetpoint(climb.GRAB_POINT);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            climb.setLeftMotorPower(Functions.clampDouble(leftPID.calculate(climb.getLeftEncoderValue()), 0.8, -0.8));
+            climb.setRightMotorPower(Functions.clampDouble(rightPID.calculate(climb.getLeftEncoderValue()), 0.8, -0.8));
 
         } else if (prioritizedRetractButton.get()) {
-            leftPID.setSetpoint(climb.BACK_LIMIT);
-            rightPID.setSetpoint(climb.BACK_LIMIT);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            leftPID.setSetpoint(climb.FOWARD_LIMIT);
+            rightPID.setSetpoint(climb.FOWARD_LIMIT);
+            climb.setLeftMotorPower(Functions.clampDouble(leftPID.calculate(climb.getLeftEncoderValue()), 0.8, -0.8));
+            climb.setRightMotorPower(Functions.clampDouble(rightPID.calculate(climb.getLeftEncoderValue()), 0.8, -0.8));
 
         } else {
             climb.setMotorPower(0);
@@ -152,6 +153,9 @@ public class ClimbSemiAuto extends ClimbAutomation {
             climb.togglePivotPos();
         }
 
+
+        System.out.println(climb.isHooked());
+        
         if (simplePrioritizedDetachButton.get()) {
             if (climb.getLeftDetachPos() || climb.getRightDetachPos()) {
                 climb.setDetachPos(false);
