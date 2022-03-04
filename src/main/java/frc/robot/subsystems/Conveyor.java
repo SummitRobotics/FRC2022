@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lidar;
@@ -354,11 +353,11 @@ public class Conveyor extends SubsystemBase {
 
     private class Ball {
         boolean isBlue;
-        boolean isRed;
+        //boolean isRed;
 
         Ball(boolean isBlue) {
             this.isBlue = isBlue;
-            this.isRed = !isBlue;
+            //this.isRed = !isBlue;
         }
 
         public ConveyorState toConveyorState() {

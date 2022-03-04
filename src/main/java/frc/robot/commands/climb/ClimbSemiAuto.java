@@ -127,20 +127,20 @@ public class ClimbSemiAuto extends ClimbAutomation {
     public void execute() {
 
         if (prioritizedExtendButton.get()) {
-            leftPID.setSetpoint(climb.forwardLimit);
-            rightPID.setSetpoint(climb.forwardLimit);
+            leftPID.setSetpoint(climb.FOWARD_LIMIT);
+            rightPID.setSetpoint(climb.FOWARD_LIMIT);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
         } else if (prioritizedMidpointButton.get()) {
-            leftPID.setSetpoint(climb.grabPoint);
-            rightPID.setSetpoint(climb.grabPoint);
+            leftPID.setSetpoint(climb.GRAD_POINT);
+            rightPID.setSetpoint(climb.GRAD_POINT);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
         } else if (prioritizedRetractButton.get()) {
-            leftPID.setSetpoint(climb.backLimit);
-            rightPID.setSetpoint(climb.backLimit);
+            leftPID.setSetpoint(climb.BACK_LIMIT);
+            rightPID.setSetpoint(climb.BACK_LIMIT);
             climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
             climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 

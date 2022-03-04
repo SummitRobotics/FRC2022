@@ -22,8 +22,8 @@ import frc.robot.commands.climb.ClimbManual;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
+import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
 import frc.robot.commands.homing.HomeByCurrent;
-import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.intake.LowerIntake;
@@ -126,8 +126,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.10, 12, Climb.backLimit, Climb.forwardLimit);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.10, 12, Climb.backLimit, Climb.forwardLimit);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.10, 12, Climb.BACK_LIMIT, Climb.FOWARD_LIMIT);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(

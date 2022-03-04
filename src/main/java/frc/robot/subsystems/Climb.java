@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -38,9 +37,9 @@ public class Climb extends SubsystemBase {
             CLIMB_TILT_ANGLE = 0,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
-            forwardLimit = 64,
-            backLimit = 2,
-            grabPoint = 40;
+            FOWARD_LIMIT = 64,
+            BACK_LIMIT = 2,
+            GRAD_POINT = 40;
 
 
     // Climb Motors
@@ -295,7 +294,7 @@ public class Climb extends SubsystemBase {
         return (climbPitchAverage.getAverage() < CLIMB_TILT_ANGLE) && !isSwinging();
     }
 
-    public boolean isSwinging(){
+    public boolean isSwinging() {
         return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
     }
 

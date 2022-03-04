@@ -39,9 +39,10 @@ public class ShuffleboardDriver {
             //finish = new ShuffleboardLEDButton(ButtonTable.getEntry("record Stop")),
             //homeTurret = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Turret")),
             //homeHood = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Hood"));
-    // public static DoubleDisplayWidget
-    //         hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
-    //         turretIndicator = new DoubleDisplayWidget(InfoTable.getEntry("turret"));
+            
+        // public static DoubleDisplayWidget
+        //         hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
+        //         turretIndicator = new DoubleDisplayWidget(InfoTable.getEntry("turret"));
 
     public static StatusDisplayWidget statusDisplay =
             new StatusDisplayWidget(InfoTable.getEntry("status"));
@@ -55,7 +56,7 @@ public class ShuffleboardDriver {
 
     public static void init() {
         SmartDashboard.putData(ShuffleboardDriver.autoChooser);
-        // removeBadItems();
+        removeBadItems();
     }
 
     /**
