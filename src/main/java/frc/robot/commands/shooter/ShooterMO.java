@@ -63,7 +63,7 @@ public class ShooterMO extends CommandBase {
 
     @Override
     public void execute() {
-        // shooter.setMotorPower(controlAxis.get());
+        //shooter.setMotorPower(controlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();
         }
@@ -72,7 +72,7 @@ public class ShooterMO extends CommandBase {
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
-        shooter.setMotorVolts(shooter.calculateVoltageFromPid(dumb.getDouble(0)));
+        shooter.setMotorVolts(shooter.calculateVoltageFromPid((controlAxis.get()*1500) + 1500));
         //shooter.setMotorTargetSpeed(dumb.getDouble(0));
     }
 

@@ -12,11 +12,14 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.climb.ClimbManual;
@@ -55,6 +58,8 @@ import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 import frc.robot.utilities.lists.StatusPriorities;
+import pabeles.concurrency.ConcurrencyOps.NewInstance;
+
 import java.util.function.Supplier;
 
 /**
@@ -296,28 +301,7 @@ public class RobotContainer {
     public void robotInit() {
         gyro.calibrate();
         ShuffleboardDriver.init();
-        // sets up all the splines so we dont need to spend lots of time
-        // turning the json files into trajectorys when we want to run them
-        String ball1 = "paths\1.path";
-        try {
-            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
-            // possible 4 ball auto
-            auto = new SequentialCommandGroup(
-                    //autoInit,
-                    new PrintCommand("paiosuibsfub"),
-                    new ShooterAtStart(shooter, conveyor).withTimeout(10),
-                    new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
-                    fball1
-                    // fullAutoShooterAssembly,
-                    // fullAutoIntake.get(),
-                    // fullAutoShooterAssembly,
-                    // fullAutoIntake.get(),
-                    // fullAutoShooterAssembly
-                    );
-
-        } catch (Exception e) {
-            System.out.println("An error occured when making autoInit: " + e);
-        }
+       
 
     }
 
@@ -341,7 +325,44 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        System.out.println("AUTOOOOOOOOOOOOOOOOOOO");
-        return auto;
+         // sets up all the splines so we dont need to spend lots of time
+        // turning the json files into trajectorys when we want to run them
+        String ball1 = "paths\1.path";
+        try {
+            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+            // possible 4 ball auto
+            auto = new SequentialCommandGroup(
+                    autoInit,
+                    new PrintCommand("paiosuibsfub"),
+                    new ShooterAtStart(shooter, conveyor).withTimeout(10),
+                    new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
+                    fball1
+                    // fullAutoShooterAssembly,
+                    // fullAutoIntake.get(),
+                    // fullAutoShooterAssembly,
+                    // fullAutoIntake.get(),
+                    // fullAutoShooterAssembly
+                    );
+
+            return auto;
+        } catch (Exception e) {
+            System.out.println("An error occured when making autoInit: " + e);
+        }
+
+        return new SequentialCommandGroup(
+            autoInit,
+            new PrintCommand("paiosuibsfub"),
+            new ShooterAtStart(shooter, conveyor).withTimeout(10),
+            new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
+            new InstantCommand(() -> drivetrain.setBothMotorPower(0.3)),
+            new WaitCommand(1.5),
+            new InstantCommand(() -> drivetrain.stop())
+            // fullAutoShooterAssembly,
+            // fullAutoIntake.get(),
+            // fullAutoShooterAssembly,
+            // fullAutoIntake.get(),
+            // fullAutoShooterAssembly
+            );
+        
     }
 }
