@@ -147,7 +147,9 @@ public class Intake extends SubsystemBase {
     public boolean getIntakeSolenoid() {
         return intakeSolenoidPosition;
     }
-
+    public void enableIntake(){
+        setIntakeMotorPower(1);
+    }
     /**
      * Gets the current state of the intake.
      *

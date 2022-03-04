@@ -286,14 +286,16 @@ public class RobotContainer {
         ShuffleboardDriver.init();
         // sets up all the splines so we dont need to spend lots of time
         // turning the json files into trajectorys when we want to run them
-        String ball1 = "paths\toBack.path";
+        String ball1 = "paths\1stBlue.path";
         try {
             Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
             // possible 4 ball auto
             auto = new SequentialCommandGroup(
                     autoInit,
                     new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
-                    fball1);
+                    new InstantCommand(intake::enableIntake),
+                    fball1,
+                    new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight));
 
         } catch (Exception e) {
             System.out.println("An error occured when making autoInit: " + e);
