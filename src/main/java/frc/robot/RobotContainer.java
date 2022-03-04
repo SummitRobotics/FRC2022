@@ -341,7 +341,30 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        System.out.println("AUTOOOOOOOOOOOOOOOOOOO");
+        gyro.calibrate();
+        ShuffleboardDriver.init();
+        // sets up all the splines so we dont need to spend lots of time
+        // turning the json files into trajectorys when we want to run them
+        String ball1 = "paths\1.path";
+        try {
+            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+            // possible 4 ball auto
+            auto = new SequentialCommandGroup(
+                    //autoInit,
+                    new PrintCommand("paiosuibsfub"),
+                    new ShooterAtStart(shooter, conveyor).withTimeout(10),
+                    new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
+                    fball1
+                    // fullAutoShooterAssembly,
+                    // fullAutoIntake.get(),
+                    // fullAutoShooterAssembly,
+                    // fullAutoIntake.get(),
+                    // fullAutoShooterAssembly
+                    );
+
+        } catch (Exception e) {
+            System.out.println("An error occured when making autoInit: " + e);
+        }
         return auto;
     }
 }
