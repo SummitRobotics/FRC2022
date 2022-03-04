@@ -5,6 +5,7 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
@@ -19,7 +20,7 @@ import frc.robot.utilities.lists.StatusPriorities;
 /**
  * ClimbSemiAuto.
  */
-public class ClimbSemiAuto extends ClimbAutomation {
+public class ClimbSemiAuto extends CommandBase{
     protected static final double 
               CLIMB_P = PIDValues.CLIMB_P,
               CLIMB_I = PIDValues.CLIMB_I,
@@ -69,7 +70,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
      * @param midpointButton The button to partially retract the pivoting arms
      */
     public ClimbSemiAuto(
-        Drivetrain drivetrain,
         Climb climb,
         OIButton pivotButton,
         OIButton detachButton,
@@ -78,7 +78,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
         OIButton midpointButton
     ) {
         
-        super(climb, drivetrain);
         this.drivetrain = drivetrain;
         this.climb = climb;
 
@@ -97,7 +96,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
         leftPID.setSetpoint(0);
         rightPID.setSetpoint(0);
 
-        addRequirements(drivetrain, climb);
+        addRequirements(climb);
     }
 
     // Called when the command is initially scheduled.
@@ -117,7 +116,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
         rightPID.reset();
         climb.stop();
 
-        climb.setDetachPos(false);
+        climb.setDetachPos(true);
         climb.setPivotPos(false);
 
         badClimbs = 0;
@@ -154,14 +153,15 @@ public class ClimbSemiAuto extends ClimbAutomation {
         }
 
 
-        System.out.println(climb.isHooked());
-        
+        //System.out.println(climb.isHooked());
+
         if (simplePrioritizedDetachButton.get()) {
             if (climb.getLeftDetachPos() || climb.getRightDetachPos()) {
                 climb.setDetachPos(false);
             } else {
                 if (climb.isHooked()) {
                     climb.setDetachPos(true);
+                    //System.out.println("unlatcherd");
                     ShuffleboardDriver.statusDisplay.removeStatus("bad_climb_sa");
                 } else {
                     ShuffleboardDriver.statusDisplay.addStatus("bad_climb_sa", "climb is not safe to release " + badClimbs, Colors.RED, StatusPriorities.BAD_CLIMB);

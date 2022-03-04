@@ -105,6 +105,7 @@ public class ArcadeDrive extends CommandBase {
         drivetrain.setOpenRampRate(0);
         avgPower.reset();
         avgSpeed.reset();
+        activateSwitchfoot = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -141,9 +142,9 @@ public class ArcadeDrive extends CommandBase {
 
         double turn = Math.pow(turnAxis.get(), 3);
 
-        if (!activateSwitchfoot) {
-            turn = -turn;
-        }
+        // if (!activateSwitchfoot) {
+        //     turn = -turn;
+        // }
 
 
         // calculates power to the motors

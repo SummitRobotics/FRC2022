@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
@@ -140,7 +141,7 @@ public class RobotContainer {
                                 Colors.TEAM,
                                 StatusPriorities.ENABLED)),
                 new InstantCommand(drivetrain::highGear),
-                new InstantCommand(intake::lowerIntake),
+                //new InstantCommand(intake::lowerIntake),
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
@@ -182,7 +183,7 @@ public class RobotContainer {
                 // new InstantCommand(() ->
                 // ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
 
-                // new ParallelCommandGroup(homeLeftArm, homeRightArm),
+                new ParallelCommandGroup(homeLeftArm, homeRightArm),
 
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
@@ -237,27 +238,26 @@ public class RobotContainer {
 
         launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
-        launchpad.buttonH.whenPressed(new ParallelCommandGroup(homeLeftArm, homeRightArm));
 
         //Climb
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
-                joystick.button5, joystick.button2, joystick.button2,
-                joystick.button6, joystick.button11);
-                
-        launchpad.missileA.toggleWhenPressed(climbMO);
+                joystick.button5, joystick.button2, joystick.button7,
+                joystick.button6, joystick.button8);
 
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
+        launchpad.missileA.whileHeld(climbMO);
+
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
         launchpad.missileB.toggleWhenPressed(climbSemiAuto);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
-                joystick.button5, joystick.button2, joystick.button2,
-                joystick.button6, joystick.button11);
+                joystick.button5, joystick.button2, joystick.button7,
+                joystick.button6, joystick.button8);
 
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
 
         launchpad.missileB.whileHeld(climbSemiAuto);
-        launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
+        //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
         //launchpad.missileB.whileHeld(climbAutomation);
@@ -298,13 +298,15 @@ public class RobotContainer {
         ShuffleboardDriver.init();
         // sets up all the splines so we dont need to spend lots of time
         // turning the json files into trajectorys when we want to run them
-        String ball1 = "paths\1stBlue.path";
+        String ball1 = "paths\1.path";
         try {
             Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
             // possible 4 ball auto
             auto = new SequentialCommandGroup(
-                    autoInit,
+                    //autoInit,
+                    new PrintCommand("paiosuibsfub"),
                     new ShooterAtStart(shooter, conveyor).withTimeout(10),
+                    new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
                     fball1
                     // fullAutoShooterAssembly,
                     // fullAutoIntake.get(),
@@ -339,6 +341,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
+        System.out.println("AUTOOOOOOOOOOOOOOOOOOO");
         return auto;
     }
 }

@@ -35,12 +35,12 @@ public class Climb extends SubsystemBase {
             FF = 0,
             IZ = 0,
             //TODO tune these values
-            CLIMB_TILT_ANGLE = 0,
+            CLIMB_TILT_ANGLE = -2,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
-            FOWARD_LIMIT = -2,
+            FOWARD_LIMIT = -1,
             BACK_LIMIT = -150,
-            GRAB_POINT = -135;
+            GRAB_POINT = -110;
 
 
     // Climb Motors
@@ -293,10 +293,12 @@ public class Climb extends SubsystemBase {
      */
 
     public boolean isHooked() {
-        return (climbPitchAverage.getAverage() < CLIMB_TILT_ANGLE) && !isSwinging();
+        //System.out.println(climbPitchAverage.getAverage());
+        return (climbPitchAverage.getAverage() < CLIMB_TILT_ANGLE);// && !isSwinging();
     }
 
     public boolean isSwinging() {
+        System.out.println("driv: " + climbDrivitiveAvrage.getAverage());
         return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
     }
 
@@ -378,7 +380,7 @@ public class Climb extends SubsystemBase {
     @Override
     public void periodic() {
         double pa = gyro.getRoll();
-        System.out.println(pa);
+        //System.out.println(pa);
         //updates drivitive calculation
         climbPitchAverage.update(pa);
         climbDrivitiveAvrage.update(Math.abs(pa - oldGyroAngle));

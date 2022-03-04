@@ -110,7 +110,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         // So, for simplicity, we do not use it.
         // TODO - Test the shooter and do a regression to find the right formula.
         // Add higher order terms if necessary.
-        if (hoodPos) {
+        if (!hoodPos) {
             return 0.100526 * distance * distance
                 + -5.87612 * distance
                 + 1484.13;
@@ -236,7 +236,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return Whether or not the hood position was correct
      */
     public boolean setHood(Shooter shooter, double limelightDistanceEstimate, boolean hoodPos) {
-        if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
+        if (!((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true))) {
 
             shooter.toggleHoodPos();
             return false;
