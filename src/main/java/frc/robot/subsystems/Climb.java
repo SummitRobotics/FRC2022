@@ -37,9 +37,9 @@ public class Climb extends SubsystemBase {
             CLIMB_TILT_ANGLE = 0,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
-            FOWARD_LIMIT = 64,
-            BACK_LIMIT = 2,
-            GRAD_POINT = 40;
+            FOWARD_LIMIT = -150,
+            BACK_LIMIT = 0,
+            GRAD_POINT = -135;
 
 
     // Climb Motors

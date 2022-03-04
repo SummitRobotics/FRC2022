@@ -160,7 +160,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
                     climb.setDetachPos(true);
                     ShuffleboardDriver.statusDisplay.removeStatus("bad_climb_sa");
                 } else {
-                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb_sa", "climb is not safe to relice " + badClimbs, Colors.RED, StatusPriorities.BAD_CLIMB);
+                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb_sa", "climb is not safe to release " + badClimbs, Colors.RED, StatusPriorities.BAD_CLIMB);
                 }
             }
             

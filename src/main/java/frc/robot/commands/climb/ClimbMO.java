@@ -70,7 +70,14 @@ public class ClimbMO extends CommandBase {
         OIButton rightDetachButton,
         OIButton bothDetachButton
     ) {
-        
+        this.climb = climb;
+        this.controlAxis = controlAxis;
+        this.leftMotorButton = leftMotorButton;
+        this.rightMotorButton = rightMotorButton;
+        this.pivotButton = pivotButton;
+        this.leftDetachButton = leftDetachButton;
+        this.rightDetachButton = rightDetachButton;
+        this.bothDetachButton = bothDetachButton;
     }
 
     /**
@@ -95,17 +102,14 @@ public class ClimbMO extends CommandBase {
             LEDButton rightDetachButton,
             LEDButton bothDetachButton
     ) {
-
-        this(
-                climb,
-                controlAxis,
-                (OIButton) leftMotorButton,
-                (OIButton) rightMotorButton,
-                (OIButton) pivotButton,
-                (OIButton) leftDetachButton,
-                (OIButton) rightDetachButton,
-                (OIButton) bothDetachButton
-        );
+        this.climb = climb;
+        this.controlAxis = controlAxis;
+        this.leftMotorButton = leftMotorButton;
+        this.rightMotorButton = rightMotorButton;
+        this.pivotButton = pivotButton;
+        this.leftDetachButton = leftDetachButton;
+        this.rightDetachButton = rightDetachButton;
+        this.bothDetachButton = bothDetachButton;
 
         leftMotorButton.pressBind();
         rightMotorButton.pressBind();
@@ -125,7 +129,6 @@ public class ClimbMO extends CommandBase {
         prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedBothDetachButton = bothDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedLeftDetachButton::get);
         simplePrioritizedRightDetachButton = new SimpleButton(prioritizedRightDetachButton::get);

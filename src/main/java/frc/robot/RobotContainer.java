@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.climb.ClimbManual;
+import frc.robot.commands.climb.ClimbSemiAuto;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
@@ -178,12 +179,12 @@ public class RobotContainer {
                 // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 // new InstantCommand(() ->
                 // ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
-                new ParallelCommandGroup(homeLeftArm, homeRightArm),
+                // new ParallelCommandGroup(homeLeftArm, homeRightArm),
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
-                }), 
-                new LowerIntake(intake)
+                }) 
+                // new LowerIntake(intake)
                 );
 
         // Configure the button bindings
@@ -237,14 +238,15 @@ public class RobotContainer {
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
         launchpad.missileA.toggleWhenPressed(climbMO);
-
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button3, joystick.button7, joystick.button4, joystick.button5, joystick.button3);
+        launchpad.missileB.toggleWhenPressed(climbSemiAuto);
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button2,
                 joystick.button6, joystick.button11);
 
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
-
+        launchpad.missileB.whileHeld(climbSemiAuto);
         launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);

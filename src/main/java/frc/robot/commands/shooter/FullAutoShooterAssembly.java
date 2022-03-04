@@ -111,13 +111,11 @@ public class FullAutoShooterAssembly extends CommandBase {
         // TODO - Test the shooter and do a regression to find the right formula.
         // Add higher order terms if necessary.
         if (hoodPos) {
-            return 0 * distance * distance * distance
-                + 0 * distance * distance
-                + 0 * distance
-                + 0;
+            return 0.100526 * distance * distance
+                + -5.87612 * distance
+                + 1484.13;
         } else {
-            return 0 * distance * distance * distance
-                + 0 * distance * distance
+            return 0 * distance * distance
                 + 0 * distance
                 + 0;
         }
