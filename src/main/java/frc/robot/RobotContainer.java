@@ -28,11 +28,14 @@ import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
+import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.intake.LowerIntake;
+import frc.robot.commands.intake.RaiseIntake;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
+import frc.robot.commands.shooter.SemiAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
@@ -80,13 +83,13 @@ public class RobotContainer {
 
     // Subsystems
     private final Drivetrain drivetrain;
-    private final Shooter shooter;
-    private final Conveyor conveyor;
-    private final Intake intake;
+    // private final Shooter shooter;
+    // private final Conveyor conveyor;
+    // private final Intake intake;
     private final Climb climb;
 
-    private final Lemonlight
-        targetingLimelight;
+    // private final Lemonlight
+    //     targetingLimelight;
     // ballDetectionLimelight;
     private final PCM pcm;
     private final AHRS gyro;
@@ -95,10 +98,9 @@ public class RobotContainer {
     private final HomeByCurrent homeLeftArm;
     private final HomeByCurrent homeRightArm;
 
-    private final ColorSensor colorSensor;
-    private final LidarV4 lidar;
-    private Command fullAutoShooterAssembly;
-    private Supplier<Command> fullAutoIntake;
+    // private final LidarV4 lidar;
+    // private Command fullAutoShooterAssembly;
+    // private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
     private final Command autoInit;
     private Command auto;
@@ -113,8 +115,7 @@ public class RobotContainer {
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
         pcm = new PCM(Ports.PCM_1);
-        colorSensor = new ColorSensor();
-        lidar = new LidarV4(0x62);
+        // lidar = new LidarV4(0x62);
         pdp = new PowerDistribution(1, ModuleType.kRev);
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
@@ -123,15 +124,15 @@ public class RobotContainer {
 
         gyro = new AHRS();
         
-        targetingLimelight = new Lemonlight("gloworm", false, true);
+        // targetingLimelight = new Lemonlight("gloworm", false, true);
         // TODO: need to ensure that this name is set on the limelight as well.
         //ballDetectionLimelight = new Lemonlight("balldetect");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        shooter = new Shooter();
-        conveyor = new Conveyor(colorSensor, lidar);
-        intake = new Intake();
+        // shooter = new Shooter();
+        // conveyor = new Conveyor(lidar);
+        // intake = new Intake();
         climb = new Climb(gyro);
 
         // TODO - set these values
@@ -192,7 +193,7 @@ public class RobotContainer {
 
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
+                    launchpad.bigLEDGreen.set(false);
                 }) 
                 // new LowerIntake(intake)
                 );
@@ -214,7 +215,7 @@ public class RobotContainer {
                 controller1.leftX, 
                 controller1.dPadAny));
         // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
-        conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
+        // conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
 
     /**
@@ -229,19 +230,23 @@ public class RobotContainer {
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 
-        controller1.buttonA.whenPressed(new IntakeToggle(intake));
+        // controller1.buttonA.whenPressed(new LowerIntake(intake));
+        // controller1.buttonB.whenPressed(
+        //     new RaiseIntake(intake)
+        // );
 
         // Conveyor
-        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        // launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
 
         // Intake
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        // launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        // launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
-        launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+        // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
 
         //Climb
@@ -263,6 +268,8 @@ public class RobotContainer {
 
         launchpad.missileB.whileHeld(climbSemiAuto);
         //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
+        launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
+        launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
         //launchpad.missileB.whileHeld(climbAutomation);
@@ -275,13 +282,13 @@ public class RobotContainer {
         //SmartDashboard.putData("PDP", pdp);
         SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
-        SmartDashboard.putData("Lemonlight", targetingLimelight);
+        // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         //SmartDashboard.putData("Shooter", shooter);
         //SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
-        SmartDashboard.putData("Color Sensor", colorSensor);
-        //SmartDashboard.putData("Lidar", lidar);
+        // SmartDashboard.putData("Color Sensor", colorSensor);
+        // SmartDashboard.putData("Lidar", lidar);
         //SmartDashboard.putData("Climb", climb);
     }
 
@@ -324,50 +331,41 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An ExampleCommand will run in autonomous
-<<<<<<< HEAD
-         // sets up all the splines so we dont need to spend lots of time
-=======
-        gyro.calibrate();
-        ShuffleboardDriver.init();
-        // sets up all the splines so we dont need to spend lots of time
->>>>>>> hellll
-        // turning the json files into trajectorys when we want to run them
-        String ball1 = "paths\1.path";
-        try {
-            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
-            // possible 4 ball auto
-            auto = new SequentialCommandGroup(
-<<<<<<< HEAD
-                    autoInit,
-=======
-                    //autoInit,
->>>>>>> hellll
-                    new PrintCommand("paiosuibsfub"),
-                    new ShooterAtStart(shooter, conveyor).withTimeout(10),
-                    new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
-                    fball1
-                    // fullAutoShooterAssembly,
-                    // fullAutoIntake.get(),
-                    // fullAutoShooterAssembly,
-                    // fullAutoIntake.get(),
-                    // fullAutoShooterAssembly
-                    );
+        // // An ExampleCommand will run in autonomous
+        //  // sets up all the splines so we dont need to spend lots of time
+        // // turning the json files into trajectorys when we want to run them
+        // String ball1 = "paths\1.path";
+        // try {
+        //     Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+        //     // possible 4 ball auto
+        //     auto = new SequentialCommandGroup(
+        //             autoInit,
+        //             new PrintCommand("paiosuibsfub"),
+        //             new ShooterAtStart(shooter, conveyor).withTimeout(10),
+        //             new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
+        //             fball1
+        //             // fullAutoShooterAssembly,
+        //             // fullAutoIntake.get(),
+        //             // fullAutoShooterAssembly,
+        //             // fullAutoIntake.get(),
+        //             // fullAutoShooterAssembly
+        //             );
 
-<<<<<<< HEAD
-            return auto;
-        } catch (Exception e) {
-            System.out.println("An error occured when making autoInit: " + e);
-        }
+        //     return auto;
+        // } catch (Exception e) {
+        //     System.out.println("An error occured when making autoInit: " + e);
+        // }
 
         return new SequentialCommandGroup(
-            autoInit,
+            //autoInit,
             new PrintCommand("paiosuibsfub"),
-            new ShooterAtStart(shooter, conveyor).withTimeout(10),
+            //new ShooterAtStart(shooter, conveyor).withTimeout(10),
             new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
-            new InstantCommand(() -> drivetrain.setBothMotorPower(0.3)),
-            new WaitCommand(1.5),
-            new InstantCommand(() -> drivetrain.stop())
+            //new InstantCommand(() -> {drivetrain.setLeftMotorPower(-0.3); drivetrain.setRightMotorPower(-0.3);}),
+            new DriveByTime(drivetrain, 3, -0.3),
+            new WaitCommand(5000000),
+            new PrintCommand("hehehfeibseogirasiipvgsefuo")
+           //new InstantCommand(() -> drivetrain.stop())
             // fullAutoShooterAssembly,
             // fullAutoIntake.get(),
             // fullAutoShooterAssembly,
@@ -375,11 +373,5 @@ public class RobotContainer {
             // fullAutoShooterAssembly
             );
         
-=======
-        } catch (Exception e) {
-            System.out.println("An error occured when making autoInit: " + e);
-        }
-        return auto;
->>>>>>> hellll
     }
 }

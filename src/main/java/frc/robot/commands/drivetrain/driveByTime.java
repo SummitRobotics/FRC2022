@@ -6,16 +6,18 @@ package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.*;
 
 /**
  * drive by time.
  */
-public class driveByTime extends CommandBase {
+public class DriveByTime extends CommandBase {
     Drivetrain drivetrain;
     double timeToBe;
     double time;
     double power;
     boolean done;
+    Timer timer;
     /** Creates a new driveByTime.
      *
      * @param drivetrain drivetrain
@@ -23,11 +25,12 @@ public class driveByTime extends CommandBase {
      * @param power power to drive, between -1, 1
     */
 
-    public driveByTime(Drivetrain drivetrain, double time, double power) {
+    public DriveByTime(Drivetrain drivetrain, double time, double power) {
         this.drivetrain = drivetrain;
         this.power = power;
         timeToBe = time;
         done = false;
+        timer = new Timer();
         addRequirements(drivetrain);
         // Use addRequirements() here to declare subsystem dependencies.
     }
@@ -35,16 +38,21 @@ public class driveByTime extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        time = System.currentTimeMillis() * 1000;
         drivetrain.setBothMotorPower(power);
+        done = false;
+        timer.start();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (time - System.currentTimeMillis() * 1000 > timeToBe) {
+        System.out.println("timemememermememememeem");
+        drivetrain.setBothMotorPower(power);
+
+        if (timer.hasElapsed(timeToBe)) {
             done = true;
             drivetrain.stop();
+            timer.stop();
         }
     }
 
@@ -52,11 +60,13 @@ public class driveByTime extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         drivetrain.stop();
+        timer.stop();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        //return done;
         return done;
     }
 }

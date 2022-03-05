@@ -39,15 +39,15 @@ public class FullAutoShooterAssembly extends CommandBase {
        
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 150,
-        MIN_SHOOTER_RANGE = 50,
+        MAX_SHOOTER_RANGE = 160,
+        MIN_SHOOTER_RANGE = 60,
         OK_TO_MOVE_OFSET = 5,
         HOOD_UP_RANGE = 5,
         RANGE_OVERLAP = 1,
         TARGET_HORIZONTAL_ACCURACY = 3,
         TARGET_WRONG_COLOR_MISS = 45,
         TARGET_MOTOR_SPEED_ACCURACY = 3,
-        IDEAL_SHOOTING_DISTANCE = 1000,
+        IDEAL_SHOOTING_DISTANCE = 100,
         SHOOTER_IDLE_SPEED = 1400;
 
     // devices
@@ -111,9 +111,11 @@ public class FullAutoShooterAssembly extends CommandBase {
         // TODO - Test the shooter and do a regression to find the right formula.
         // Add higher order terms if necessary.
         if (!hoodPos) {
-            return 0.100526 * distance * distance
-                + -5.87612 * distance
-                + 1484.13;
+            return 
+                + (0.000257791 * distance * distance * distance)
+                + (-0.0448 * distance * distance)
+                + 9.24 * distance
+                + 1191.15;
         } else {
             return 0 * distance * distance
                 + 0 * distance

@@ -9,11 +9,12 @@ import frc.robot.subsystems.Intake;
  * Command for raising the intake.
  */
 public class RaiseIntake extends SequentialCommandGroup {
-    RaiseIntake(Intake intake) {
+    public RaiseIntake(Intake intake) {
         addCommands(
 
                 new InstantCommand(() -> {
-                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                    System.out.println("IIIINNNNNTTTAAAAKKKKEEEE");
+                    intake.setIntakeMotorPower(0);
                     intake.setIntakeSolenoid(false);
                 }, intake),
 

@@ -54,6 +54,7 @@ public class ShooterAtStart extends CommandBase {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
         shooter.setMotorVolts(shooter.calculateVoltageFromPid(1700));
+        System.out.println("feawuybiouabivbgrjfhfjfhjfhjfjfjfjfjfjffjfj");
         //shooter.setMotorTargetSpeed(dumb.getDouble(0));
     }
 
@@ -64,6 +65,7 @@ public class ShooterAtStart extends CommandBase {
 
     @Override
     public boolean isFinished() {
+        System.out.println("existssssss: "+ conveyor.doesBallExist());
         return !conveyor.doesBallExist();
     }
 }
