@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = -0.33;
+            INTAKE_MOTOR_SPEED = -0.5;
 
     // motor
     private final CANSparkMax intakeMotor =

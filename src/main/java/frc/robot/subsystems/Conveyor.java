@@ -47,7 +47,6 @@ public class Conveyor extends SubsystemBase {
     private final SparkMaxPIDController indexPID = index.getPIDController();
 
     // sensors
-    private final ColorSensor colorSensor;
     private final Lidar lidar;
 
     // tracker variables
@@ -67,7 +66,7 @@ public class Conveyor extends SubsystemBase {
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 1,
         MAX_EXISTS_LIDAR_DISTANCE = 65,
-        MAX_INDEXED_LIDAR_DISTANCE = 32,
+        MAX_INDEXED_LIDAR_DISTANCE = 35,
         MIN_INDEXED_LIDAR_DISTANCE = 1;
 
     /**
@@ -76,8 +75,7 @@ public class Conveyor extends SubsystemBase {
      * @param colorSensor the color sensor
      * @param lidar the lidar
      */
-    public Conveyor(ColorSensor colorSensor, Lidar lidar) {
-        this.colorSensor = colorSensor;
+    public Conveyor(Lidar lidar) {
         this.lidar = lidar;
         zeroEncoders();
 
@@ -205,17 +203,17 @@ public class Conveyor extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if (lidar == null || colorSensor == null) {
+        if (lidar == null) {
             return;
         }
 
         // Set tracker variables to prevent weird stuff from happening
         // if measurements change mid-cycle.
         previousColorSensorMeasurement = colorSensorMeasurement;
-        colorSensorMeasurement = colorSensor.getColorString();
+        colorSensorMeasurement = "Blue";
         previousLidarDistance = lidarDistance;
         lidarDistance = lidar.getAverageDistance();
-        colorSensorDistance = colorSensor.getProximity();
+        // colorSensorDistance = colorSensor.getProximity();
         wasBallIndexed = isBallIndexed;
         isBallIndexed = isBallIndexed();
         doesBallExist = doesBallExist();
@@ -233,34 +231,33 @@ public class Conveyor extends SubsystemBase {
         } else if (beltRPM > 0) {
             // If the belt is moving forwards...
 
-            if (colorSensorMeasurement != previousColorSensorMeasurement || (colorSensorMeasurement != "NoTarget" && colorSensorState == null)) {
-                // If we detect a different measurement
+            // If we detect a different measurement
 
-                if (colorSensor.getColorString() == "Blue") {
-                    // If the measurement is blue...
-                    colorSensorState = new Ball(true);
+            if (true) {
+                // If the measurement is blue...
+                colorSensorState = new Ball(true);
 
-                    // If the lidar is not bound it to the ball.
-                    if (lidarBind == null) {
-                        lidarBind = colorSensorState;
-                    }
+                // If the lidar is not bound it to the ball.
+                if (lidarBind == null) {
+                    lidarBind = colorSensorState;
+                }
 
-                } else if (colorSensor.getColorString() == "Red") {
-                    // If the measurement is red...
-                    colorSensorState = new Ball(false);
+            } else if (false) {
+                // If the measurement is red...
+                colorSensorState = new Ball(false);
 
-                    // If the lidar is not bound it to the ball.
-                    if (lidarBind == null) {
-                        lidarBind = colorSensorState;
-                    }
-                } else {
-                    // If the measurement is not Red or Blue move to the next stage.
-                    if (beltState == null) {
-                        beltState = colorSensorState;
-                        colorSensorState = null;
-                    }
+                // If the lidar is not bound it to the ball.
+                if (lidarBind == null) {
+                    lidarBind = colorSensorState;
+                }
+            } else {
+                // If the measurement is not Red or Blue move to the next stage.
+                if (beltState == null) {
+                    beltState = colorSensorState;
+                    colorSensorState = null;
                 }
             }
+
             if (lidarBind != null
                     && indexState == null
                     && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE
@@ -318,7 +315,7 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a ball ready to be fired
      */
     public boolean isBallIndexed() {
-        if (lidar == null || colorSensor == null) {
+        if (lidar == null) {
             return false;
         }
         if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
@@ -336,7 +333,7 @@ public class Conveyor extends SubsystemBase {
      * @return whether or not there is a single ball in the conveyor
      */
     public boolean doesBallExist() {
-        if (lidar == null || colorSensor == null) {
+        if (lidar == null) {
             return false;
         }
         if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance

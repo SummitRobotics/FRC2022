@@ -153,7 +153,6 @@ public class ClimbSemiAuto extends CommandBase{
         }
 
 
-        //System.out.println(climb.isHooked());
 
         if (simplePrioritizedDetachButton.get()) {
             if (climb.getLeftDetachPos() || climb.getRightDetachPos()) {

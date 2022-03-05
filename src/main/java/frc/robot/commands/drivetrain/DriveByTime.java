@@ -36,23 +36,27 @@ public class DriveByTime extends CommandBase {
 
     @Override
     public void initialize() {
-        timer.start();
         drivetrain.setBothMotorPower(power);
+        done = false;
+        timer.start();
     }
 
     @Override
     public void execute() {
-        if (timer.get() >= targetTime) {
+        System.out.println("timemememermememememeem");
+        drivetrain.setBothMotorPower(power);
+
+        if (timer.hasElapsed(targetTime)) {
             done = true;
-            timer.stop();
             drivetrain.stop();
+            timer.stop();
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        timer.stop();
         drivetrain.stop();
+        timer.stop();
     }
 
     @Override
