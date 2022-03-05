@@ -77,11 +77,19 @@ public class Drivetrain extends SubsystemBase {
 
     // pid controllers
     private final SparkMaxPIDController leftPID = left.getPIDController();
+    private final SparkMaxPIDController leftMiddlePID = leftMiddle.getPIDController();
+    private final SparkMaxPIDController leftBackPID = leftBack.getPIDController();
     private final SparkMaxPIDController rightPID = right.getPIDController();
+    private final SparkMaxPIDController rightMiddlePID = rightMiddle.getPIDController();
+    private final SparkMaxPIDController rightBackPID = rightBack.getPIDController();
 
     // encoders
     private final RelativeEncoder leftEncoder = left.getEncoder();
+    private final RelativeEncoder leftMiddleEncoder = leftMiddle.getEncoder();
+    private final RelativeEncoder leftBackEncoder = leftBack.getEncoder();
     private final RelativeEncoder rightEncoder = right.getEncoder();
+    private final RelativeEncoder rightBackEncoder = rightBack.getEncoder();
+    private final RelativeEncoder rightMiddleEncoder = rightMiddle.getEncoder();
 
     private final DifferentialDriveOdometry odometry;
 
@@ -135,16 +143,13 @@ public class Drivetrain extends SubsystemBase {
 
         f2d = new Field2d();
 
-        // tells other two motors to follow the first
-        leftMiddle.follow(left);
-        leftBack.follow(left);
-
-        rightMiddle.follow(right);
-        rightBack.follow(right);
-
         // inverts right side
         left.setInverted(true);
+        leftMiddle.setInverted(true);
+        leftBack.setInverted(true);
         right.setInverted(false);
+        rightMiddle.setInverted(false);
+        rightBack.setInverted(false);
 
         // sets pid values
         zeroDistance();
@@ -155,19 +160,55 @@ public class Drivetrain extends SubsystemBase {
         leftPID.setD(581.73);
         leftPID.setOutputRange(-.25, .25);
 
+        leftMiddlePID.setP(14.301);
+        leftMiddlePID.setI(0);
+        leftMiddlePID.setD(581.73);
+        leftMiddlePID.setOutputRange(-.25, .25);
+
+        leftBackPID.setP(14.301);
+        leftBackPID.setI(0);
+        leftBackPID.setD(581.73);
+        leftBackPID.setOutputRange(-.25, .25);
+
         rightPID.setP(14.301);
         rightPID.setI(0);
         rightPID.setD(581.73);
         rightPID.setOutputRange(-.25, .25);
+
+        rightMiddlePID.setP(14.301);
+        rightMiddlePID.setI(0);
+        rightMiddlePID.setD(581.73);
+        rightMiddlePID.setOutputRange(-.25, .25);
+
+        rightBackPID.setP(14.301);
+        rightBackPID.setI(0);
+        rightBackPID.setD(581.73);
+        rightBackPID.setOutputRange(-.25, .25);
 
         // pid for velocity
         leftPID.setP(0.00012245, 2);
         leftPID.setI(0, 2);
         leftPID.setD(0.0, 2);
 
+        leftMiddlePID.setP(0.00012245, 2);
+        leftMiddlePID.setI(0, 2);
+        leftMiddlePID.setD(0.0, 2);
+
+        leftBackPID.setP(0.00012245, 2);
+        leftBackPID.setI(0, 2);
+        leftBackPID.setD(0.0, 2);
+
         rightPID.setP(0.00012245, 2);
         rightPID.setI(0, 2);
         rightPID.setD(0.0, 2);
+
+        rightMiddlePID.setP(0.00012245, 2);
+        rightMiddlePID.setI(0, 2);
+        rightMiddlePID.setD(0.0, 2);
+
+        rightBackPID.setP(0.00012245, 2);
+        rightBackPID.setI(0, 2);
+        rightBackPID.setD(0.0, 2);
 
         left.disableVoltageCompensation();
         right.disableVoltageCompensation();
@@ -258,6 +299,8 @@ public class Drivetrain extends SubsystemBase {
         power = Functions.clampDouble(power, 1.0, -1.0);
         synchronized (left) {
             left.set(power);
+            leftMiddle.set(power);
+            leftBack.set(power);
         }
     }
 
@@ -270,6 +313,8 @@ public class Drivetrain extends SubsystemBase {
         power = Functions.clampDouble(power, 1.0, -1.0);
         synchronized (right) {
             right.set(power);
+            rightMiddle.set(power);
+            rightBack.set(power);
         }
     }
 
@@ -279,9 +324,8 @@ public class Drivetrain extends SubsystemBase {
      * @param power The power, between -1 and 1
      */
     public synchronized void setBothMotorPower(double power) {
-        power = Functions.clampDouble(power, 1.0, -1.0);
-        left.set(power);
-        right.set(power);
+        setLeftMotorPower(power);
+        setRightMotorPower(power);
     }
 
     /**
@@ -292,6 +336,8 @@ public class Drivetrain extends SubsystemBase {
     public void setLeftMotorVolts(double volts) {
         synchronized (left) {
             left.setVoltage(volts);
+            leftMiddle.setVoltage(volts);
+            leftBack.setVoltage(volts);
         }
     }
 
@@ -303,6 +349,8 @@ public class Drivetrain extends SubsystemBase {
     public void setRightMotorVolts(double volts) {
         synchronized (right) {
             right.setVoltage(volts);
+            rightMiddle.setVoltage(volts);
+            rightBack.setVoltage(volts);
         }
     }
 
@@ -328,7 +376,11 @@ public class Drivetrain extends SubsystemBase {
         //leftPID.setFF(getFeedForward().calculate(leftMS));
         //rightPID.setFF(getFeedForward().calculate(rightMS));
         leftPID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
+        leftMiddlePID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
+        leftBackPID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
         rightPID.setReference(convertMPStoRPM(rightMS), ControlType.kVelocity, 2);
+        rightMiddlePID.setReference(convertMPStoRPM(rightMS), ControlType.kVelocity, 2);
+        rightBackPID.setReference(convertMPStoRPM(rightMS), ControlType.kVelocity, 2);
     }
 
     /**
@@ -353,6 +405,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized void setLeftMotorTarget(double position) {
         leftPID.setReference(position, ControlType.kPosition);
+        leftMiddlePID.setReference(position, ControlType.kPosition);
+        leftBackPID.setReference(position, ControlType.kPosition);
     }
 
     /**
@@ -362,6 +416,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized void setRightMotorTarget(double position) {
         rightPID.setReference(position, ControlType.kPosition);
+        rightMiddlePID.setReference(position, ControlType.kPosition);
+        rightBackPID.setReference(position, ControlType.kPosition);
     }
 
     /**
@@ -387,6 +443,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized void setLeftEncoder(double position) {
         leftEncoder.setPosition(position);
+        leftMiddleEncoder.setPosition(position);
+        leftBackEncoder.setPosition(position);
     }
 
     /**
@@ -397,6 +455,8 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized void setRightEncoder(double position) {
         rightEncoder.setPosition(position);
+        rightMiddleEncoder.setPosition(position);
+        rightBackEncoder.setPosition(position);
     }
 
     /**
@@ -515,7 +575,11 @@ public class Drivetrain extends SubsystemBase {
      */
     public void setOpenRampRate(double rate) {
         left.setOpenLoopRampRate(rate);
+        leftMiddle.setOpenLoopRampRate(rate);
+        leftBack.setOpenLoopRampRate(rate);
         right.setOpenLoopRampRate(rate);
+        rightMiddle.setOpenLoopRampRate(rate);
+        rightBack.setOpenLoopRampRate(rate);
     }
 
     /**
@@ -525,7 +589,11 @@ public class Drivetrain extends SubsystemBase {
      */
     public void setClosedRampRate(double rate) {
         left.setClosedLoopRampRate(rate);
+        leftMiddle.setClosedLoopRampRate(rate);
+        leftBack.setClosedLoopRampRate(rate);
         right.setClosedLoopRampRate(rate);
+        rightMiddle.setClosedLoopRampRate(rate);
+        rightBack.setClosedLoopRampRate(rate);
     }
 
     public double getLeftMotorCurrent() {
@@ -541,7 +609,11 @@ public class Drivetrain extends SubsystemBase {
      */
     public void stop() {
         left.stopMotor();
+        leftMiddle.stopMotor();
+        leftBack.stopMotor();
         right.stopMotor();
+        rightMiddle.stopMotor();
+        rightBack.stopMotor();
     }
 
     public synchronized DifferentialDriveWheelSpeeds getWheelSpeeds() {
