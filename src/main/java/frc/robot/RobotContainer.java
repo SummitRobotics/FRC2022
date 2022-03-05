@@ -31,6 +31,7 @@ import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
 import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.homing.HomeByCurrent;
+import frc.robot.commands.intake.DefaultIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.intake.LowerIntake;
@@ -39,7 +40,6 @@ import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.commands.shooter.SemiAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterMO;
-import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
@@ -63,7 +63,6 @@ import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 import frc.robot.utilities.lists.StatusPriorities;
 import pabeles.concurrency.ConcurrencyOps.NewInstance;
-
 import java.util.function.Supplier;
 
 /**
@@ -84,9 +83,9 @@ public class RobotContainer {
 
     // Subsystems
     private final Drivetrain drivetrain;
-    // private final Shooter shooter;
-    // private final Conveyor conveyor;
-    // private final Intake intake;
+    private final Shooter shooter;
+    private final Conveyor conveyor;
+    private final Intake intake;
     private final Climb climb;
 
     // private final Lemonlight
@@ -131,9 +130,9 @@ public class RobotContainer {
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        // shooter = new Shooter();
-        // conveyor = new Conveyor(lidar);
-        // intake = new Intake();
+        shooter = new Shooter();
+        conveyor = new Conveyor();
+        intake = new Intake();
         climb = new Climb(gyro);
 
         // TODO - set these values
@@ -215,8 +214,8 @@ public class RobotContainer {
                 controller1.leftTrigger,
                 controller1.leftX, 
                 controller1.dPadAny));
-        // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
-        // conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
+        intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
+        conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
 
     /**

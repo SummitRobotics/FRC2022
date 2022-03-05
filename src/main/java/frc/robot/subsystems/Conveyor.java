@@ -6,8 +6,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.devices.ColorSensor;
-import frc.robot.devices.Lidar;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -46,9 +44,6 @@ public class Conveyor extends SubsystemBase {
     // PID controllers
     private final SparkMaxPIDController indexPID = index.getPIDController();
 
-    // sensors
-    private final Lidar lidar;
-
     // tracker variables
     private String previousColorSensorMeasurement;
     private String colorSensorMeasurement;
@@ -71,12 +66,8 @@ public class Conveyor extends SubsystemBase {
 
     /**
      * Subsystem to control the conveyor of the robot.
-     *
-     * @param colorSensor the color sensor
-     * @param lidar the lidar
      */
-    public Conveyor(Lidar lidar) {
-        this.lidar = lidar;
+    public Conveyor() {
         zeroEncoders();
 
         indexPID.setP(P);
@@ -91,8 +82,6 @@ public class Conveyor extends SubsystemBase {
         previousLidarDistance = -1.0;
         lidarDistance = -1.0;
         wasBallIndexed = false;
-        isBallIndexed = isBallIndexed();
-        doesBallExist = doesBallExist();
         beltRPM = 0;
         indexRPM = 0;
         index.setInverted(true);
@@ -195,173 +184,6 @@ public class Conveyor extends SubsystemBase {
         index.stopMotor();
     }
 
-    private Ball colorSensorState = null;
-    private Ball lidarBind = null;
-    private Ball beltState = null;
-    private Ball indexState = null;
-
-    @Override
-    public void periodic() {
-
-        if (lidar == null) {
-            return;
-        }
-
-        // Set tracker variables to prevent weird stuff from happening
-        // if measurements change mid-cycle.
-        previousColorSensorMeasurement = colorSensorMeasurement;
-        colorSensorMeasurement = "Blue";
-        previousLidarDistance = lidarDistance;
-        lidarDistance = lidar.getAverageDistance();
-        // colorSensorDistance = colorSensor.getProximity();
-        wasBallIndexed = isBallIndexed;
-        isBallIndexed = isBallIndexed();
-        doesBallExist = doesBallExist();
-        beltRPM = -getBeltRPM();
-        indexRPM = -getIndexRPM();
-
-        if (!doesBallExist) {
-
-            // If no balls are detected, both states are set to none.
-            colorSensorState = null;
-            beltState = null;
-            indexState = null;
-            lidarBind = null;
-
-        } else if (beltRPM > 0) {
-            // If the belt is moving forwards...
-
-            // If we detect a different measurement
-
-            if (true) {
-                // If the measurement is blue...
-                colorSensorState = new Ball(true);
-
-                // If the lidar is not bound it to the ball.
-                if (lidarBind == null) {
-                    lidarBind = colorSensorState;
-                }
-
-            } else if (false) {
-                // If the measurement is red...
-                colorSensorState = new Ball(false);
-
-                // If the lidar is not bound it to the ball.
-                if (lidarBind == null) {
-                    lidarBind = colorSensorState;
-                }
-            } else {
-                // If the measurement is not Red or Blue move to the next stage.
-                if (beltState == null) {
-                    beltState = colorSensorState;
-                    colorSensorState = null;
-                }
-            }
-
-            if (lidarBind != null
-                    && indexState == null
-                    && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE
-                    && lidarDistance >= MIN_INDEXED_LIDAR_DISTANCE) {
-                if (beltState == lidarBind) {
-                    // If the ball is in the belt.
-                    indexState = beltState;
-                    beltState = null;
-                } else if (colorSensorState == lidarBind) {
-                    // If the ball is in the color sensor state.
-                    indexState = colorSensorState;
-                    colorSensorState = null;
-                }
-            }
-            if (indexRPM > 0
-                    && indexState != null
-                    && wasBallIndexed
-                    && !isBallIndexed
-                    && lidarDistance - previousLidarDistance > 5) {
-                indexState = null;
-                if (beltState != null) {
-                    lidarBind = beltState;
-                } else if (colorSensorState != null) {
-                    lidarBind = colorSensorState;
-                } else {
-                    lidarBind = null;
-                }
-            }
-        } else if (beltRPM < 0) {
-            System.out.println("TEST");
-        }
-    }
-
-    /**
-     * Returns the type of ball present in the position closer to the intake.
-     *
-     * @return the type of ball present in the position closer to the intake
-     */
-    public ConveyorState getBeltState() {
-        return beltState == null ? ConveyorState.NONE : beltState.toConveyorState();
-    }
-
-    public ConveyorState getIndexState() {
-        return indexState == null ? ConveyorState.NONE : indexState.toConveyorState();
-    }
-
-    public ConveyorState getColorSensorState() {
-        return colorSensorState == null ? ConveyorState.NONE : colorSensorState.toConveyorState();
-    }
-
-    /**
-     * Returns whether or not there is a ball ready to be fired.
-     * This should be checked by the shooter.
-     *
-     * @return whether or not there is a ball ready to be fired
-     */
-    public boolean isBallIndexed() {
-        if (lidar == null) {
-            return false;
-        }
-        if (MIN_INDEXED_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_INDEXED_LIDAR_DISTANCE) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Returns whether or not there is a single ball in the conveyor.
-     * This should be checked by the shooter.
-     *
-     * @return whether or not there is a single ball in the conveyor
-     */
-    public boolean doesBallExist() {
-        if (lidar == null) {
-            return false;
-        }
-        if (MIN_EXISTS_LIDAR_DISTANCE <= lidarDistance
-            && lidarDistance <= MAX_EXISTS_LIDAR_DISTANCE) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public double getLidarDistance() {
-        return lidar.getAverageDistance();
-    }
-
-    private class Ball {
-        boolean isBlue;
-        //boolean isRed;
-
-        Ball(boolean isBlue) {
-            this.isBlue = isBlue;
-            //this.isRed = !isBlue;
-        }
-
-        public ConveyorState toConveyorState() {
-            return isBlue ? ConveyorState.BLUE : ConveyorState.RED;
-        }
-    }
-
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("conveyor");
@@ -369,9 +191,9 @@ public class Conveyor extends SubsystemBase {
         //builder.addDoubleProperty("index_motor_position", this::getIndexEncoderPosition, null);
         //builder.addDoubleProperty("belt_motor_speed", this::getBeltRPM, null);
         //builder.addDoubleProperty("index_motor_speed", this::getIndexRPM, null);
-        builder.addStringProperty("belt_ball", () -> this.getBeltState().toString(), null);
-        builder.addStringProperty("index_ball", () -> this.getIndexState().toString(), null);
-        builder.addStringProperty("color_ball", () -> this.getColorSensorState().toString(), null);
-        builder.addBooleanProperty("ball_exists", this::doesBallExist, null);
+        // builder.addStringProperty("belt_ball", () -> this.getBeltState().toString(), null);
+        // builder.addStringProperty("index_ball", () -> this.getIndexState().toString(), null);
+        // builder.addStringProperty("color_ball", () -> this.getColorSensorState().toString(), null);
+        // builder.addBooleanProperty("ball_exists", this::doesBallExist, null);
     }
 }

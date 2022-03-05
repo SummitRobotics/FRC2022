@@ -65,7 +65,7 @@ public class ShooterAtStart extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        System.out.println("existssssss: "+ conveyor.doesBallExist());
-        return !conveyor.doesBallExist();
+        // System.out.println("existssssss: "+ conveyor.doesBallExist());
+        return /*!conveyor.doesBallExist();*/ true;
     }
 }

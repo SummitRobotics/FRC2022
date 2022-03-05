@@ -35,23 +35,10 @@ public class DefaultIntake extends CommandBase {
     public void execute() {
         switch (intake.getState()) {
             case DOWN:
-                if (conveyor.getColorSensorState() != ConveyorState.NONE && conveyor.getIndexState() != ConveyorState.NONE) {
-
-                    if (loopCount < 50) {
-                        intake.setIntakeMotorPower(-Intake.INTAKE_MOTOR_SPEED);
-                        loopCount++;
-                    } else {
-                        intake.stop();
-                    }
-
-                } else {
-                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
-                    if (loopCount != 0) {
-                        loopCount = 0;
-                    }
-                }
+                intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
                 break;
             default:
+                intake.setIntakeMotorPower(0);
                 break;
         }
     }

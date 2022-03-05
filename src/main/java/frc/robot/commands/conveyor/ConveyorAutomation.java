@@ -40,7 +40,7 @@ public class ConveyorAutomation extends CommandBase {
     @Override
     public void execute() {
 
-        ConveyorState colorSensorState = conveyor.getColorSensorState();
+        /*ConveyorState colorSensorState = conveyor.getColorSensorState();
         ConveyorState indexState = conveyor.getIndexState();
         boolean isBallIndexed = conveyor.isBallIndexed();
         Shooter.States shooterState = shooter.getState();
@@ -92,7 +92,9 @@ public class ConveyorAutomation extends CommandBase {
             }
             conveyor.setIndexMotorPower(0);
             conveyor.setBeltMotorPower(0);
-        }
+        }*/
+
+        conveyor.setBeltMotorPower(BELT_SPEED);
     }
 
     @Override

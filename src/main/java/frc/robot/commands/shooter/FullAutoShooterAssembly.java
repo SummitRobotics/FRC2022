@@ -138,7 +138,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return Whether or not there is a ball ready to be fired.
      */
     public boolean isBallReady() {
-        return (indexState != ConveyorState.NONE && conveyor.isBallIndexed());
+        return /*(indexState != ConveyorState.NONE && conveyor.isBallIndexed());*/ false;
     }
 
     /**
@@ -267,7 +267,7 @@ public class FullAutoShooterAssembly extends CommandBase {
             limelight.getVerticalOffset());
 
         smoothedHorizontalOffset = limelight.getHorizontalOffset();
-        indexState = conveyor.getIndexState();
+        indexState = /*conveyor.getIndexState();*/ null;
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterRPM();
 
@@ -322,6 +322,6 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return whether or not the command should end
      */
     public boolean isFinished() {
-        return !conveyor.doesBallExist();
+        return /*!conveyor.doesBallExist();*/ true;
     }
 }

@@ -72,7 +72,7 @@ public class ShooterMO extends CommandBase {
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
-        double x = ((controlAxis.get()*1500) + 1500);
+        double x = ((controlAxis.get() * 1500) + 1500);
         System.out.println(x);
         shooter.setMotorVolts(shooter.calculateVoltageFromPid(x));
         //shooter.setMotorTargetSpeed(dumb.getDouble(0));
