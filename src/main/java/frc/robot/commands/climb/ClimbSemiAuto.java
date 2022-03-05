@@ -20,7 +20,7 @@ import frc.robot.utilities.lists.StatusPriorities;
 /**
  * ClimbSemiAuto.
  */
-public class ClimbSemiAuto extends CommandBase{
+public class ClimbSemiAuto extends CommandBase {
     protected static final double 
               CLIMB_P = PIDValues.CLIMB_P,
               CLIMB_I = PIDValues.CLIMB_I,
