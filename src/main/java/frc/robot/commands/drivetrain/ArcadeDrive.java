@@ -15,6 +15,7 @@ import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.SimpleButton;
+import frc.robot.utilities.lists.AxisPriorities;
 
 /**
  * Command for Arcade Drive.
@@ -25,13 +26,12 @@ public class ArcadeDrive extends CommandBase {
     private double forwardPower;
     private double reversePower;
     private boolean activateSwitchfoot;
-    private final OIAxis forwardPowerAxis;
-    private OIAxis reversePowerAxis;
+
+    private final OIAxis.PrioritizedAxis forwardPowerAxis;
+    private final OIAxis.PrioritizedAxis reversePowerAxis;
+    private final OIButton.PrioritizedButton switchfootPRI;
     private final SimpleButton switchfoot;
-    private final SimpleButton switchfoot1;
-    private final SimpleButton switchfoot2;
-    private final SimpleButton switchfoot3;
-    private final OIAxis turnAxis;
+    private final OIAxis.PrioritizedAxis turnAxis;
 
     private final ChangeRateLimiter limiter;
 
@@ -59,15 +59,13 @@ public class ArcadeDrive extends CommandBase {
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
         OIAxis turnAxis,
-        OIButton switchfootr, OIButton switchfoot2r, OIButton switchfoot3r, OIButton switchfoot1r) {
-        switchfoot = new SimpleButton(switchfootr);
-        switchfoot1 = new SimpleButton(switchfoot1r);
-        switchfoot2 = new SimpleButton(switchfoot2r);
-        switchfoot3 = new SimpleButton(switchfoot3r);
+        OIButton switchfoot) {
+        switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
+        this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
-        this.forwardPowerAxis = forwardPowerAxis;
-        this.reversePowerAxis = reversePowerAxis;
-        this.turnAxis = turnAxis;
+        this.forwardPowerAxis = forwardPowerAxis.prioritize(AxisPriorities.DRIVE);
+        this.reversePowerAxis = reversePowerAxis.prioritize(AxisPriorities.DRIVE);
+        this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
@@ -86,14 +84,14 @@ public class ArcadeDrive extends CommandBase {
     public ArcadeDrive(
         Drivetrain drivetrain, 
         OIAxis powerAxis, 
-        OIAxis turnAxis, OIButton switchfootr, OIButton switchfoot2r, OIButton switchfoot3r, OIButton switchfoot1r) {
-        switchfoot = new SimpleButton(switchfootr);
-        switchfoot1 = new SimpleButton(switchfoot1r);
-        switchfoot2 = new SimpleButton(switchfoot2r);
-        switchfoot3 = new SimpleButton(switchfoot3r);
+        OIAxis turnAxis, 
+        OIButton switchfoot) {
+        switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
+        this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
-        this.forwardPowerAxis = powerAxis;
-        this.turnAxis = turnAxis;
+        this.forwardPowerAxis = powerAxis.prioritize(AxisPriorities.DRIVE);
+        this.reversePowerAxis = null;
+        this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
 
@@ -107,6 +105,7 @@ public class ArcadeDrive extends CommandBase {
         drivetrain.setOpenRampRate(0);
         avgPower.reset();
         avgSpeed.reset();
+        activateSwitchfoot = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -118,8 +117,6 @@ public class ArcadeDrive extends CommandBase {
         if (isSingleAxis) {
             power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
         } else {
-            reversePower = forwardPowerAxis.get();
-            forwardPower = reversePowerAxis.get();
             forwardPower = forwardPowerAxis.get();
             reversePower = reversePowerAxis.get();   
 
@@ -145,14 +142,19 @@ public class ArcadeDrive extends CommandBase {
 
         double turn = Math.pow(turnAxis.get(), 3);
 
+        // if (!activateSwitchfoot) {
+        //     turn = -turn;
+        // }
+
 
         // calculates power to the motors
         double leftPower = power + turn;
         double rightPower = power - turn;
-        if (switchfoot.get() || switchfoot1.get() || switchfoot2.get() || switchfoot3.get()) {
+
+        if (switchfoot.get()) {
             activateSwitchfoot = !activateSwitchfoot;
         }
-        if (activateSwitchfoot) {
+        if (!activateSwitchfoot) {
             drivetrain.setLeftMotorPower(leftPower);
             drivetrain.setRightMotorPower(rightPower);
         } else {

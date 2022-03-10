@@ -39,7 +39,7 @@ public class FullAutoShooterAssembly extends CommandBase {
        
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 100,
+        MAX_SHOOTER_RANGE = 160,
         MIN_SHOOTER_RANGE = 20,
         OK_TO_MOVE_OFSET = 5,
         HOOD_UP_RANGE = 5,
@@ -47,8 +47,8 @@ public class FullAutoShooterAssembly extends CommandBase {
         TARGET_HORIZONTAL_ACCURACY = 3,
         TARGET_WRONG_COLOR_MISS = 45,
         TARGET_MOTOR_SPEED_ACCURACY = 3,
-        IDEAL_SHOOTING_DISTANCE = 1000,
-        SHOOTER_IDLE_SPEED = 3000;
+        IDEAL_SHOOTING_DISTANCE = 100,
+        SHOOTER_IDLE_SPEED = 1400;
 
     // devices
     protected Lemonlight limelight;
@@ -116,10 +116,11 @@ public class FullAutoShooterAssembly extends CommandBase {
                 + 0 * distance
                 + 0;
         } else {
-            return 0 * distance * distance * distance
-                + 0 * distance * distance
-                + 0 * distance
-                + 0;
+            return 
+                + (0.000257791 * distance * distance * distance)
+                + (-0.0448 * distance * distance)
+                + 9.24 * distance
+                + 1191.15;
         }
     }
 

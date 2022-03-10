@@ -67,7 +67,7 @@ public class Conveyor extends SubsystemBase {
     // TODO - set these
     private static final double
         MIN_EXISTS_LIDAR_DISTANCE = 1,
-        MAX_EXISTS_LIDAR_DISTANCE = 60,
+        MAX_EXISTS_LIDAR_DISTANCE = 65,
         MAX_INDEXED_LIDAR_DISTANCE = 35,
         MIN_INDEXED_LIDAR_DISTANCE = 1;
 

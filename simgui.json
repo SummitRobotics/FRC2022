@@ -26,6 +26,24 @@
   },
   "NetworkTables": {
     "LiveWindow": {
+      "Ungrouped": {
+        "Scheduler": {
+          "open": true
+        },
+        "open": true
+      },
+      "open": true
+    },
+    "RobotInfo": {
+      "open": true
+    },
+    "SmartDashboard": {
+      "Color Sensor": {
+        "open": true
+      },
+      "open": true
+    },
+    "chronic": {
       "open": true
     }
   }

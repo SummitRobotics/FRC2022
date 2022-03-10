@@ -9,7 +9,13 @@ import frc.robot.subsystems.Intake;
  * Command for raising the intake.
  */
 public class RaiseIntake extends SequentialCommandGroup {
-    RaiseIntake(Intake intake) {
+
+    /**
+     * Raise the intake.
+     *
+     * @param intake The intake subsystem
+     */
+    public RaiseIntake(Intake intake) {
         addCommands(
 
                 new InstantCommand(() -> {

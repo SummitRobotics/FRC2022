@@ -7,9 +7,9 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.Homeable;
@@ -22,9 +22,11 @@ import frc.robot.utilities.lists.Ports;
 public class Climb extends SubsystemBase {
 
     private AHRS gyro;
-    private DigitalInput leftClimbLimit;
-    private DigitalInput rightClimbLimit;
+
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
+    private double oldGyroAngle = 0;
+    private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
+
     //TODO set these
     public static final double
             P = 0,
@@ -32,9 +34,14 @@ public class Climb extends SubsystemBase {
             D = 0,
             FF = 0,
             IZ = 0,
-            CLIMB_ANGLE = 0,
-            forwardLimit = 64,
-            backLimit = 2;
+            //TODO tune these values
+            CLIMB_TILT_ANGLE = -2,
+            CLIMB_ROLL_ANGLE = 5,
+            CLIMB_DRIVITIVE = 1,
+            FORWARD_LIMIT = -1,
+            BACK_LIMIT = -150,
+            GRAB_POINT = -110;
+
 
     // Climb Motors
     private final CANSparkMax leftMotor =
@@ -87,13 +94,12 @@ public class Climb extends SubsystemBase {
         rightPidController.setIZone(IZ);
         rightPidController.setOutputRange(-1.0, 1.0);
         this.gyro = gyro;
-        gyro.calibrate();
-        zeroEncoders();
-        leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
-        rightClimbLimit = new DigitalInput(Ports.RIGHT_LIMIT_SWITCH);
+        //zeroEncoders();
+   
 
         leftMotor.setInverted(true);
         rightMotor.setInverted(true);
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     /**
@@ -277,7 +283,7 @@ public class Climb extends SubsystemBase {
      */
 
     public boolean isRollLevel() {
-        return (gyro.getRoll() < 10);
+        return (gyro.getYaw() < CLIMB_ROLL_ANGLE);
     }
 
     /**
@@ -287,35 +293,35 @@ public class Climb extends SubsystemBase {
      */
 
     public boolean isHooked() {
-        return climbPitchAverage.getAverage() < CLIMB_ANGLE;
-    }
-    /**
-     * checks if touching limit switch.
-     *
-     * @return is left climb touching limit switch
-     */
-
-    public boolean getLeftLimit() {
-        return leftClimbLimit.get();
+        //System.out.println(climbPitchAverage.getAverage());
+        return (climbPitchAverage.getAverage() < CLIMB_TILT_ANGLE); // && !isSwinging();
     }
 
-    /**
-     * checks if touching limit switch.
-     *
-     * @return is right climb touching limit switch
-     */
-
-    public boolean getRightLimit() {
-        return rightClimbLimit.get();
+    public boolean isSwinging() {
+        System.out.println("driv: " + climbDrivitiveAvrage.getAverage());
+        return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
     }
-    /**
-     * Updating climb average.
-     * 
-     */
 
-    public void updateClimbAverage() {
-        climbPitchAverage.update(gyro.getPitch());
-    }
+    // /**
+    //  * checks if touching limit switch.
+    //  *
+    //  * @return is left climb touching limit switch
+    //  */
+
+    // public boolean getLeftLimit() {
+    //     return leftClimbLimit.get();
+    // }
+
+    // /**
+    //  * checks if touching limit switch.
+    //  *
+    //  * @return is right climb touching limit switch
+    //  */
+
+    // public boolean getRightLimit() {
+    //     return rightClimbLimit.get();
+    // }
+
     /**
      * Toggles the position of the left detach piston.
      */
@@ -351,12 +357,12 @@ public class Climb extends SubsystemBase {
         setLeftDetachPos(pos);
     }
 
-    /** 
-     * zeros climb at the beginning of the match.
-    */
-    public void zeroClimb() {
-        setMotorPower(-.01);
-    }
+    // /** 
+    //  * zeros climb at the beginning of the match.
+    // */
+    // public void zeroClimb() {
+    //     setMotorPower(-.01);
+    // }
 
     /**
      * Stops the motors.
@@ -371,6 +377,16 @@ public class Climb extends SubsystemBase {
         return new double[] {P, I, D, FF, IZ};
     }
 
+    @Override
+    public void periodic() {
+        double pa = gyro.getRoll();
+        //System.out.println(pa);
+        //updates drivitive calculation
+        climbPitchAverage.update(pa);
+        climbDrivitiveAvrage.update(Math.abs(pa - oldGyroAngle));
+        oldGyroAngle = pa;
+    }
+
     /**
      * Function to init telemetry for the climb subsystem.
      */
@@ -380,8 +396,8 @@ public class Climb extends SubsystemBase {
 
         builder.addDoubleProperty("leftEncoderPosition", this::getLeftEncoderValue, null);
         builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
-        //builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
-        //builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
+        builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
+        builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
 
         builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
         builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);

@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -12,21 +8,33 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.climb.ClimbManual;
+import frc.robot.commands.climb.ClimbSemiAuto;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
+import frc.robot.commands.drivetrain.DriveByTime;
+import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
+import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.homing.HomeByCurrent;
-import frc.robot.commands.intake.FullAutoIntake;
+import frc.robot.commands.intake.DefaultIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
+import frc.robot.commands.intake.LowerIntake;
+import frc.robot.commands.intake.RaiseIntake;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
+import frc.robot.commands.shooter.SemiAutoShooterAssembly;
+import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
@@ -77,8 +85,8 @@ public class RobotContainer {
     private final Climb climb;
 
     private final Lemonlight
-        targetingLimelight;
-    // ballDetectionLimelight;
+        targetingLimelight,
+        ballDetectionLimelight;
     private final PCM pcm;
     private final AHRS gyro;
     private final PowerDistribution pdp;
@@ -104,8 +112,8 @@ public class RobotContainer {
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
         pcm = new PCM(Ports.PCM_1);
-        colorSensor = new ColorSensor();
         lidar = new LidarV4(0x62);
+        colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
 
         new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
@@ -113,9 +121,10 @@ public class RobotContainer {
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
+        
         targetingLimelight = new Lemonlight("gloworm", false, true);
         // TODO: need to ensure that this name is set on the limelight as well.
-        //ballDetectionLimelight = new Lemonlight("balldetect");
+        ballDetectionLimelight = new Lemonlight("balldetect", true, true);
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
@@ -125,8 +134,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), -.10, 12, Climb.backLimit, Climb.forwardLimit);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), -.10, 12, Climb.backLimit, Climb.forwardLimit);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -140,8 +149,8 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
-                }),
-                new InstantCommand(climb::zeroClimb));
+                })
+                );
 
         teleInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -177,11 +186,15 @@ public class RobotContainer {
                 // new InstantCommand(() -> targetingLimelight.setLEDMode(LEDModes.FORCE_OFF)),
                 // new InstantCommand(() ->
                 // ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
+
                 new ParallelCommandGroup(homeLeftArm, homeRightArm),
+
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
-                }));
+                    launchpad.bigLEDGreen.set(false);
+                }), 
+                new LowerIntake(intake)
+                );
 
         // Configure the button bindings
         setDefaultCommands();
@@ -197,8 +210,9 @@ public class RobotContainer {
                 drivetrain,
                 controller1.rightTrigger,
                 controller1.leftTrigger,
-                controller1.leftX, controller1.dPadUp, controller1.dPadDown, controller1.dPadRight, controller1.dPadLeft));
-        // intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
+                controller1.leftX, 
+                controller1.dPadAny));
+        intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
         conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
 
@@ -214,28 +228,46 @@ public class RobotContainer {
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 
+        // controller1.buttonA.whenPressed(new LowerIntake(intake));
+        // controller1.buttonB.whenPressed(
+        //     new RaiseIntake(intake)
+        // );
+
         // Conveyor
-        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        // launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
 
         // Intake
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        // launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
-        launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+        // launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
+
+        // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+
 
         //Climb
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
-                joystick.button5, joystick.button2, joystick.button2,
-                joystick.button6, joystick.button11);
-        launchpad.buttonA.toggleWhenPressed(climbMO);
-        launchpad.buttonA.commandBind(climbMO);
+                joystick.button5, joystick.button2, joystick.button7,
+                joystick.button6, joystick.button8);
+
+        launchpad.missileA.whileHeld(climbMO);
+
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
+        launchpad.missileB.toggleWhenPressed(climbSemiAuto);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
-                joystick.button5, joystick.button2, joystick.button2,
-                joystick.button6, joystick.button11);
-        launchpad.missileA.whileHeld(climbManual);
+                joystick.button5, joystick.button2, joystick.button7,
+                joystick.button6, joystick.button8);
+
+        launchpad.buttonA.whileHeld(climbManual);
+        launchpad.buttonA.commandBind(climbManual);
+
+        launchpad.missileB.whileHeld(climbSemiAuto);
+        //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
+        launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
+        launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
         //launchpad.missileB.whileHeld(climbAutomation);
@@ -246,15 +278,15 @@ public class RobotContainer {
      */
     private void initTelemetry() {
         //SmartDashboard.putData("PDP", pdp);
-        // SmartDashboard.putData("PCM", pcm);
+        SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
-        SmartDashboard.putData("Lemonlight", targetingLimelight);
+        // SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         //SmartDashboard.putData("Shooter", shooter);
         //SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
-        SmartDashboard.putData("Color Sensor", colorSensor);
-        //SmartDashboard.putData("Lidar", lidar);
+        // SmartDashboard.putData("Color Sensor", colorSensor);
+        // SmartDashboard.putData("Lidar", lidar);
         //SmartDashboard.putData("Climb", climb);
     }
 
@@ -272,25 +304,9 @@ public class RobotContainer {
      * runs when the robot is powered on.
      */
     public void robotInit() {
+        gyro.calibrate();
         ShuffleboardDriver.init();
-        // sets up all the splines so we dont need to spend lots of time
-        // turning the json files into trajectorys when we want to run them
-        String ball1 = "paths\1stBlue.path";
-        try {
-            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
-            // possible 4 ball auto
-            auto = new SequentialCommandGroup(
-                    autoInit,
-                    fball1,
-                    fullAutoShooterAssembly,
-                    fullAutoIntake.get(),
-                    fullAutoShooterAssembly,
-                    fullAutoIntake.get(),
-                    fullAutoShooterAssembly);
-
-        } catch (Exception e) {
-            System.out.println("An error occured when making autoInit: " + e);
-        }
+       
 
     }
 
@@ -313,7 +329,43 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An ExampleCommand will run in autonomous
-        return auto;
+        // // An ExampleCommand will run in autonomous
+        //  // sets up all the splines so we dont need to spend lots of time
+        // // turning the json files into trajectorys when we want to run them
+        // String ball1 = "paths\1.path";
+        // try {
+        //     Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+        //     // possible 4 ball auto
+        //     auto = new SequentialCommandGroup(
+        //             autoInit,
+        //             new PrintCommand("paiosuibsfub"),
+        //             new ShooterAtStart(shooter, conveyor).withTimeout(10),
+        //             new PrintCommand("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa"),
+        //             fball1
+        //             // fullAutoShooterAssembly,
+        //             // fullAutoIntake.get(),
+        //             // fullAutoShooterAssembly,
+        //             // fullAutoIntake.get(),
+        //             // fullAutoShooterAssembly
+        //             );
+
+        //     return auto;
+        // } catch (Exception e) {
+        //     System.out.println("An error occured when making autoInit: " + e);
+        // }
+
+        return new SequentialCommandGroup(
+            //autoInit,
+            //new ShooterAtStart(shooter, conveyor).withTimeout(10),
+            //new InstantCommand(() -> {drivetrain.setLeftMotorPower(-0.3); drivetrain.setRightMotorPower(-0.3);}),
+            new DriveByTime(drivetrain, 3, -0.3)
+            //new InstantCommand(() -> drivetrain.stop())
+            // fullAutoShooterAssembly,
+            // fullAutoIntake.get(),
+            // fullAutoShooterAssembly,
+            // fullAutoIntake.get(),
+            // fullAutoShooterAssembly
+            );
+        
     }
 }

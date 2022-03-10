@@ -378,6 +378,7 @@ public class Drivetrain extends SubsystemBase {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
         }
     }
+    
     /**
      * The position you want the left side to register.
      * When it is in the position it is currently in
@@ -525,6 +526,14 @@ public class Drivetrain extends SubsystemBase {
     public void setClosedRampRate(double rate) {
         left.setClosedLoopRampRate(rate);
         right.setClosedLoopRampRate(rate);
+    }
+
+    public double getLeftMotorCurrent() {
+        return left.getOutputCurrent();
+    }
+
+    public double getRightMotorCurrent() {
+        return right.getOutputCurrent();
     }
 
     /**

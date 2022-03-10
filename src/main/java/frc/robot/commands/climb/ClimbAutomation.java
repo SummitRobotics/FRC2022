@@ -11,12 +11,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
-import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
-import frc.robot.utilities.lists.AxisPriorities;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.PIDValues;
@@ -229,11 +227,11 @@ public class ClimbAutomation extends CommandBase {
     // update with network tables code
 
     private boolean touchingBar() {
-        if (climb.getRightLimit() && climb.getLeftLimit()) {
+        if (drivetrain.getLeftMotorCurrent() > 10 && drivetrain.getRightMotorCurrent() > 10) {
             drivetrain.setBothMotorPower(0);
             return true;
         } else {
-            drivetrain.setBothMotorPower(.1);
+            drivetrain.setBothMotorPower(.15);
             return false;
         }
     }
@@ -268,35 +266,33 @@ public class ClimbAutomation extends CommandBase {
 
         return alignPID.atSetpoint() && movePID.atSetpoint();
     }
-    /**
-     * aligns climb using limit switches.
-     *
-     * @return aligned
-     */
-
-    public boolean alignByLimit() {
-        if (!climb.getLeftLimit() && barMisaligned == "" && climb.getRightLimit()) {
-            barMisaligned = "left";
-            drivetrain.setLeftMotorPower(0);
-            return false;
-        } else if (!climb.getRightLimit() && barMisaligned == "" && climb.getLeftLimit()) {
-            barMisaligned = "right";
-            drivetrain.setRightMotorPower(0);
-            return false;
-        } else if (climb.getLeftLimit() && climb.getRightLimit()) {
-            drivetrain.setBothMotorPower(.5);
-            barMisaligned = "";
-            return false;
-        } else {
-            drivetrain.setBothMotorPower(0);
-            return true;
-        }
-    }
+    // /**
+    //  * aligns climb using limit switches.
+    //  *
+    //  * @return aligned
+    //  */
+    // public boolean alignByLimit() {
+        // if (!climb.getLeftLimit() && barMisaligned == "" && climb.getRightLimit()) {
+            // barMisaligned = "left";
+            // drivetrain.setLeftMotorPower(0);
+            // return false;
+        // } else if (!climb.getRightLimit() && barMisaligned == "" && climb.getLeftLimit()) {
+            // barMisaligned = "right";
+            // drivetrain.setRightMotorPower(0);
+            // return false;
+        // } else if (climb.getLeftLimit() && climb.getRightLimit()) {
+            // drivetrain.setBothMotorPower(.5);
+            // barMisaligned = "";
+            // return false;
+        // } else {
+            // drivetrain.setBothMotorPower(0);
+            // return true;
+        // }
+    // }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        climb.updateClimbAverage();
         if (stateChanged) {
             climbLeftPID.reset();
             climbRightPID.reset();
@@ -311,7 +307,7 @@ public class ClimbAutomation extends CommandBase {
                         climb.setDetachPos(true);
                     }
                 //replace touchingBar() with alignByLimit() if using it
-                } else if (climbSystem == ClimbStates.EXTENDED && alignByLimit()) {
+                } else if (climbSystem == ClimbStates.EXTENDED && touchingBar()) {
                     retract();
                 } else if (climbSystem == ClimbStates.LATCHED) {
                     cycle();

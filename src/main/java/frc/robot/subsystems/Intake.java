@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = 1;
+            INTAKE_MOTOR_SPEED = -0.5;
 
     // motor
     private final CANSparkMax intakeMotor =
@@ -159,6 +159,11 @@ public class Intake extends SubsystemBase {
 
     private void updateState() {
         state = intakeSolenoidPosition ? States.DOWN : States.UP;
+    }
+
+    @Override
+    public void periodic() {
+        updateState();
     }
     
     @Override

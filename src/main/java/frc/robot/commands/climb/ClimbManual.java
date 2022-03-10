@@ -5,11 +5,14 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.StatusPriorities;
 
 /**
  * Like climbMo, but with safety features.
@@ -27,16 +30,6 @@ public class ClimbManual extends CommandBase {
     OIButton pivotButton;
     OIButton.PrioritizedButton prioritizedPivotButton;
     SimpleButton simplePrioritizedPivotButton;
-
-    // button for only the left detach solenoid
-    OIButton leftDetachButton;
-    OIButton.PrioritizedButton prioritizedLeftDetachButton;
-    SimpleButton simplePrioritizedLeftDetachButton;
-
-    // button for only the right detach solenoid
-    OIButton rightDetachButton;
-    OIButton.PrioritizedButton prioritizedRightDetachButton;
-    SimpleButton simplePrioritizedRightDetachButton;
 
     // button for LeftMotorPower
     OIButton leftMotorButton;
@@ -79,25 +72,19 @@ public class ClimbManual extends CommandBase {
         this.leftMotorButton = leftMotorButton;
         this.rightMotorButton = rightMotorButton;
         this.pivotButton = pivotButton;
-        this.leftDetachButton = leftDetachButton;
-        this.rightDetachButton = rightDetachButton;
         this.bothDetachButton = bothDetachButton;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedBothDetachButton = bothDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.CLIMB);
+        prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedBothDetachButton = bothDetachButton.prioritize(AxisPriorities.CLIMB);
 
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
-        simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedLeftDetachButton::get);
-        simplePrioritizedRightDetachButton = new SimpleButton(prioritizedRightDetachButton::get);
         simplePrioritizedBothDetachButton = new SimpleButton(prioritizedBothDetachButton::get);
 
         climb.stop();
@@ -109,7 +96,6 @@ public class ClimbManual extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        climb.updateClimbAverage();
         if (prioritizedLeftMotorButton.get() && prioritizedRightMotorButton.get()) {
             climb.setMotorPower(prioritizedControlAxis.get());
         } else if (prioritizedLeftMotorButton.get()) {
@@ -125,17 +111,15 @@ public class ClimbManual extends CommandBase {
         }
 
         if (simplePrioritizedBothDetachButton.get()) {
-            if (!climb.getLeftDetachPos()) {
-                climb.setDetachPos(!(climb.getLeftDetachPos() && climb.getRightDetachPos()));
-            } else if (climb.getLeftDetachPos() && climb.getRightDetachPos() && climb.isHooked()) {
-                climb.setDetachPos(!(climb.getLeftDetachPos() && climb.getRightDetachPos()));
-            }
-        } else {
-            if (simplePrioritizedLeftDetachButton.get()) {
-                climb.toggleLeftDetachPos();
-            }
-            if (simplePrioritizedRightDetachButton.get()) {
-                climb.toggleRightDetachPos();
+            if (climb.getLeftDetachPos() || climb.getRightDetachPos()) {
+                climb.setDetachPos(false);
+            } else {
+                if (climb.isHooked()) {
+                    climb.setDetachPos(true);
+                    ShuffleboardDriver.statusDisplay.removeStatus("bad_climb");
+                } else {
+                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb", "climb is not safe to relice " + Colors.RED, StatusPriorities.BAD_CLIMB);
+                }
             }
         }
     }
@@ -148,9 +132,8 @@ public class ClimbManual extends CommandBase {
         prioritizedLeftMotorButton.destroy();
         prioritizedRightMotorButton.destroy();
         prioritizedPivotButton.destroy();
-        prioritizedLeftDetachButton.destroy();
-        prioritizedRightDetachButton.destroy();
         prioritizedBothDetachButton.destroy();
+        ShuffleboardDriver.statusDisplay.removeStatus("bad_climb");
     }
 
     // Returns true when the command should end.

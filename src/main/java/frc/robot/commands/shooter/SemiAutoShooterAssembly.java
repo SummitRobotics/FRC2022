@@ -73,7 +73,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     public void end(final boolean interrupted) {
         super.end(interrupted);
 
-        prioritizedShootButton = null;
         prioritizedShootButton.destroy();
         prioritizedControlAxis.destroy();
     }

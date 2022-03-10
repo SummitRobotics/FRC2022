@@ -15,5 +15,5 @@ public class StatusPriorities {
             ENABLED = 1,
             BAD_LIDAR_READINGS = 2,
             STUCK_BALL = 3,
-            SHOOTER_OVER_75 = 4;
+            BAD_CLIMB = 4;
 }

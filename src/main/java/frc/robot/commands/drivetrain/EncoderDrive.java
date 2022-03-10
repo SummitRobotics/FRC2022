@@ -58,8 +58,8 @@ public class EncoderDrive extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Math.abs(drivetrain.getLeftDistance() - left) < 1
-            && Math.abs(drivetrain.getRightDistance() - right) < 1;
+        return Math.abs(drivetrain.getLeftDistance() - left) < 5
+            && Math.abs(drivetrain.getRightDistance() - right) < 5;
 
     }
 }

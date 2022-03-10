@@ -17,7 +17,7 @@ public final class PIDValues {
         ALIGN_D = 0,
 
         // climb PID
-        CLIMB_P = .004,
-        CLIMB_I = .02,
+        CLIMB_P = 0.15,
+        CLIMB_I = 0.1,
         CLIMB_D = 0;
 }
