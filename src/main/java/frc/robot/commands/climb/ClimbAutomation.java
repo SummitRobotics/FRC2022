@@ -150,11 +150,6 @@ public class ClimbAutomation extends CommandBase {
         avgRightScrewPower = new RollingAverage(5, false);
         avgRightMotorPower = new RollingAverage(5, false);
         avgLeftScrewPower = new RollingAverage(5, false);
-        // TODO find actual value in testing
-        normalDrivePower = 0;
-        normalTestDrivePower = 0;
-        normalScrewPower = 0;
-        normalTestScrewPower = 0;
         hasHorizonalDistance = false;
         motorLeft = MotorStates.IDLE;
         motorRight = MotorStates.IDLE;
@@ -265,6 +260,7 @@ public class ClimbAutomation extends CommandBase {
      *
      * @return aligned
      */
+
     public boolean alignByLimit() {
         if (!climb.getLeftLimit() && barMisaligned == "" && climb.getRightLimit()) {
             barMisaligned = "left";
@@ -290,6 +286,7 @@ public class ClimbAutomation extends CommandBase {
         if (stateChanged) {
             climbLeftPID.reset();
             climbRightPID.reset();
+            stateChanged = false;
         }
         if (barNumber < 3) {
             climbingLedCall.activate();
