@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -22,7 +23,8 @@ import frc.robot.utilities.lists.Ports;
 public class Climb extends SubsystemBase {
 
     private AHRS gyro;
-
+    private DigitalInput leftClimbLimit;
+    private DigitalInput rightClimbLimit;
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
     private double oldGyroAngle = 0;
     private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
@@ -302,25 +304,25 @@ public class Climb extends SubsystemBase {
         return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
     }
 
-    // /**
-    //  * checks if touching limit switch.
-    //  *
-    //  * @return is left climb touching limit switch
-    //  */
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is left climb touching limit switch
+     */
 
-    // public boolean getLeftLimit() {
-    //     return leftClimbLimit.get();
-    // }
+    public boolean getLeftLimit() {
+        return leftClimbLimit.get();
+    }
 
-    // /**
-    //  * checks if touching limit switch.
-    //  *
-    //  * @return is right climb touching limit switch
-    //  */
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is right climb touching limit switch
+     */
 
-    // public boolean getRightLimit() {
-    //     return rightClimbLimit.get();
-    // }
+    public boolean getRightLimit() {
+        return rightClimbLimit.get();
+    }
 
     /**
      * Toggles the position of the left detach piston.

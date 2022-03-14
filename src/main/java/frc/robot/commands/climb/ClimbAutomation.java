@@ -179,12 +179,11 @@ public class ClimbAutomation extends CommandBase {
 
     // Extending to grab bar using screws
     private void extend() {
-        if ((climb.getRightEncoderValue() < 65 || climb.getLeftEncoderValue() < 65) && climbSystem != ClimbStates.EXTENDED) {
-            climbLeftPID.setSetpoint(66);
-            climbRightPID.setSetpoint(66);
-            climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
-        }
+        climbLeftPID.setSetpoint(climb.BACK_LIMIT);
+        climbRightPID.setSetpoint(climb.BACK_LIMIT);
+        climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
+        climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+        
         if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
             climbSystem = ClimbStates.EXTENDED;
             stateChanged = true;
@@ -194,30 +193,35 @@ public class ClimbAutomation extends CommandBase {
 
     // retracting screws
     private void retract() {
-        if (climb.getRightEncoderValue() > 2 || climb.getLeftEncoderValue() > 2) {
-            climbLeftPID.setSetpoint(0);
-            climbRightPID.setSetpoint(0);
-            climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+        climb.setPivotPos(true);
+        climbLeftPID.setSetpoint(climb.FORWARD_LIMIT);
+        climbRightPID.setSetpoint(climb.FORWARD_LIMIT);
+        climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
+        climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+        if (climb.isHooked()){
+            climb.setLeftDetachPos(false);
+            climb.setRightDetachPos(false);
+        } else if (!climb.getLeftDetachPos() && climb.getRightEncoderValue() > -100) {
+            climbSystem = ClimbStates.BROKEN;
         }
         if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
-            climbSystem = ClimbStates.RETRACTED;
+            climbSystem = ClimbStates.LATCHED;
             stateChanged = true;
-
+            climb.setRightDetachPos(true);
+            climb.setLeftDetachPos(true);
         }
     }
 
     // cycling bot, making sure that latches are on by using power detection
     private void cycle() {
-        if ((climb.getRightEncoderValue() < 10 || climb.getLeftEncoderValue() < 10) && climbSystem != ClimbStates.EXTENDED) {
-            climbLeftPID.setSetpoint(15);
-            climbRightPID.setSetpoint(15);
-            climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
-        }
+        climb.setPivotPos(false);
+        climbLeftPID.setSetpoint(15);
+        climbRightPID.setSetpoint(15);
+        climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
+        climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+    
         if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
             climbSystem = ClimbStates.DONE;
-            climb.setPivotPos(true);
             stateChanged = true;
 
         }
@@ -225,16 +229,6 @@ public class ClimbAutomation extends CommandBase {
     }
     // set camera height in pixels
     // update with network tables code
-
-    private boolean touchingBar() {
-        if (drivetrain.getLeftMotorCurrent() > 10 && drivetrain.getRightMotorCurrent() > 10) {
-            drivetrain.setBothMotorPower(0);
-            return true;
-        } else {
-            drivetrain.setBothMotorPower(.15);
-            return false;
-        }
-    }
 
     private boolean aligned() {
         double angle = angleToTurn.getDouble(0.0);
@@ -266,29 +260,29 @@ public class ClimbAutomation extends CommandBase {
 
         return alignPID.atSetpoint() && movePID.atSetpoint();
     }
-    // /**
-    //  * aligns climb using limit switches.
-    //  *
-    //  * @return aligned
-    //  */
-    // public boolean alignByLimit() {
-        // if (!climb.getLeftLimit() && barMisaligned == "" && climb.getRightLimit()) {
-            // barMisaligned = "left";
-            // drivetrain.setLeftMotorPower(0);
-            // return false;
-        // } else if (!climb.getRightLimit() && barMisaligned == "" && climb.getLeftLimit()) {
-            // barMisaligned = "right";
-            // drivetrain.setRightMotorPower(0);
-            // return false;
-        // } else if (climb.getLeftLimit() && climb.getRightLimit()) {
-            // drivetrain.setBothMotorPower(.5);
-            // barMisaligned = "";
-            // return false;
-        // } else {
-            // drivetrain.setBothMotorPower(0);
-            // return true;
-        // }
-    // }
+    /**
+     * aligns climb using limit switches.
+     *
+     * @return aligned
+     */
+    public boolean alignByLimit() {
+        if (!climb.getLeftLimit() && barMisaligned == "" && climb.getRightLimit()) {
+            barMisaligned = "left";
+            drivetrain.setLeftMotorPower(0);
+            return false;
+        } else if (!climb.getRightLimit() && barMisaligned == "" && climb.getLeftLimit()) {
+            barMisaligned = "right";
+            drivetrain.setRightMotorPower(0);
+            return false;
+        } else if (climb.getLeftLimit() && climb.getRightLimit()) {
+            drivetrain.setBothMotorPower(.5);
+            barMisaligned = "";
+            return false;
+        } else {
+            drivetrain.setBothMotorPower(0);
+            return true;
+        }
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
@@ -301,13 +295,13 @@ public class ClimbAutomation extends CommandBase {
             climbingLedCall.activate();
             if (barNumber == 0) {
                 // get rid of aligned() here if using alignByLimit()
-                if (climbSystem == ClimbStates.DONE && aligned()) {
+                if (climbSystem == ClimbStates.DONE && alignByLimit()) {
                     extend();
-                    if (!climb.getLeftDetachPos() && !climb.getRightDetachPos()) {
-                        climb.setDetachPos(true);
+                    if (!climb.getLeftDetachPos() || !climb.getRightDetachPos()) {
+                        climb.setDetachPos(false);
                     }
                 //replace touchingBar() with alignByLimit() if using it
-                } else if (climbSystem == ClimbStates.EXTENDED && touchingBar()) {
+                } else if (climbSystem == ClimbStates.EXTENDED) {
                     retract();
                 } else if (climbSystem == ClimbStates.LATCHED) {
                     cycle();
@@ -316,9 +310,6 @@ public class ClimbAutomation extends CommandBase {
                 }
             } else if (barNumber <= 2) {
                 if (climbSystem == ClimbStates.DONE) {
-                    if (!climb.getLeftDetachPos() && !climb.getRightDetachPos()) {
-                        climb.setDetachPos(true);
-                    }
                     extend();
                 } else if (climbSystem == ClimbStates.EXTENDED) {
                     retract();
