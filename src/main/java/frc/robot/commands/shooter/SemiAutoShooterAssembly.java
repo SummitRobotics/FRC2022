@@ -6,7 +6,6 @@ import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
-import frc.robot.utilities.lists.AxisPriorities;
 
 
 /**
@@ -43,7 +42,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         this.shootButton = shootButton;
         this.controlAxis = controlAxis;
 
-        addRequirements(shooter, drivetrain, conveyor);
+        addRequirements(shooter, drivetrain);
     }
 
     @Override
@@ -54,9 +53,11 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     }
 
     @Override
-    public void fire() {
+    public void fire(Shooter shooter) {
         if (prioritizedShootButton.get()) {
-            super.fire();
+            super.fire(shooter);
+        } else {
+            shooter.setState(Shooter.States.NOT_SHOOTING);
         }
     }
 
@@ -72,9 +73,12 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     public void end(final boolean interrupted) {
         super.end(interrupted);
 
-        prioritizedShootButton = null;
         prioritizedShootButton.destroy();
         prioritizedControlAxis.destroy();
     }
 
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

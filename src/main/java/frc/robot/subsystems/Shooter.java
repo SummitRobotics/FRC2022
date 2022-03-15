@@ -5,11 +5,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
@@ -18,20 +20,40 @@ import frc.robot.utilities.lists.Ports;
  */
 public class Shooter extends SubsystemBase {
 
+    /**
+     * Enum describing shooter state.
+     */
+    public enum States {
+        NOT_SHOOTING,
+        NO_BALL,
+        NO_TARGET,
+        DRIVING_AND_ALIGNING,
+        SETTING_HOOD,
+        SPOOLING,
+        READY_TO_FIRE
+    }
+
+    private States shooterState = States.NOT_SHOOTING;
+
     // TODO - Set these
     public static final double
-            P = 0,
+            P = 1.4217E-9,
             I = 0,
             D = 0,
-            FF = 0,
+            FF = 0.068605 / 12 / 30,
             IZ = 0,
-            MAX_RPM = 0,
-            RATE = 0.05;
+            MAX_RPM = 5000;
 
+    PIDController pidDum = new PIDController(1.4217E-11, 0, 0);
+    SimpleMotorFeedforward ffDum = new SimpleMotorFeedforward(0.5235, 0.066605, 0.011555);
 
-    private final CANSparkMax shooterMotor = new CANSparkMax(
-            Ports.SHOOTER_MOTOR,
+    private final CANSparkMax shooterMotorMain = new CANSparkMax(
+            Ports.SHOOTER_MOTOR_1,
             CANSparkMaxLowLevel.MotorType.kBrushless);
+    private final CANSparkMax shooterMotorFollow = new CANSparkMax(
+        Ports.SHOOTER_MOTOR_2,
+        CANSparkMaxLowLevel.MotorType.kBrushless
+    );
 
     private final Solenoid hood = new Solenoid(
             Ports.PCM_1,
@@ -39,16 +61,13 @@ public class Shooter extends SubsystemBase {
             Ports.HOOD_SOLENOID);
 
     // Pid controller
-    private final SparkMaxPIDController shooterMotorPIDController = shooterMotor.getPIDController();
+    private final SparkMaxPIDController shooterMotorPIDController = shooterMotorMain.getPIDController();
 
     // Encoder
-    private final RelativeEncoder shooterEncoder = shooterMotor.getEncoder();
+    private final RelativeEncoder shooterEncoder = shooterMotorMain.getEncoder();
 
     // Hood position false - Piston not extended : true - Piston extended
     private boolean hoodPos = false;
-
-    // Rate Limiter
-    private ChangeRateLimiter motorRateLimiter = new ChangeRateLimiter(RATE);
 
     /**
      * Creates a new shooter instance.
@@ -62,6 +81,15 @@ public class Shooter extends SubsystemBase {
         shooterMotorPIDController.setOutputRange(-1.0, 1.0);
         
         zeroEncoders();
+        shooterMotorFollow.follow(shooterMotorMain, true);
+    }
+
+    public void setState(States state) {
+        shooterState = state;
+    }
+
+    public States getState() {
+        return shooterState;
     }
 
     /**
@@ -70,7 +98,7 @@ public class Shooter extends SubsystemBase {
      * @param power speed to set the motor to
      */
     public void setMotorPower(double power) {
-        shooterMotor.set(motorRateLimiter.getRateLimitedValue(power));
+        shooterMotorMain.set(power);
     }
     
     /**
@@ -86,7 +114,8 @@ public class Shooter extends SubsystemBase {
      * @param volts The voltage.
      */
     public void setMotorVolts(double volts) {
-        shooterMotor.setVoltage(volts);
+        volts = Functions.clampDouble(volts, 12, -12);
+        shooterMotorMain.setVoltage(volts);
     }
 
     /**
@@ -130,8 +159,13 @@ public class Shooter extends SubsystemBase {
      *
      * @return the shooter velocity in RPM
      */
-    public double getShooterVelocity() {
+    public double getShooterRPM() {
         return shooterEncoder.getVelocity();
+    }
+
+    public double calculateVoltageFromPid(double velocity) {
+        velocity /= 30;
+        return Functions.clampDouble(pidDum.calculate(getShooterRPM(), velocity) + ffDum.calculate(velocity), 12, -12);
     }
 
     /**
@@ -190,12 +224,17 @@ public class Shooter extends SubsystemBase {
         setHoodPos(!hoodPos);
     }
 
+    private String getShooterStateAsText() {
+        return shooterState.toString();
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Shooter");
 
-        builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
-        builder.addDoubleProperty("shooterVelocity", this::getShooterVelocity, null);
+        //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
+        builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
         builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

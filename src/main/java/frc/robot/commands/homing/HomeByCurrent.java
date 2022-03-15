@@ -92,7 +92,7 @@ public class HomeByCurrent extends CommandBase {
     public void end(boolean interrupted) {
         toHome.setHomingPower(0);
         // prints out homing completed message
-        System.out.println( "homing of " + toHome.getSubsystemObject().getClass().getCanonicalName() + " ended with interrupted " + interrupted);
+        System.out.println("homing of " + toHome.getSubsystemObject().getClass().getCanonicalName() + " ended with interrupted " + interrupted);
         if (!interrupted) {
             toHome.setHome(0);
             if (limits) {

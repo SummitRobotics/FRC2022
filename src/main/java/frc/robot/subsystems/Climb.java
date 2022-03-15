@@ -1,14 +1,20 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utilities.ChangeRateLimiter;
+import frc.robot.utilities.Homeable;
+import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -16,14 +22,28 @@ import frc.robot.utilities.lists.Ports;
  */
 public class Climb extends SubsystemBase {
 
+    private AHRS gyro;
+    private DigitalInput leftClimbLimit;
+    private DigitalInput rightClimbLimit;
+    RollingAverage climbPitchAverage = new RollingAverage(10, true);
+    private double oldGyroAngle = 0;
+    private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
+
+    //TODO set these
     public static final double
             P = 0,
             I = 0,
             D = 0,
             FF = 0,
             IZ = 0,
-            LEFT_MOTOR_RATE = 0.01,
-            RIGHT_MOTOR_RATE = 0.01;
+            //TODO tune these values
+            CLIMB_TILT_ANGLE = -2,
+            CLIMB_ROLL_ANGLE = 5,
+            CLIMB_DRIVITIVE = 1,
+            FORWARD_LIMIT = -1,
+            BACK_LIMIT = -150,
+            GRAB_POINT = -110;
+
 
     // Climb Motors
     private final CANSparkMax leftMotor =
@@ -55,14 +75,13 @@ public class Climb extends SubsystemBase {
     private final RelativeEncoder leftMotorEncoder = leftMotor.getEncoder();
     private final RelativeEncoder rightMotorEncoder = rightMotor.getEncoder();
 
-    // Rate Limiters
-    private final ChangeRateLimiter leftMotorRateLimiter = new ChangeRateLimiter(LEFT_MOTOR_RATE);
-    private final ChangeRateLimiter rightMotorRateLimiter = new ChangeRateLimiter(RIGHT_MOTOR_RATE);
-
     /**
      * Public Constructor for climb subsystem.
+     *
+     * @param gyro
+     * 
      */
-    public Climb() {
+    public Climb(AHRS gyro) {
         leftPidController.setP(P);
         leftPidController.setI(I);
         leftPidController.setD(D);
@@ -76,8 +95,13 @@ public class Climb extends SubsystemBase {
         rightPidController.setFF(FF);
         rightPidController.setIZone(IZ);
         rightPidController.setOutputRange(-1.0, 1.0);
+        this.gyro = gyro;
+        //zeroEncoders();
+   
 
-        zeroEncoders();
+        leftMotor.setInverted(true);
+        rightMotor.setInverted(true);
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     /**
@@ -135,6 +159,20 @@ public class Climb extends SubsystemBase {
         return pivotPos;
     }
 
+    public void setLeftMotorVelocity(double speed) {
+        leftMotor.set(speed);
+    }
+
+    public void setRightMotorVelocity(double speed) {
+
+        leftMotor.set(speed);
+    }
+
+    public void setBothMotorVelocity(double speed) {
+        leftMotor.set(speed);
+        rightMotor.set(speed);
+    }
+
     /**
      * Gets the current position of the pneumatic detach for the left side.
      *
@@ -159,7 +197,7 @@ public class Climb extends SubsystemBase {
      * @param power The power to set the left motor.
      */
     public void setLeftMotorPower(double power) {
-        leftMotor.set(leftMotorRateLimiter.getRateLimitedValue(power));
+        leftMotor.set(power);
     }
 
     /**
@@ -168,7 +206,7 @@ public class Climb extends SubsystemBase {
      * @param power The power to set the right motor.
      */
     public void setRightMotorPower(double power) {
-        rightMotor.set(rightMotorRateLimiter.getRateLimitedValue(power));
+        rightMotor.set(power);
     }
 
     /**
@@ -240,8 +278,56 @@ public class Climb extends SubsystemBase {
     }
 
     /**
+     * Checks to see if both arms are hooked, not sure if needed ¯\_(ツ)_/¯.
+     *
+     * @return rollIsLevel
+     * 
+     */
+
+    public boolean isRollLevel() {
+        return (gyro.getYaw() < CLIMB_ROLL_ANGLE);
+    }
+
+    /**
+     * checks to see if the robot is hooked.
+     *
+     * @return isHooked
+     */
+
+    public boolean isHooked() {
+        //System.out.println(climbPitchAverage.getAverage());
+        return (climbPitchAverage.getAverage() < CLIMB_TILT_ANGLE); // && !isSwinging();
+    }
+
+    public boolean isSwinging() {
+        System.out.println("driv: " + climbDrivitiveAvrage.getAverage());
+        return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
+    }
+
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is left climb touching limit switch
+     */
+
+    public boolean getLeftLimit() {
+        return leftClimbLimit.get();
+    }
+
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is right climb touching limit switch
+     */
+
+    public boolean getRightLimit() {
+        return rightClimbLimit.get();
+    }
+
+    /**
      * Toggles the position of the left detach piston.
      */
+
     public void toggleLeftDetachPos() {
         setLeftDetachPos(!leftDetachPos);
     }
@@ -272,10 +358,18 @@ public class Climb extends SubsystemBase {
         setRightDetachPos(pos);
         setLeftDetachPos(pos);
     }
-    
+
+    // /** 
+    //  * zeros climb at the beginning of the match.
+    // */
+    // public void zeroClimb() {
+    //     setMotorPower(-.01);
+    // }
+
     /**
      * Stops the motors.
      */
+
     public void stop() {
         setLeftMotorPower(0);
         setRightMotorPower(0);
@@ -283,6 +377,16 @@ public class Climb extends SubsystemBase {
 
     public double[] getPID() {
         return new double[] {P, I, D, FF, IZ};
+    }
+
+    @Override
+    public void periodic() {
+        double pa = gyro.getRoll();
+        //System.out.println(pa);
+        //updates drivitive calculation
+        climbPitchAverage.update(pa);
+        climbDrivitiveAvrage.update(Math.abs(pa - oldGyroAngle));
+        oldGyroAngle = pa;
     }
 
     /**
@@ -300,6 +404,120 @@ public class Climb extends SubsystemBase {
         builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
         builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
         builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
+    }
+
+    /**
+     * Returns the homeable object for the left pivoting climb arm.
+     *
+     * @return the homeable object for the left pivoting climb arm
+     */
+    public Homeable getLeftArmHomeable() {
+        return new Homeable() {
+
+            @Override
+            public double getCurrent() {
+                return leftMotor.getOutputCurrent();
+            }
+
+            @Override
+            public double getVelocity() {
+                return leftMotorEncoder.getVelocity();
+            }
+
+            @Override
+            public void setHomingPower(double power) {
+                setLeftMotorPower(power);
+            }
+
+            @Override
+            public void setHome(double position) {
+                leftMotorEncoder.setPosition(position);
+            }
+
+            @Override
+            public void setSoftLimits(double reverse, double forward) {
+                leftMotor.setSoftLimit(SoftLimitDirection.kForward, (float) forward);
+                leftMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) reverse);
+            }
+
+            @Override
+            public void disableSoftLimits() {
+                leftMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+                leftMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+            }
+
+            @Override
+            public void enableSoftLimits() {
+                leftMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+                leftMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+            }
+
+            @Override
+            public Subsystem getSubsystemObject() {
+                return new Subsystem() {
+                    
+                };
+            }
+        };
+    }
+
+    /**
+     * Returns the homeable object for the right pivoting arm.
+     *
+     * @return the homeable object for the right pivoting arm
+     */
+    public Homeable getRightArmHomeable() {
+        return new Homeable() {
+
+            @Override
+            public double getCurrent() {
+                return rightMotor.getOutputCurrent();
+            }
+
+            @Override
+            public double getVelocity() {
+                return rightMotorEncoder.getVelocity();
+            }
+
+            @Override
+            public void setHomingPower(double power) {
+                setRightMotorPower(power);
+            }
+
+            @Override
+            public void setHome(double position) {
+                rightMotorEncoder.setPosition(position);
+                
+            }
+
+            @Override
+            public void setSoftLimits(double reverse, double forward) {
+                rightMotor.setSoftLimit(SoftLimitDirection.kForward, (float) forward);
+                rightMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) reverse);
+                
+            }
+
+            @Override
+            public void disableSoftLimits() {
+                rightMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+                rightMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+                
+            }
+
+            @Override
+            public void enableSoftLimits() {
+                rightMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+                rightMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+                
+            }
+
+            @Override
+            public Subsystem getSubsystemObject() {
+                return new Subsystem() {
+                    
+                };
+            }
+        };
     }
 }
 

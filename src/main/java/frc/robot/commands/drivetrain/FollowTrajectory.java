@@ -1,6 +1,5 @@
 package frc.robot.commands.drivetrain;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -34,19 +33,14 @@ public class FollowTrajectory extends CommandBase {
 
     @Override
     public void initialize() {
-        double[] pid = drivetrain.getPid();
-
         command =
                 new RamseteCommand(
                         trajectory,
                         drivetrain::getPose,
+                        //TODO Tune
                         new RamseteController(2, 0.7),
-                        drivetrain.getFeedForward(),
                         Drivetrain.DriveKinimatics,
-                        drivetrain::getWheelSpeeds,
-                        new PIDController(pid[0], pid[1], pid[2]),
-                        new PIDController(pid[0], pid[1], pid[2]),
-                        drivetrain::setMotorVolts,
+                        drivetrain::setMotorTargetSpeed,
                         drivetrain);
 
         drivetrain.setPose(trajectory.getInitialPose());
@@ -57,6 +51,7 @@ public class FollowTrajectory extends CommandBase {
     @Override
     public void execute() {
         command.execute();
+        drivetrain.updateOdometry();
     }
 
     @Override
@@ -69,5 +64,6 @@ public class FollowTrajectory extends CommandBase {
         if (interrupted) {
             command.cancel();
         }
+        command.end(interrupted);
     }
 }

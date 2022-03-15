@@ -29,6 +29,10 @@ public class LidarV4 implements Lidar, Sendable {
         rollingAverage = new RollingAverage(10, true);
     }
 
+    public LidarV4() {
+        this(0x62);
+    }
+
     /**
      * reads the current distance from the lidar if one is available.
      */

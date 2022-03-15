@@ -22,11 +22,11 @@ public class Intake extends SubsystemBase {
         DOWN,
     }
 
-    public States state;
+    private States state;
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = 1;
+            INTAKE_MOTOR_SPEED = -0.5;
 
     // motor
     private final CANSparkMax intakeMotor =
@@ -69,21 +69,40 @@ public class Intake extends SubsystemBase {
     public double getIntakeEncoderPosition() {
         return intakeEncoder.getPosition();
     }
+    /**
+     * Lowers intake.
+     */
 
+    public void lowerIntake() {
+        if (state == States.UP) {
+            setIntakeSolenoid(true);
+            setIntakeMotorPower(INTAKE_MOTOR_SPEED);
+        }
+    }
     /**
      * Gets the intake motor's speed (in RPM).
      *
      * @return speed
      */
+
     public double getIntakeRPM() {
         return intakeEncoder.getVelocity();
     }
+    /**
+     * sets Intake State.
+     *
+     * @param states Sets the intake state
+     */
 
+    public void setState(States states) {
+        state = states;
+    }
     /**
      * Manually overrides the intake motor's encoder position.
      *
      * @param position The desired position of the intake motor's encoder.
      */
+    
     public void setIntakeEncoder(double position) {
         intakeEncoder.setPosition(position);
     }
@@ -106,8 +125,7 @@ public class Intake extends SubsystemBase {
      * Toggles the intake solenoid.
      */
     public void toggleIntakeSolenoid() {
-        intakeSolenoidPosition = !intakeSolenoidPosition;
-        intakeSolenoid.toggle();
+        setIntakeSolenoid(!intakeSolenoidPosition);
     }
 
     /**
@@ -118,6 +136,7 @@ public class Intake extends SubsystemBase {
     public void setIntakeSolenoid(boolean value) {
         intakeSolenoidPosition = value;
         intakeSolenoid.set(value);
+        updateState();
     }
 
     /**
@@ -138,20 +157,20 @@ public class Intake extends SubsystemBase {
         return state;
     }
 
-    /**
-     * Sets the state of the intake.
-     *
-     * @param state The state the intake is in.
-     */
-    public void setState(States state) {
-        this.state = state;
+    private void updateState() {
+        state = intakeSolenoidPosition ? States.DOWN : States.UP;
     }
 
     @Override
+    public void periodic() {
+        updateState();
+    }
+    
+    @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");
-        builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
-        builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
+        //builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
+        //builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
         builder.addBooleanProperty("intake_solenoid_position", this::getIntakeSolenoid, null);
     }
 }

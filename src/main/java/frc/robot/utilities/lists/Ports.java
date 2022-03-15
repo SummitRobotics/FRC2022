@@ -28,35 +28,36 @@ public final class Ports {
             RIGHT_DRIVE_1 = 13,
             RIGHT_DRIVE_2 = 14,
             RIGHT_DRIVE_3 = 15,
-            SHIFT_SOLENOID_UP = 1,
-            SHIFT_SOLENOID_DOWN = 2,
+            SHIFT_SOLENOID_UP = 0,
+            SHIFT_SOLENOID_DOWN = 0,
 
             // Shooter
-            SHOOTER_MOTOR = 16,
-            HOOD_SOLENOID = 3,
+            SHOOTER_MOTOR_1 = 30,
+            SHOOTER_MOTOR_2 = 31,
+            HOOD_SOLENOID = 7,
 
             // Climb
-            LEFT_CLIMB_MOTOR = 17,
-            RIGHT_CLIMB_MOTOR = 18,
-            PIVOT_CLIMB_SOLENOID = 4,
-            LEFT_DETACH_SOLENOID = 5,
-            RIGHT_DETACH_SOLENOID = 6,
-
+            LEFT_CLIMB_MOTOR = 21,
+            RIGHT_CLIMB_MOTOR = 20,
+            PIVOT_CLIMB_SOLENOID = 6,
+            LEFT_DETACH_SOLENOID = 2,
+            RIGHT_DETACH_SOLENOID = 3,
+            LEFT_LIMIT_SWITCH = 1,
+            RIGHT_LIMIT_SWITCH = 2,
             // LEDs
             LED_PORT = 0,
-            LED_LENGTH = 1000,
+            LED_LENGTH = 50,
 
             // pneumatics
             PRESSURE_SENSOR = 0,
-            PCM_1 = 1,
-
-            PDP = 2, 
+            PCM_1 = 2,
+            PDP = 1,
 
             // conveyor
-            FRONT_CONVEYOR = 19,
-            BACK_CONVEYOR = 20,
+            FRONT_CONVEYOR = 40,
+            BACK_CONVEYOR = 41,
 
             // intake
-            INTAKE_MOTOR = 21,
-            INTAKE_SOLENOID = 7;
+            INTAKE_MOTOR = 50,
+            INTAKE_SOLENOID = 1;
 }

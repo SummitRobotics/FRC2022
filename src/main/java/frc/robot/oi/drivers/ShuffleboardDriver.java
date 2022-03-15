@@ -1,10 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.oi.drivers;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -29,20 +22,20 @@ import java.util.Vector;
 public class ShuffleboardDriver {
 
     private static final String[] BAD_SHUFFLE_HELL_ITEMS = {"navX", "Solenoid", "Compressor"};
-
     private static NetworkTable InfoTable = NetworkTableInstance.getDefault().getTable("RobotInfo"),
             ButtonTable = NetworkTableInstance.getDefault().getTable("Buttons");
     public static ShuffleboardLEDButton
-            recordStart = new ShuffleboardLEDButton(ButtonTable.getEntry("record Start")),
+            //recordStart = new ShuffleboardLEDButton(ButtonTable.getEntry("record Start")),
             intake = new ShuffleboardLEDButton(ButtonTable.getEntry("record Intake")),
             shoot = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shoot")),
-            shift = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shift")),
-            finish = new ShuffleboardLEDButton(ButtonTable.getEntry("record Stop")),
-            homeTurret = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Turret")),
-            homeHood = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Hood"));
-    public static DoubleDisplayWidget
-            hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
-            turretIndicator = new DoubleDisplayWidget(InfoTable.getEntry("turret"));
+            shift = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shift"));
+            //finish = new ShuffleboardLEDButton(ButtonTable.getEntry("record Stop")),
+            //homeTurret = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Turret")),
+            //homeHood = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Hood"));
+            
+        // public static DoubleDisplayWidget
+        //         hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
+        //         turretIndicator = new DoubleDisplayWidget(InfoTable.getEntry("turret"));
 
     public static StatusDisplayWidget statusDisplay =
             new StatusDisplayWidget(InfoTable.getEntry("status"));
@@ -56,7 +49,7 @@ public class ShuffleboardDriver {
 
     public static void init() {
         SmartDashboard.putData(ShuffleboardDriver.autoChooser);
-        removeBadItems();
+        // removeBadItems();
     }
 
     /**
