@@ -4,7 +4,7 @@
 
 package frc.robot.commands.climb;
 
-import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.SparkMaxPIDController;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
@@ -50,8 +50,8 @@ public class ClimbSemiAuto extends ClimbAutomation {
     OIButton cycleButton;
     OIButton.PrioritizedButton prioritizedCycleButton;
     // PID
-    PIDController leftPID;
-    PIDController rightPID;
+    SparkMaxPIDController leftPID;
+    SparkMaxPIDController rightPID;
 
     /**
      * Manual override for the climber. Many parameters!
@@ -80,8 +80,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
         this.drivetrain = drivetrain;
         this.climb = climb;
         this.cycleButton = cycleButton;
-        this.leftPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
-        this.rightPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
 
         this.pivotButton = pivotButton;
         this.detachButton = detachButton;
@@ -89,11 +87,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
         this.extendButton = extendButton;
         this.midpointButton = midpointButton;
 
-        // TODO - set these
-        leftPID.setTolerance(1, 1);
-        rightPID.setTolerance(1, 1);
-        leftPID.setSetpoint(0);
-        rightPID.setSetpoint(0);
 
         addRequirements(drivetrain, climb);
     }
@@ -110,9 +103,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
         prioritizedCycleButton = cycleButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedDetachButton = new SimpleButton(prioritizedDetachButton::get);
-
-        leftPID.reset();
-        rightPID.reset();
         climb.stop();
 
         climb.setDetachPos(false);
@@ -124,31 +114,18 @@ public class ClimbSemiAuto extends ClimbAutomation {
     public void execute() {
         if (isClimbGood) {
             if (prioritizedExtendButton.get()) {
-                leftPID.setSetpoint(66);
-                rightPID.setSetpoint(66);
-                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+                climb.setMotorPosition(climb.FORWARD_LIMIT);
 
             } else if (prioritizedMidpointButton.get()) {
-                leftPID.setSetpoint(33);
-                rightPID.setSetpoint(33);
-                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
-
+                climb.setMotorPosition(climb.GRAB_POINT);
             } else if (prioritizedRetractButton.get()) {
-                leftPID.setSetpoint(0);
-                rightPID.setSetpoint(0);
-                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+                climb.setMotorPosition(climb.BACK_LIMIT);
 
             } else if (prioritizedCycleButton.get()) {
                 climb.setPivotPos(false);
-                climbLeftPID.setSetpoint(5);
-                climbRightPID.setSetpoint(5);
-                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+                climb.setMotorPosition(5);
                 if ((climb.getLeftLimit() || climb.getRightLimit()) 
-                    && (climbRightPID.atSetpoint() && climbLeftPID.atSetpoint())) {
+                    && (climb.getRightEncoderValue() == 5 && climb.getLeftEncoderValue() == 5)) {
                     isClimbGood = false;
                 }
             } else {
@@ -169,10 +146,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        leftPID.reset();
-        rightPID.reset();
-        leftPID.close();
-        rightPID.close();
         prioritizedCycleButton.destroy();
         prioritizedDetachButton.destroy();
         prioritizedExtendButton.destroy();

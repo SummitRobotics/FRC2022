@@ -41,11 +41,8 @@ public class ClimbAutomation extends CommandBase {
             CLIMB_I = PIDValues.CLIMB_I,
             CLIMB_D = PIDValues.CLIMB_D,
             HEIGHT_OF_BAR = 3;
-    // PID controllers
     protected PIDController movePID;
     protected PIDController alignPID;
-    protected PIDController climbLeftPID;
-    protected PIDController climbRightPID;
     // Initializing Subsystems
     Climb climb;
     Drivetrain drivetrain;
@@ -129,11 +126,9 @@ public class ClimbAutomation extends CommandBase {
     public void initialize() {
         barMisaligned = "";
         stateChanged = false;
+        climb.stop();
         this.alignPID = new PIDController(ALIGN_P, ALIGN_I, ALIGN_D);
         this.movePID = new PIDController(MOVE_P, MOVE_I, MOVE_D);
-        this.climbLeftPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
-        this.climbRightPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
-        climb.stop();
         motorLeft = MotorStates.IDLE;
         motorRight = MotorStates.IDLE;
         climb.setPivotPos(false);
@@ -163,25 +158,15 @@ public class ClimbAutomation extends CommandBase {
         angleToTurn = datatable.getEntry("Target Angle");
         distToMove = datatable.getEntry("Target Angle");
         inst.startClientTeam(5468);
-        alignPID.setTolerance(1, 1);
-        movePID.setTolerance(1, 1);
-        alignPID.setSetpoint(0);
-        movePID.setSetpoint(0);
-        climbLeftPID.setSetpoint(0);
-        climbLeftPID.setTolerance(1, 1);
 
     }
 
     // Extending to grab bar using screws
     private void extend() {
-        climbLeftPID.setSetpoint(climb.BACK_LIMIT);
-        climbRightPID.setSetpoint(climb.BACK_LIMIT);
-        climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
-        climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+        climb.setMotorPosition(climb.BACK_LIMIT);
         
-        if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
+        if (climb.getLeftEncoderValue() <= climb.BACK_LIMIT + 1 && climb.getRightEncoderValue() <= climb.BACK_LIMIT + 1) {
             climbSystem = ClimbStates.EXTENDED;
-            stateChanged = true;
 
         }
     }
@@ -189,17 +174,14 @@ public class ClimbAutomation extends CommandBase {
     // retracting screws
     private void retract() {
         climb.setPivotPos(true);
-        climbLeftPID.setSetpoint(climb.FORWARD_LIMIT);
-        climbRightPID.setSetpoint(climb.FORWARD_LIMIT);
-        climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
-        climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+        climb.setMotorPosition(climb.FORWARD_LIMIT);
         if (climb.isHooked()){
             climb.setLeftDetachPos(false);
             climb.setRightDetachPos(false);
         } else if (!climb.getLeftDetachPos() && climb.getRightEncoderValue() > -100) {
             climbSystem = ClimbStates.BROKEN;
         }
-        if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
+        if (climb.getLeftEncoderValue() >= climb.BACK_LIMIT -1 && climb.getRightEncoderValue() >= climb.BACK_LIMIT -1) {
             climbSystem = ClimbStates.LATCHED;
             stateChanged = true;
             climb.setRightDetachPos(true);
@@ -210,12 +192,9 @@ public class ClimbAutomation extends CommandBase {
     // cycling bot, making sure that latches are on by using power detection
     private void cycle() {
         climb.setPivotPos(false);
-        climbLeftPID.setSetpoint(15);
-        climbRightPID.setSetpoint(15);
-        climb.setLeftMotorPower(climbLeftPID.calculate(climb.getLeftEncoderValue()));
-        climb.setRightMotorPower(climbRightPID.calculate(climb.getRightEncoderValue()));
+        climb.setMotorPosition(-10);
     
-        if (climbLeftPID.atSetpoint() && climbRightPID.atSetpoint()) {
+        if (climb.getLeftEncoderValue() <= -9 && climb.getRightEncoderValue() <= -9) {
             climbSystem = ClimbStates.DONE;
             stateChanged = true;
 

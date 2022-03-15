@@ -249,7 +249,11 @@ public class Climb extends SubsystemBase {
         setRightMotorPosition(position);
         setLeftMotorPosition(position);
     }
-
+    /**
+     * 
+     * @return boolean indicating whether it is at the setpoint
+     */
+    
     /**
      * Sets the pivot position for the pneumatics.
      *
