@@ -118,7 +118,7 @@ public class ClimbManual extends CommandBase {
                     climb.setDetachPos(true);
                     ShuffleboardDriver.statusDisplay.removeStatus("bad_climb");
                 } else {
-                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb", "climb is not safe to relice " + Colors.RED, StatusPriorities.BAD_CLIMB);
+                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb", "climb is not safe to release " + Colors.RED, StatusPriorities.BAD_CLIMB);
                 }
             }
         }

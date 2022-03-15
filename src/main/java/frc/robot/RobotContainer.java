@@ -254,7 +254,7 @@ public class RobotContainer {
 
         launchpad.missileA.whileHeld(climbMO);
 
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
         launchpad.missileB.toggleWhenPressed(climbSemiAuto);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,

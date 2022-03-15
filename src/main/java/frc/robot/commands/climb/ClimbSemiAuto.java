@@ -24,7 +24,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // subsystems
     Climb climb;
     Drivetrain drivetrain;
-
+    private boolean isClimbGood;
     // button for the pivot solenoid
     OIButton pivotButton;
     OIButton.PrioritizedButton prioritizedPivotButton;
@@ -46,7 +46,9 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // button for partially retracting the arms
     OIButton midpointButton;
     OIButton.PrioritizedButton prioritizedMidpointButton;
-
+    //button for cycling
+    OIButton cycleButton;
+    OIButton.PrioritizedButton prioritizedCycleButton;
     // PID
     PIDController leftPID;
     PIDController rightPID;
@@ -61,6 +63,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
      * @param retractButton The button to retract the pivoting arms
      * @param extendButton The button to extend the pivoting arms
      * @param midpointButton The button to partially retract the pivoting arms
+     * @param cycleButton pivot button, but with safety features.
      */
     public ClimbSemiAuto(
         Drivetrain drivetrain,
@@ -69,13 +72,14 @@ public class ClimbSemiAuto extends ClimbAutomation {
         OIButton detachButton,
         OIButton retractButton,
         OIButton extendButton,
-        OIButton midpointButton
+        OIButton midpointButton, 
+        OIButton cycleButton
     ) {
-        
         super(climb, drivetrain);
+        isClimbGood = true;
         this.drivetrain = drivetrain;
         this.climb = climb;
-
+        this.cycleButton = cycleButton;
         this.leftPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
         this.rightPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
 
@@ -97,13 +101,13 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-
+        
         prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedDetachButton = detachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRetractButton = retractButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedExtendButton = extendButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedMidpointButton = midpointButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-
+        prioritizedCycleButton = cycleButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedDetachButton = new SimpleButton(prioritizedDetachButton::get);
 
@@ -118,28 +122,48 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        if (isClimbGood) {
+            if (prioritizedExtendButton.get()) {
+                leftPID.setSetpoint(66);
+                rightPID.setSetpoint(66);
+                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
+                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
-        if (prioritizedExtendButton.get()) {
-            leftPID.setSetpoint(66);
-            rightPID.setSetpoint(66);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            } else if (prioritizedMidpointButton.get()) {
+                leftPID.setSetpoint(33);
+                rightPID.setSetpoint(33);
+                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
+                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
-        } else if (prioritizedMidpointButton.get()) {
-            leftPID.setSetpoint(33);
-            rightPID.setSetpoint(33);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            } else if (prioritizedRetractButton.get()) {
+                leftPID.setSetpoint(0);
+                rightPID.setSetpoint(0);
+                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
+                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
-        } else if (prioritizedRetractButton.get()) {
-            leftPID.setSetpoint(0);
-            rightPID.setSetpoint(0);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            } else if (prioritizedCycleButton.get()) {
+                climb.setPivotPos(false);
+                climbLeftPID.setSetpoint(5);
+                climbRightPID.setSetpoint(5);
+                climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
+                climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+                if ((climb.getLeftLimit() || climb.getRightLimit()) 
+                    && (climbRightPID.atSetpoint() && climbLeftPID.atSetpoint())) {
+                    isClimbGood = false;
+                }
+            } else {
+                climb.setMotorPower(0);
+            }
+            if (simplePrioritizedPivotButton.get()) {
+                climb.togglePivotPos();
+            }
 
-        } else {
-            climb.setMotorPower(0);
-        }
+            if (prioritizedDetachButton.get()) {
+                if (climb.isHooked()) {
+                    climb.setDetachPos(false);
+                }
+            }
+        }   
     }
 
     // Called once the command ends or is interrupted.
@@ -149,6 +173,13 @@ public class ClimbSemiAuto extends ClimbAutomation {
         rightPID.reset();
         leftPID.close();
         rightPID.close();
+        prioritizedCycleButton.destroy();
+        prioritizedDetachButton.destroy();
+        prioritizedExtendButton.destroy();
+        prioritizedMidpointButton.destroy();
+        prioritizedPivotButton.destroy();
+        prioritizedRetractButton.destroy();
+
     }
 
     // Returns true when the command should end.

@@ -283,11 +283,6 @@ public class ClimbAutomation extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (stateChanged) {
-            climbLeftPID.reset();
-            climbRightPID.reset();
-            stateChanged = false;
-        }
         if (barNumber < 3) {
             climbingLedCall.activate();
             if (barNumber == 0) {
