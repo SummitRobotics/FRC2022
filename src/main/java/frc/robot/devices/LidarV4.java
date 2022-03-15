@@ -4,6 +4,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.Notifier;
 import frc.robot.utilities.RollingAverage;
 
 /**
@@ -17,6 +18,10 @@ public class LidarV4 implements Lidar, Sendable {
 
     private final RollingAverage rollingAverage;
 
+    private final Runnable proximityReader;
+    private Notifier thread;
+    private Object valueLock;
+
     /**
      * constructor.
      *
@@ -27,6 +32,16 @@ public class LidarV4 implements Lidar, Sendable {
         value = 0;
 
         rollingAverage = new RollingAverage(10, true);
+
+        valueLock = new Object();
+        proximityReader = new Runnable() {
+            @Override
+            public void run() {
+                updateValue(readDistance());
+            }
+        };
+        thread = new Notifier(proximityReader);
+        thread.startPeriodic(0.02);
     }
 
     public LidarV4() {
@@ -36,7 +51,7 @@ public class LidarV4 implements Lidar, Sendable {
     /**
      * reads the current distance from the lidar if one is available.
      */
-    private void readDistance() {
+    private int readDistance() {
         byte[] status = new byte[1];
 
         // checks if there is a valid measurement
@@ -68,14 +83,9 @@ public class LidarV4 implements Lidar, Sendable {
 
             // tells lidar to take another measurement
             portI2C.write(0x00, 0x04);
-
-            // prevent bad values
-            if (out < 1000) {
-                value = out;
-            }
+            return out;
         }
-
-        rollingAverage.update(value);
+        return -1;
     }
 
     /**
@@ -85,8 +95,9 @@ public class LidarV4 implements Lidar, Sendable {
      */
     @Override
     public int getDistance() {
-        readDistance();
-        return value;
+        synchronized (valueLock) {
+            return value;
+        }
     }
 
     /**
@@ -115,6 +126,15 @@ public class LidarV4 implements Lidar, Sendable {
         portI2C.write(0x1B, 0x01);
     }
 
+    private void updateValue(int value) {
+        if (value != -1) {
+            synchronized (valueLock) {
+                this.value = value;
+                rollingAverage.update(value);
+            }
+        }
+    }
+
     /**
      * Gets the average distance.
      *
@@ -122,8 +142,9 @@ public class LidarV4 implements Lidar, Sendable {
      */
     @Override
     public int getAverageDistance() {
-        readDistance();
-        return (int) rollingAverage.getAverage();
+        synchronized (valueLock) {
+            return (int) rollingAverage.getAverage();
+        }
     }
 
     @Override

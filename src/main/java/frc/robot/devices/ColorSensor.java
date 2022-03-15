@@ -22,7 +22,6 @@ public class ColorSensor implements Sendable {
     private final Color noTarget;
     private static double measuredProximity;
     private static Color measuredColor;
-    private static final double THREAD_PERIOD = 0.02;
 
     private final Runnable colorSensorReader = new Runnable() {
         @Override
@@ -66,7 +65,7 @@ public class ColorSensor implements Sendable {
 
         measuredProximity = 0;
         measuredColor = new Color(0, 0, 0);
-        thread.startPeriodic(THREAD_PERIOD);
+        thread.startPeriodic(0.02);
     }
 
     /**

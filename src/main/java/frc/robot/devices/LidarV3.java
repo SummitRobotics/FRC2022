@@ -28,7 +28,7 @@ public class LidarV3 implements Lidar, Sendable {
     private final Runnable proximityReader = new Runnable() {
         @Override
         public void run() {
-            updateValue(readShort(DEVICE_ADDRESS));
+            updateValue(readShort(0x8f));
         }
     };
 
