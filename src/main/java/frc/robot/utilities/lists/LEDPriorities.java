@@ -16,5 +16,6 @@ public class LEDPriorities {
             LOW_GEAR = 1,
             INTAKE_DOWN = 2,
             SHOOTING = 3,
-            CLIMBING = 4;
+            CLIMBING = 4,
+            SPLINES = 5;
 }

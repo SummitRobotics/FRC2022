@@ -4,7 +4,6 @@
 
 package frc.robot.commands.climb;
 
-import edu.wpi.first.math.controller.PIDController;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
@@ -152,10 +151,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
     @Override
     public void end(boolean interrupted) {
         LEDs.getInstance().removeCall("Climbing");
-        leftPID.reset();
-        rightPID.reset();
-        leftPID.close();
-        rightPID.close();
         prioritizedCycleButton.destroy();
         prioritizedDetachButton.destroy();
         prioritizedExtendButton.destroy();
