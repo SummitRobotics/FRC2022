@@ -228,20 +228,20 @@ public class RobotContainer {
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 
-        // controller1.buttonA.whenPressed(new LowerIntake(intake));
-        // controller1.buttonB.whenPressed(
-        //     new RaiseIntake(intake)
-        // );
+        controller1.buttonA.whenPressed(new LowerIntake(intake));
+        controller1.buttonB.whenPressed(
+            new RaiseIntake(intake)
+        );
 
         // Conveyor
-        // launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
 
         // Intake
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        // launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        // launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
         // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
         // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
