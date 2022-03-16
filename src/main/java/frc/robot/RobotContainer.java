@@ -116,7 +116,7 @@ public class RobotContainer {
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
 
-        LEDs.getInstance().addCall("enabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.GREEN));
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.addStatus(
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
