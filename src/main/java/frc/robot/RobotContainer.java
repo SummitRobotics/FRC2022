@@ -116,7 +116,7 @@ public class RobotContainer {
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
 
-        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.addStatus(
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
@@ -295,7 +295,7 @@ public class RobotContainer {
      */
     public void disabledInit() {
         LEDs.getInstance().removeAllCalls();
-        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.removeStatus("enabled");
         ChangeRateLimiter.resetAllChangeRateLimiters();
     }

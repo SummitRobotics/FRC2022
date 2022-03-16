@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.Functions;
@@ -107,7 +108,6 @@ public class ClimbAutomation extends CommandBase {
     double moveDist;
     String barMisaligned; 
     boolean stateChanged;
-    private final LEDCall climbingLedCall = new LEDCall(LEDPriorities.ARMS_UP, LEDRange.All).sine(Colors.ORANGE);
 
     /** Creates a new ClimbAutomation. 
      *
@@ -124,6 +124,7 @@ public class ClimbAutomation extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        LEDs.getInstance().addCall("Climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All));
         barMisaligned = "";
         stateChanged = false;
         climb.stop();
@@ -263,7 +264,6 @@ public class ClimbAutomation extends CommandBase {
     @Override
     public void execute() {
         if (barNumber < 3) {
-            climbingLedCall.activate();
             if (barNumber == 0) {
                 // get rid of aligned() here if using alignByLimit()
                 if (climbSystem == ClimbStates.DONE && alignByLimit()) {
@@ -291,7 +291,7 @@ public class ClimbAutomation extends CommandBase {
                 }
             }
         } else {
-            climbingLedCall.cancel();
+            LEDs.getInstance().removeCall("Climbing");
             climb.stop();
         }
     }
@@ -299,6 +299,7 @@ public class ClimbAutomation extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        LEDs.getInstance().removeCall("Climbing");
         climb.stop();
     }
 

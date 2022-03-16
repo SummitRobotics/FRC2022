@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
@@ -113,9 +114,6 @@ public class Drivetrain extends SubsystemBase {
     private final Solenoid shift;
 
     private boolean oldShift;
-
-    private final LEDCall lowShift =
-            new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
 
     //for making robot distance consistent across shifts
     private double leftDistanceAcum = 0;
@@ -252,7 +250,7 @@ public class Drivetrain extends SubsystemBase {
      * Shifts the robot into high gear.
      */
     public void highGear() {
-        lowShift.cancel();
+        LEDs.getInstance().removeCall("Low Gear");
         oldShift = true;
         updateDistanceAcum();
         shift.set(true);
@@ -262,7 +260,7 @@ public class Drivetrain extends SubsystemBase {
      * Shifts the robot into low gear.
      */
     public void lowGear() {
-        lowShift.activate();
+        LEDs.getInstance().addCall("Low Gear", new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED));
         oldShift = false;
         updateDistanceAcum();
         shift.set(false);

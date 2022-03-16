@@ -23,7 +23,7 @@ public class LEDCall implements LEDHandler {
      * @param priority the priority, where higher values override lower values
      * @param range    the LEDRange the call applies to
      */
-    public LEDCall(String name, int priority, LEDRange range) {
+    private LEDCall(String name, int priority, LEDRange range) {
         this.name = name;
         this.priority = priority;
         this.range = range;

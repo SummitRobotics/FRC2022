@@ -4,12 +4,17 @@
 
 package frc.robot.commands.climb;
 
+import edu.wpi.first.math.controller.PIDController;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
 import com.revrobotics.SparkMaxPIDController;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.PIDValues;
 
 /**
@@ -94,7 +99,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        
+        LEDs.getInstance().addCall("Climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All));
         prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedDetachButton = detachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRetractButton = retractButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
@@ -146,6 +151,11 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        LEDs.getInstance().removeCall("Climbing");
+        leftPID.reset();
+        rightPID.reset();
+        leftPID.close();
+        rightPID.close();
         prioritizedCycleButton.destroy();
         prioritizedDetachButton.destroy();
         prioritizedExtendButton.destroy();
