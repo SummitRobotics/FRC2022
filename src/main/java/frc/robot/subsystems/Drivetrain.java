@@ -122,6 +122,8 @@ public class Drivetrain extends SubsystemBase {
     private final Timer odometryTime = new Timer();
 
     private final Field2d f2d;
+
+    private LEDCall lowGear = new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED);
     
     /**
      * i am in PAIN wow this is BAD.
@@ -250,7 +252,7 @@ public class Drivetrain extends SubsystemBase {
      * Shifts the robot into high gear.
      */
     public void highGear() {
-        LEDs.getInstance().removeCall("Low Gear");
+        lowGear.cancel();
         oldShift = true;
         updateDistanceAcum();
         shift.set(true);
@@ -260,7 +262,7 @@ public class Drivetrain extends SubsystemBase {
      * Shifts the robot into low gear.
      */
     public void lowGear() {
-        LEDs.getInstance().addCall("Low Gear", new LEDCall(LEDPriorities.LOW_GEAR, LEDRange.All).sine(Colors.RED));
+        lowGear.activate();
         oldShift = false;
         updateDistanceAcum();
         shift.set(false);
