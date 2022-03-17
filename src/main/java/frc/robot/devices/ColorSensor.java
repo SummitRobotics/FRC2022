@@ -20,8 +20,8 @@ public class ColorSensor implements Sendable {
     private final Color blueTarget;
     private final Color redTarget;
     private final Color noTarget;
-    private static double measuredProximity;
-    private static Color measuredColor;
+    private double measuredProximity;
+    private Color measuredColor;
 
     private final Runnable colorSensorReader = new Runnable() {
         @Override
