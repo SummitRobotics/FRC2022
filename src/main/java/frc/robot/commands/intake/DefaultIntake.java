@@ -21,7 +21,7 @@ public class DefaultIntake extends CommandBase {
      * @param conveyor The conveyor
      */
     public DefaultIntake(Intake intake, Conveyor conveyor) {
-        addRequirements(intake, conveyor);
+        addRequirements(intake);
         this.intake = intake;
         this.conveyor = conveyor;
     }
