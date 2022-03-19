@@ -215,7 +215,7 @@ public class Conveyor extends SubsystemBase {
         previousColorSensorMeasurement = colorSensorMeasurement;
         colorSensorMeasurement = colorSensor.getColorString();
         previousLidarDistance = lidarDistance;
-        lidarDistance = lidar.getAverageDistance();
+        lidarDistance = getLidarDistance();
         colorSensorDistance = colorSensor.getProximity();
         wasBallIndexed = isBallIndexed;
         isBallIndexed = isBallIndexed();
@@ -368,14 +368,16 @@ public class Conveyor extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        // builder.setSmartDashboardType("conveyor");
+        builder.setSmartDashboardType("conveyor");
         // builder.addDoubleProperty("belt_motor_position", this::getBeltEncoderPosition, null);
         // builder.addDoubleProperty("index_motor_position", this::getIndexEncoderPosition, null);
         // builder.addDoubleProperty("belt_motor_speed", this::getBeltRPM, null);
         // builder.addDoubleProperty("index_motor_speed", this::getIndexRPM, null);
-        // builder.addStringProperty("belt_ball", () -> this.getBeltState().toString(), null);
-        // builder.addStringProperty("index_ball", () -> this.getIndexState().toString(), null);
-        // builder.addStringProperty("color_ball", () -> this.getColorSensorState().toString(), null);
-        // builder.addBooleanProperty("ball_exists", this::doesBallExist, null);
+        builder.addDoubleProperty("lidar_distance", this::getLidarDistance, null);
+        builder.addStringProperty("belt_ball", () -> this.getBeltState().toString(), null);
+        builder.addStringProperty("index_ball", () -> this.getIndexState().toString(), null);
+        builder.addStringProperty("color_ball", () -> this.getColorSensorState().toString(), null);
+        builder.addStringProperty("colorSensorRaw", colorSensor::getColorString, null);
+        builder.addBooleanProperty("ball_exists", this::doesBallExist, null);
     }
 }

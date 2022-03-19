@@ -23,10 +23,10 @@ public class LidarV4 implements Lidar, Sendable {
      * @param id the i2c id of the lidarV4
      */
     public LidarV4(int id) {
-        portI2C = new I2C(Port.kOnboard, id);
+        portI2C = new I2C(Port.kMXP, id);
         value = 0;
 
-        rollingAverage = new RollingAverage(10, true);
+        rollingAverage = new RollingAverage(5, true);
     }
 
     public LidarV4() {
@@ -70,9 +70,9 @@ public class LidarV4 implements Lidar, Sendable {
             portI2C.write(0x00, 0x04);
 
             // prevent bad values
-            if (out < 1000) {
-                value = out;
-            }
+            // if (out < 1000) {
+            value = out;
+            // }
         }
 
         rollingAverage.update(value);

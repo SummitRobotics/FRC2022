@@ -19,8 +19,8 @@ public class Lemonlight implements Sendable {
     // VALUES SHOULD BE IN CM and DEGREES
     // TODO - Set these
     public static final double
-            MAIN_MOUNT_HEIGHT = 79.5,
-            MAIN_MOUNT_ANGLE = 36.8,
+            MAIN_MOUNT_HEIGHT = 81.915, 
+            MAIN_MOUNT_ANGLE = 55.25,
             MAIN_TARGET_HEIGHT = 257,
             BALL_MOUNT_HEIGHT = 22.0,
             BALL_MOUNT_ANGLE = -20.0,
