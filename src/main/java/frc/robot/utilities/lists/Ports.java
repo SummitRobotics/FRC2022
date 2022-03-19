@@ -41,8 +41,8 @@ public final class Ports {
             PIVOT_CLIMB_SOLENOID = 6,
             LEFT_DETACH_SOLENOID = 2,
             RIGHT_DETACH_SOLENOID = 0,
-            LEFT_LIMIT_SWITCH = 1,
-            RIGHT_LIMIT_SWITCH = 2,
+            LEFT_LIMIT_SWITCH = 0,
+            RIGHT_LIMIT_SWITCH = 1,
             // LEDs
             LED_PORT = 0,
             LED_LENGTH = 50,

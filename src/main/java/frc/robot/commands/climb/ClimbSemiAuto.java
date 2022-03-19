@@ -8,6 +8,8 @@ import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
 import com.revrobotics.SparkMaxPIDController;
+
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
@@ -19,7 +21,7 @@ import frc.robot.utilities.lists.PIDValues;
 /**
  * ClimbSemiAuto.
  */
-public class ClimbSemiAuto extends ClimbAutomation {
+public class ClimbSemiAuto extends CommandBase {
     protected static final double 
               CLIMB_P = PIDValues.CLIMB_P,
               CLIMB_I = PIDValues.CLIMB_I,
@@ -27,7 +29,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
 
     // subsystems
     Climb climb;
-    Drivetrain drivetrain;
     private boolean isClimbGood;
     // button for the pivot solenoid
     OIButton pivotButton;
@@ -70,7 +71,6 @@ public class ClimbSemiAuto extends ClimbAutomation {
      * @param cycleButton pivot button, but with safety features.
      */
     public ClimbSemiAuto(
-        Drivetrain drivetrain,
         Climb climb,
         OIButton pivotButton,
         OIButton detachButton,
@@ -79,9 +79,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
         OIButton midpointButton, 
         OIButton cycleButton
     ) {
-        super(climb, drivetrain);
         isClimbGood = true;
-        this.drivetrain = drivetrain;
         this.climb = climb;
         this.cycleButton = cycleButton;
 
@@ -92,7 +90,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
         this.midpointButton = midpointButton;
 
 
-        addRequirements(drivetrain, climb);
+        addRequirements(climb);
     }
 
     // Called when the command is initially scheduled.
@@ -109,7 +107,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
         simplePrioritizedDetachButton = new SimpleButton(prioritizedDetachButton::get);
         climb.stop();
 
-        climb.setDetachPos(false);
+        climb.setDetachPos(true);
         climb.setPivotPos(false);
     }
 
@@ -118,26 +116,20 @@ public class ClimbSemiAuto extends ClimbAutomation {
     public void execute() {
         if (isClimbGood) {
             if (prioritizedExtendButton.get()) {
-                if (climb.getLeftEncoderValue() < 7) {
-                    climb.setMotorPower(.75);
-                } else { 
-                    climb.setMotorPosition(climb.FORWARD_LIMIT);
-                }
+                climb.setMotorPosition(climb.FORWARD_LIMIT);
+
 
             } else if (prioritizedMidpointButton.get()) {
-                if (climb.getLeftEncoderValue() < 7) {
-                    climb.setMotorPower(.75);
-                } else {
-                    climb.setMotorPosition(climb.GRAB_POINT);
-                }
+                climb.setMotorPosition(climb.GRAB_POINT);
+
             } else if (prioritizedRetractButton.get()) {
                 climb.setMotorPosition(climb.BACK_LIMIT);
 
             } else if (prioritizedCycleButton.get()) {
                 climb.setPivotPos(false);
-                climb.setMotorPosition(5);
+                climb.setMotorPosition(-5);
                 if ((climb.getLeftLimit() || climb.getRightLimit()) 
-                    && (climb.getRightEncoderValue() == 5 && climb.getLeftEncoderValue() == 5)) {
+                    && (climb.getRightEncoderValue() >= -6 && climb.getLeftEncoderValue() >= -6)) {
                     isClimbGood = false;
                 }
             } else {

@@ -20,7 +20,7 @@ public class RaiseIntake extends SequentialCommandGroup {
         addCommands(
 
                 new InstantCommand(() -> {
-                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                    //intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
                     intake.setIntakeSolenoid(false);
                 }, intake),
 

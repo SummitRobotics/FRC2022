@@ -134,8 +134,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -193,7 +193,7 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }), 
-                new LowerIntake(intake)
+                new RaiseIntake(intake)
                 );
 
         // Configure the button bindings
@@ -246,7 +246,7 @@ public class RobotContainer {
         launchpad.buttonI.commandBind(shooterMO);
         // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
-        // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+        //launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
 
         //Climb
@@ -256,7 +256,7 @@ public class RobotContainer {
 
         launchpad.missileA.whileHeld(climbMO);
 
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
         launchpad.missileB.toggleWhenPressed(climbSemiAuto);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
@@ -265,7 +265,9 @@ public class RobotContainer {
 
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
-
+        ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain);
+        launchpad.buttonH.whileHeld(climbAutomation);
+        launchpad.buttonH.commandBind(climbAutomation);
         launchpad.missileB.whileHeld(climbSemiAuto);
         //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
         launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
