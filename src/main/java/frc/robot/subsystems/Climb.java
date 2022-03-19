@@ -249,10 +249,6 @@ public class Climb extends SubsystemBase {
         setRightMotorPosition(position);
         setLeftMotorPosition(position);
     }
-    /**
-     * 
-     * @return boolean indicating whether it is at the setpoint
-     */
     
     /**
      * Sets the pivot position for the pneumatics.
@@ -362,13 +358,6 @@ public class Climb extends SubsystemBase {
         setRightDetachPos(pos);
         setLeftDetachPos(pos);
     }
-
-    // /** 
-    //  * zeros climb at the beginning of the match.
-    // */
-    // public void zeroClimb() {
-    //     setMotorPower(-.01);
-    // }
 
     /**
      * Stops the motors.

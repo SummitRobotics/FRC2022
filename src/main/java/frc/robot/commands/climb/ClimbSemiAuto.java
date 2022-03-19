@@ -4,15 +4,13 @@
 
 package frc.robot.commands.climb;
 
+import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
-import com.revrobotics.SparkMaxPIDController;
-
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
-import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
 import frc.robot.utilities.lists.LEDPriorities;
@@ -61,7 +59,6 @@ public class ClimbSemiAuto extends CommandBase {
     /**
      * Manual override for the climber. Many parameters!
      *
-     * @param drivetrain The drivetrain subsystem
      * @param climb The climb subsystem
      * @param pivotButton The button to control the pivot
      * @param detachButton The button to control the static hooks

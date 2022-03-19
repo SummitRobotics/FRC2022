@@ -92,13 +92,13 @@ public class Shooter extends SubsystemBase {
 
     /**
      * sets the state of the shooter.
+     *
      * @param state the new state of the shooter
      */
     public void setState(States state) {
         if (state.equals(States.READY_TO_FIRE)) {
             firing.activate();
-        }
-        else {
+        } else {
             firing.cancel();
         }
         shooterState = state;

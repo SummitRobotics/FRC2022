@@ -58,6 +58,7 @@ public class ClimbAutomation extends CommandBase {
     /**
      * Climb states.
      */
+    
     public enum ClimbStates {
         EXTENDED,
         RETRACTED,
@@ -168,13 +169,13 @@ public class ClimbAutomation extends CommandBase {
         System.out.println(climb.getRightEncoderValue());
         System.out.println(extendLoop);
         if (climb.getLeftEncoderValue() <= climb.BACK_LIMIT + 1 && climb.getRightEncoderValue() <= climb.BACK_LIMIT + 1) {
-            if (barNumber == 0){
+            if (barNumber == 0) {
                 climbSystem = ClimbStates.EXTENDED;
-            }else if (extendLoop > 50){
+            } else if (extendLoop > 50) {
                 climbSystem = ClimbStates.EXTENDED;
                 loopCount = 0;
                 attachLoop = 0;
-            } else{
+            } else {
                 climb.setPivotPos(false);
                 extendLoop++;
             }
@@ -190,7 +191,7 @@ public class ClimbAutomation extends CommandBase {
             climb.setLeftDetachPos(true);
             climb.setRightDetachPos(true);
         } 
-        if (climb.getLeftEncoderValue() >= climb.FORWARD_LIMIT -.2 && climb.getRightEncoderValue() >= climb.FORWARD_LIMIT -.2 ) {
+        if (climb.getLeftEncoderValue() >= climb.FORWARD_LIMIT - .2 && climb.getRightEncoderValue() >= climb.FORWARD_LIMIT - .2) {
             System.out.println("WITHIN LIMIT");
             climb.setRightDetachPos(false);
             climb.setLeftDetachPos(false);
@@ -198,7 +199,7 @@ public class ClimbAutomation extends CommandBase {
                 if (attachLoop >= 10){
                     climbSystem = ClimbStates.LATCHED;
                     System.out.println("LATCHEEEEEEEEEEEEEEEEEEEEEEEEEED");
-                }else{
+                } else {
                     attachLoop++;
                     System.out.println("incrementing");
                 }
@@ -260,35 +261,35 @@ public class ClimbAutomation extends CommandBase {
      */
 
     public boolean alignByLimit() {
-        if (loopCount < 20){
-        if (climb.getLeftLimit() && barMisaligned == "" && !climb.getRightLimit()) {
-            barMisaligned = "left";
-            drivetrain.setLeftMotorPower(0);
-            return false;
-        } else if (climb.getRightLimit() && barMisaligned == "" && !climb.getLeftLimit()) {
-            barMisaligned = "right";
-            drivetrain.setRightMotorPower(0);
-            return false;
-        } else if (!climb.getLeftLimit() && !climb.getRightLimit()) {
-            drivetrain.setBothMotorPower(.2);
-            barMisaligned = "";
-            return false;
-        } else {
-            loopCount += 1;
-            if (loopCount >= 20){
-                drivetrain.setBothMotorPower(0);
-                return true;
-
-            }else{
-                drivetrain.setBothMotorPower(.2);
+        if (loopCount < 20) {
+            if (climb.getLeftLimit() && barMisaligned == "" && !climb.getRightLimit()) {
+                barMisaligned = "left";
+                drivetrain.setLeftMotorPower(0);
                 return false;
+            } else if (climb.getRightLimit() && barMisaligned == "" && !climb.getLeftLimit()) {
+                barMisaligned = "right";
+                drivetrain.setRightMotorPower(0);
+                return false;
+            } else if (!climb.getLeftLimit() && !climb.getRightLimit()) {
+                drivetrain.setBothMotorPower(.2);
+                barMisaligned = "";
+                return false;
+            } else {
+                loopCount += 1;
+                if (loopCount >= 20) {
+                    drivetrain.setBothMotorPower(0);
+                    return true;
+
+                } else {
+                    drivetrain.setBothMotorPower(.2);
+                    return false;
+                }
             }
+
+        } else {
+
+            return true;
         }
-
-    }else{
-
-        return true;
-    }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -320,8 +321,10 @@ public class ClimbAutomation extends CommandBase {
                     retract();
                     System.out.println("retracting 2");
                 } else if (climbSystem == ClimbStates.LATCHED) {
-                    cycle();
-                    System.out.println("cycle 2");
+                    if (barNumber != 2) {
+                        cycle();
+                        System.out.println("cycle 2");
+                    }
                 } else if (climbSystem == ClimbStates.BROKEN) {
                     climb.stop();
                     System.out.println("brk 1");
