@@ -28,8 +28,7 @@ public final class Ports {
             RIGHT_DRIVE_1 = 13,
             RIGHT_DRIVE_2 = 14,
             RIGHT_DRIVE_3 = 15,
-            SHIFT_SOLENOID_UP = 0,
-            SHIFT_SOLENOID_DOWN = 0,
+            SHIFT_SOLENOID = 4,
 
             // Shooter
             SHOOTER_MOTOR_1 = 30,
@@ -41,7 +40,7 @@ public final class Ports {
             RIGHT_CLIMB_MOTOR = 20,
             PIVOT_CLIMB_SOLENOID = 6,
             LEFT_DETACH_SOLENOID = 2,
-            RIGHT_DETACH_SOLENOID = 3,
+            RIGHT_DETACH_SOLENOID = 0,
             LEFT_LIMIT_SWITCH = 1,
             RIGHT_LIMIT_SWITCH = 2,
             // LEDs
@@ -59,5 +58,5 @@ public final class Ports {
 
             // intake
             INTAKE_MOTOR = 50,
-            INTAKE_SOLENOID = 1;
+            INTAKE_SOLENOID = 3;
 }

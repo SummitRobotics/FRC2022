@@ -398,16 +398,16 @@ public class Climb extends SubsystemBase {
      */
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Climb");
+        // builder.setSmartDashboardType("Climb");
 
-        builder.addDoubleProperty("leftEncoderPosition", this::getLeftEncoderValue, null);
-        builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
-        builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
-        builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
+        // builder.addDoubleProperty("leftEncoderPosition", this::getLeftEncoderValue, null);
+        // builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
+        // builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
+        // builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
 
-        builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
-        builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
-        builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
+        // builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
+        // builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
+        // builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
     }
 
     /**

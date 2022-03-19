@@ -133,7 +133,7 @@ public class Drivetrain extends SubsystemBase {
     public Drivetrain(AHRS gyro) {
         this.gyro = gyro;
 
-        shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID_UP);
+        shift = new Solenoid(Ports.PCM_1, PneumaticsModuleType.REVPH, Ports.SHIFT_SOLENOID);
 
         odometryTime.reset();
         odometryTime.start();
@@ -716,7 +716,7 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Drivetrain");
+        //builder.setSmartDashboardType("Drivetrain");
 
         //builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
         //builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
@@ -728,9 +728,9 @@ public class Drivetrain extends SubsystemBase {
         //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
         //builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
         //builder.addDoubleProperty("rotation", this::getRotation, null);
-        f2d.initSendable(builder);
+        // f2d.initSendable(builder);
 
-        builder.addBooleanProperty("shifterStatus", this::getShift, null);
+        // builder.addBooleanProperty("shifterStatus", this::getShift, null);
         //builder.addDoubleArrayProperty("pidValues", this::getPid, null);
     }
 }

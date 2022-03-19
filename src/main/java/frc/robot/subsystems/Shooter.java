@@ -246,11 +246,10 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Shooter");
-
-        //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
-        builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
-        builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
-        builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
+        // builder.setSmartDashboardType("Shooter");
+        // //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
+        // builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
+        // builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

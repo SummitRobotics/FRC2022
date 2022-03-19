@@ -241,7 +241,9 @@ public class RobotContainer {
         launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        launchpad.buttonH.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        ShooterMO shooterMO = new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger);
+        launchpad.buttonI.whileHeld(shooterMO);
+        launchpad.buttonI.commandBind(shooterMO);
         // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
         // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);

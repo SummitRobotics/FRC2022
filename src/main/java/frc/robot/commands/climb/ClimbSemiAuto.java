@@ -118,10 +118,18 @@ public class ClimbSemiAuto extends ClimbAutomation {
     public void execute() {
         if (isClimbGood) {
             if (prioritizedExtendButton.get()) {
-                climb.setMotorPosition(climb.FORWARD_LIMIT);
+                if (climb.getLeftEncoderValue() < 7) {
+                    climb.setMotorPower(.75);
+                } else { 
+                    climb.setMotorPosition(climb.FORWARD_LIMIT);
+                }
 
             } else if (prioritizedMidpointButton.get()) {
-                climb.setMotorPosition(climb.GRAB_POINT);
+                if (climb.getLeftEncoderValue() < 7) {
+                    climb.setMotorPower(.75);
+                } else {
+                    climb.setMotorPosition(climb.GRAB_POINT);
+                }
             } else if (prioritizedRetractButton.get()) {
                 climb.setMotorPosition(climb.BACK_LIMIT);
 
