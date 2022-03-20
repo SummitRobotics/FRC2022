@@ -15,12 +15,13 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem for the Climb Subsystem.
  */
-public class Climb extends SubsystemBase {
+public class Climb extends SubsystemBase implements Testable {
 
     private AHRS gyro;
     private DigitalInput leftClimbLimit;
@@ -387,6 +388,24 @@ public class Climb extends SubsystemBase {
         climbPitchAverage.update(pa);
         climbDrivitiveAvrage.update(Math.abs(pa - oldGyroAngle));
         oldGyroAngle = pa;
+    }
+
+
+    @Override
+    public Subsystem getSubsystemObject() {
+        return this;
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        CANSparkMax[] motors = {leftMotor, rightMotor};
+        return motors;
+    }
+
+    @Override
+    public String[] getMotorNames() {
+        String[] names = {"climbLeft", "climbRight"};
+        return names;
     }
 
     /**

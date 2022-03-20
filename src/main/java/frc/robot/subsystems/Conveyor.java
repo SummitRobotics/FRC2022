@@ -5,16 +5,17 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lidar;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem to control the conveyor of the robot.
  */
-public class Conveyor extends SubsystemBase {
+public class Conveyor extends SubsystemBase implements Testable {
 
     // TODO - Set these
     public static final double
@@ -364,6 +365,23 @@ public class Conveyor extends SubsystemBase {
         public ConveyorState toConveyorState() {
             return isBlue ? ConveyorState.BLUE : ConveyorState.RED;
         }
+    }
+
+    @Override
+    public Subsystem getSubsystemObject() {
+        return this;
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        CANSparkMax[] motors = {belt, index};
+        return motors;
+    }
+
+    @Override
+    public String[] getMotorNames() {
+        String[] names = {"conveyorBelt", "conveyorIndex"};
+        return names;
     }
 
     @Override

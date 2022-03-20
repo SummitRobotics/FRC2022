@@ -10,15 +10,16 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem for the Shooter mechanism.
  */
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements Testable {
 
     /**
      * Enum describing shooter state.
@@ -226,6 +227,23 @@ public class Shooter extends SubsystemBase {
 
     private String getShooterStateAsText() {
         return shooterState.toString();
+    }
+
+    @Override
+    public Subsystem getSubsystemObject() {
+        return this;
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        CANSparkMax[] motors = {shooterMotorMain};
+        return motors;
+    }
+
+    @Override
+    public String[] getMotorNames() {
+        String[] names = {"shooterMotor"};
+        return names;
     }
 
     @Override

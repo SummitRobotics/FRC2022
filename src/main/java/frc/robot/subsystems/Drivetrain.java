@@ -18,10 +18,12 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
@@ -29,7 +31,7 @@ import frc.robot.utilities.lists.Ports;
 /**
  * Subsystem to control the drivetrain of the robot.
  */
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain extends SubsystemBase implements Testable {
 
     // TODO re tune/calculate all these
     public static final double 
@@ -634,6 +636,23 @@ public class Drivetrain extends SubsystemBase {
         // System.out.println(MPStoRPM(getRightSpeed()));
         // System.out.println(rightEncoder.getVelocity());
         // System.out.println("------------------------");
+    }
+
+    @Override
+    public Subsystem getSubsystemObject() {
+        return this;
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        CANSparkMax[] motors = {left, right};
+        return motors;
+    }
+
+    @Override
+    public String[] getMotorNames() {
+        String[] names = {"drivetrainLeft", "drivetrainRight"};
+        return names;
     }
 
     @Override

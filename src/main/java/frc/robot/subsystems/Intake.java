@@ -6,13 +6,15 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem to control the intake of the robot.
  */
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements Testable {
 
     /**
      * Enum for Intake States.
@@ -164,6 +166,23 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         updateState();
+    }
+
+    @Override
+    public Subsystem getSubsystemObject() {
+        return this;
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        CANSparkMax[] motors = {intakeMotor};
+        return motors;
+    }
+
+    @Override
+    public String[] getMotorNames() {
+        String[] names = {"intakeMotor"};
+        return names;
     }
     
     @Override
