@@ -6,14 +6,16 @@ package frc.robot.commands.climb.climbAutomationSteps;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climb;
+import frc.robot.utilities.Functions;
 
 public class CycleArms extends CommandBase {
     private Climb climb;
-    private double retractTarget;
-
+    private double target;
+    static boolean isBroken = false;
+    private final double error = 0.2;
     /** Creates a new CycleArms. */
-    public CycleArms(Climb climb, double retractTarget) {
-        this.retractTarget = retractTarget;
+    public CycleArms(Climb climb, double target) {
+        this.target = target;
         this.climb = climb;
         addRequirements(climb);
         // Use addRequirements() here to declare subsystem dependencies.
@@ -22,22 +24,37 @@ public class CycleArms extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        climb.setMotorPosition(retractTarget);
+        climb.setMotorPosition(target);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        if (climb.getLeftEncoderValue() == climb.GRAB_POINT && climb.isHooked()) {
+            climb.setLeftDetachPos(true);
+            climb.setRightDetachPos(true);
+        } else if (climb.getLeftEncoderValue() == climb.GRAB_POINT && !climb.isHooked()) {
+            climb.stop();
+            isBroken = true;
+        }   
     }
+    
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        climb.stop();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        if (isBroken) {
+            return false;
+        }else{
+            return Functions.isWithin(climb.getLeftEncoderValue(), target, error) && Functions.isWithin(climb.getRightEncoderValue(), target, error);
+
+        }
+        
     }
 }
