@@ -49,7 +49,7 @@ public class LidarV3 implements Lidar, Sendable {
     /**
      * Tells the lidar to start taking measurements. Must be called before getting measurements
      */
-    public void startMeasuring() {
+    private void startMeasuring() {
         writeRegister(0x04, 0x08 | 32); // default plus bit 5
         writeRegister(0x11, 0xff);
         writeRegister(0x00, 0x04);
@@ -59,7 +59,7 @@ public class LidarV3 implements Lidar, Sendable {
     /**
      * Tells the lidar to stop taking measurements.
      */
-    public void stopMeasuring() {
+    private void stopMeasuring() {
         writeRegister(0x11, 0x00);
         thread.stop();
     }
