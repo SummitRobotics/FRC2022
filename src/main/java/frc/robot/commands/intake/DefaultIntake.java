@@ -12,7 +12,7 @@ public class DefaultIntake extends CommandBase {
 
     private final Intake intake;
     private final Conveyor conveyor;
-    private double loopCount;
+
 
     /**
      * Default command for Intake.
@@ -21,34 +21,22 @@ public class DefaultIntake extends CommandBase {
      * @param conveyor The conveyor
      */
     public DefaultIntake(Intake intake, Conveyor conveyor) {
-        addRequirements(intake, conveyor);
+        addRequirements(intake);
         this.intake = intake;
         this.conveyor = conveyor;
     }
 
     @Override
-    public void initialize() {
-        loopCount = 0;
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
         switch (intake.getState()) {
             case DOWN:
                 if (conveyor.getColorSensorState() != ConveyorState.NONE && conveyor.getIndexState() != ConveyorState.NONE) {
-
-                    if (loopCount < 50) {
-                        intake.setIntakeMotorPower(-Intake.INTAKE_MOTOR_SPEED);
-                        loopCount++;
-                    } else {
-                        intake.stop();
-                    }
-
+                    intake.stop();
                 } else {
                     intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
-                    if (loopCount != 0) {
-                        loopCount = 0;
-                    }
                 }
                 break;
             default:

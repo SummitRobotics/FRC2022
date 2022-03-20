@@ -52,7 +52,7 @@ public class ColorSensor implements Sendable {
      * Creates a new ColorSensor object.
      */
     public ColorSensor() {
-        colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+        colorSensor = new ColorSensorV3(I2C.Port.kMXP);
         colorMatcher = new ColorMatch();
 
         blueTarget = new Color(BLUE_TARGET_RED, BLUE_TARGET_GREEN, BLUE_TARGET_BLUE);

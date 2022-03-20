@@ -12,7 +12,11 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -69,6 +73,8 @@ public class Shooter extends SubsystemBase {
     // Hood position false - Piston not extended : true - Piston extended
     private boolean hoodPos = false;
 
+    private LEDCall firing = new LEDCall(LEDPriorities.SHOOTING, LEDRange.All).solid(Colors.PURPLE);
+
     /**
      * Creates a new shooter instance.
      */
@@ -84,7 +90,17 @@ public class Shooter extends SubsystemBase {
         shooterMotorFollow.follow(shooterMotorMain, true);
     }
 
+    /**
+     * sets the state of the shooter.
+     *
+     * @param state the new state of the shooter
+     */
     public void setState(States state) {
+        if (state.equals(States.READY_TO_FIRE)) {
+            firing.activate();
+        } else {
+            firing.cancel();
+        }
         shooterState = state;
     }
 
@@ -230,11 +246,10 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Shooter");
-
-        //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
-        builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
-        builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
-        builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
+        // builder.setSmartDashboardType("Shooter");
+        // //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
+        // builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
+        // builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

@@ -3,6 +3,7 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.devices.LEDs.LEDs;
 import frc.robot.subsystems.Intake;
 
 /**
@@ -19,13 +20,14 @@ public class RaiseIntake extends SequentialCommandGroup {
         addCommands(
 
                 new InstantCommand(() -> {
-                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                    //intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
                     intake.setIntakeSolenoid(false);
                 }, intake),
 
                 new WaitCommand(0.25),
 
                 new InstantCommand(() -> {
+                    LEDs.getInstance().removeCall("Intake Down");
                     intake.stop();
                 }, intake)
         );

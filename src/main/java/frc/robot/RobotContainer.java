@@ -116,7 +116,7 @@ public class RobotContainer {
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
 
-        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.addStatus(
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
@@ -134,8 +134,8 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -193,7 +193,7 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }), 
-                new LowerIntake(intake)
+                new RaiseIntake(intake)
                 );
 
         // Configure the button bindings
@@ -228,23 +228,25 @@ public class RobotContainer {
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 
-        // controller1.buttonA.whenPressed(new LowerIntake(intake));
-        // controller1.buttonB.whenPressed(
-        //     new RaiseIntake(intake)
-        // );
+        controller1.buttonA.whenPressed(new LowerIntake(intake));
+        controller1.buttonB.whenPressed(
+            new RaiseIntake(intake)
+        );
 
         // Conveyor
-        // launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
 
         // Intake
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        // launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        // launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        ShooterMO shooterMO = new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger);
+        launchpad.buttonI.whileHeld(shooterMO);
+        launchpad.buttonI.commandBind(shooterMO);
         // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
-        // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+        //launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
 
         //Climb
@@ -254,7 +256,7 @@ public class RobotContainer {
 
         launchpad.missileA.whileHeld(climbMO);
 
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
         launchpad.missileB.toggleWhenPressed(climbSemiAuto);
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
@@ -263,7 +265,9 @@ public class RobotContainer {
 
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
-
+        ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain);
+        launchpad.buttonH.whileHeld(climbAutomation);
+        launchpad.buttonH.commandBind(climbAutomation);
         launchpad.missileB.whileHeld(climbSemiAuto);
         //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
         launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
@@ -295,7 +299,7 @@ public class RobotContainer {
      */
     public void disabledInit() {
         LEDs.getInstance().removeAllCalls();
-        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.removeStatus("enabled");
         ChangeRateLimiter.resetAllChangeRateLimiters();
     }

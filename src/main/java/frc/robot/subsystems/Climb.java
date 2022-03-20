@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -22,14 +23,15 @@ import frc.robot.utilities.lists.Ports;
 public class Climb extends SubsystemBase {
 
     private AHRS gyro;
-
+    private final DigitalInput leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
+    private final DigitalInput rightClimbLimit = new DigitalInput(Ports.RIGHT_LIMIT_SWITCH);
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
     private double oldGyroAngle = 0;
     private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
 
     //TODO set these
     public static final double
-            P = 0,
+            P = 1,
             I = 0,
             D = 0,
             FF = 0,
@@ -38,9 +40,9 @@ public class Climb extends SubsystemBase {
             CLIMB_TILT_ANGLE = -2,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
-            FORWARD_LIMIT = -1,
-            BACK_LIMIT = -150,
-            GRAB_POINT = -110;
+            FORWARD_LIMIT = 0,
+            BACK_LIMIT = -155,
+            GRAB_POINT = -100;
 
 
     // Climb Motors
@@ -234,7 +236,7 @@ public class Climb extends SubsystemBase {
      * @param position The position to set the motor to. (Revolutions)
      */
     public void setLeftMotorPosition(double position) {
-        rightPidController.setReference(position, CANSparkMax.ControlType.kPosition);
+        leftPidController.setReference(position, CANSparkMax.ControlType.kPosition);
     }
 
     /**
@@ -247,7 +249,7 @@ public class Climb extends SubsystemBase {
         setRightMotorPosition(position);
         setLeftMotorPosition(position);
     }
-
+    
     /**
      * Sets the pivot position for the pneumatics.
      *
@@ -302,25 +304,25 @@ public class Climb extends SubsystemBase {
         return climbDrivitiveAvrage.getAverage() < CLIMB_DRIVITIVE;
     }
 
-    // /**
-    //  * checks if touching limit switch.
-    //  *
-    //  * @return is left climb touching limit switch
-    //  */
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is left climb touching limit switch
+     */
 
-    // public boolean getLeftLimit() {
-    //     return leftClimbLimit.get();
-    // }
+    public boolean getLeftLimit() {
+        return leftClimbLimit.get();
+    }
 
-    // /**
-    //  * checks if touching limit switch.
-    //  *
-    //  * @return is right climb touching limit switch
-    //  */
+    /**
+     * checks if touching limit switch.
+     *
+     * @return is right climb touching limit switch
+     */
 
-    // public boolean getRightLimit() {
-    //     return rightClimbLimit.get();
-    // }
+    public boolean getRightLimit() {
+        return rightClimbLimit.get();
+    }
 
     /**
      * Toggles the position of the left detach piston.
@@ -357,13 +359,6 @@ public class Climb extends SubsystemBase {
         setLeftDetachPos(pos);
     }
 
-    // /** 
-    //  * zeros climb at the beginning of the match.
-    // */
-    // public void zeroClimb() {
-    //     setMotorPower(-.01);
-    // }
-
     /**
      * Stops the motors.
      */
@@ -392,16 +387,17 @@ public class Climb extends SubsystemBase {
      */
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Climb");
+        // builder.setSmartDashboardType("Climb");
 
         builder.addDoubleProperty("leftEncoderPosition", this::getLeftEncoderValue, null);
         builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
-        builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
-        builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
-
-        builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
-        builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
-        builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
+        // builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
+        // builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
+        builder.addBooleanProperty("leftLimitSwitch", this::getLeftLimit, null);
+        builder.addBooleanProperty("rightLimitSwitch", this::getRightLimit, null);
+        // builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
+        // builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
+        // builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
     }
 
     /**
