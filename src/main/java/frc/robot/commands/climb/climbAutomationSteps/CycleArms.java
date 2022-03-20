@@ -30,10 +30,9 @@ public class CycleArms extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (climb.getLeftEncoderValue() == climb.GRAB_POINT && climb.isHooked()) {
-            climb.setLeftDetachPos(true);
-            climb.setRightDetachPos(true);
-        } else if (climb.getLeftEncoderValue() == climb.GRAB_POINT && !climb.isHooked()) {
+        if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && climb.isHooked()) {
+            climb.setDetachPos(true);
+        } else if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && !climb.isHooked()) {
             climb.stop();
             isBroken = true;
         }   
@@ -51,7 +50,7 @@ public class CycleArms extends CommandBase {
     public boolean isFinished() {
         if (isBroken) {
             return false;
-        }else{
+        } else {
             return Functions.isWithin(climb.getLeftEncoderValue(), target, error) && Functions.isWithin(climb.getRightEncoderValue(), target, error);
 
         }
