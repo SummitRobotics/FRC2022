@@ -11,5 +11,7 @@ public interface Testable {
     public Subsystem getSubsystemObject();
 
     public CANSparkMax[] getMotors();
+
+    public String[] getMotorNames();
     
 }

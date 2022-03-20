@@ -2,10 +2,11 @@ package frc.robot.commands.testing;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.utilities.Testable;
+import frc.robot.utilities.lists.Colors;
 
 /**
  * Tests a testable subsystem.
@@ -16,11 +17,18 @@ public class TestSubsystem extends CommandBase {
     private RelativeEncoder[] encoders;
     private double[] startingPositions;
     private boolean[] areMotorsGood;
+    private String[] motorNames;
 
     private Timer timer;
     
+    /**
+     * Tests a testable subsystem.
+     *
+     * @param toTest The testable object
+     */
     public TestSubsystem(Testable toTest) {
         motors = toTest.getMotors();
+        motorNames = toTest.getMotorNames();
         
         for (int i = 0; i < motors.length; i++) {
             areMotorsGood[i] = false;
@@ -63,15 +71,34 @@ public class TestSubsystem extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if (timer.hasElapsed(5)) {
-            String whatWentWrong = "";
+        String whatIsWrong = "";
 
-            for (int i = 0; i < motors.length; i++) {
-                if (!areMotorsGood[i]) {
-                    // Continue here
-                }
+        for (int i = 0; i < motors.length; i++) {
+            if (!areMotorsGood[i]) {
+                whatIsWrong += (" " + motorNames[i]);
             }
         }
-        return false;
+
+        if (whatIsWrong == "") {
+            ShuffleboardDriver.statusDisplay.addStatus(
+                "Test Status",
+                "Test was successful",
+                Colors.GREEN,
+                5
+            );
+            return true;
+
+        } else if (timer.hasElapsed(5)) {
+            ShuffleboardDriver.statusDisplay.addStatus(
+                "Test Status",
+                "Test failed due to timeout |" + whatIsWrong,
+                Colors.RED,
+                5
+            );
+            throw new RuntimeException("Test failed due to timeout:" + whatIsWrong);
+
+        } else {
+            return false;
+        }
     }
 }
