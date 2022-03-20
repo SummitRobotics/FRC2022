@@ -7,6 +7,7 @@ package frc.robot.commands.climb.climbAutomationSteps;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.climb.StatefullSequentalCommandGroup;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -16,7 +17,7 @@ import frc.robot.subsystems.Drivetrain;
  * climb command to go automatically.
  */
 
-public class climbCommand extends SequentialCommandGroup {
+public class climbCommand extends StatefullSequentalCommandGroup {
     
     private Climb climb;
     private Drivetrain drivetrain;
