@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.testing;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
