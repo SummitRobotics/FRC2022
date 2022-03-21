@@ -20,10 +20,10 @@ import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.climb.ClimbManual;
 import frc.robot.commands.climb.ClimbSemiAuto;
+import frc.robot.commands.climb.ClimbAutomationBetter;
 import frc.robot.commands.climb.climbAutomationSteps.AutoAlign;
 import frc.robot.commands.climb.climbAutomationSteps.CycleArms;
 import frc.robot.commands.climb.climbAutomationSteps.MoveArms;
-import frc.robot.commands.climb.climbAutomationSteps.climbCommand;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
@@ -262,21 +262,25 @@ public class RobotContainer {
         
         // ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
         // launchpad.missileB.toggleWhenPressed(climbSemiAuto);
-        climbCommand autoClimbCommand = new climbCommand(drivetrain, climb);
+        ClimbAutomationBetter autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
         launchpad.missileB.whileHeld(autoClimbCommand);
+
+
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button7,
                 joystick.button6, joystick.button8);
 
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
-        ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain);
-        launchpad.buttonH.whileHeld(climbAutomation);
-        launchpad.buttonH.commandBind(climbAutomation);
+
+        // ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain);
+        // launchpad.buttonH.whileHeld(climbAutomation);
+        // launchpad.buttonH.commandBind(climbAutomation);
+
         //launchpad.missileB.whileHeld(climbSemiAuto);
         //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
-        launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
-        launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
+        // launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
+        // launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
         //launchpad.missileB.whileHeld(climbAutomation);

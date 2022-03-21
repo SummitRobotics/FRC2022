@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 
 public class StatefullSequentalCommandGroup extends CommandGroupBase {
-    private enum CommandState{
+    private enum CommandState {
         NotRun, Inited, Done
     }
 
@@ -34,7 +34,7 @@ public class StatefullSequentalCommandGroup extends CommandGroupBase {
     public void addCommands(Command... commands) {
         requireUngrouped(commands);
 
-        registerGroupedCommands(commands);
+        //registerGroupedCommands(commands);
 
         for (Command x : commands){
             m_requirements.addAll(x.getRequirements());

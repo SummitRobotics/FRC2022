@@ -3,6 +3,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Shooter;
@@ -19,7 +20,7 @@ public class ShooterMO extends CommandBase {
     OIAxis controlAxis;
     OIAxis.PrioritizedAxis prioritizedControlAxis;
 
-    OIButton controlButton;
+    LEDButton controlButton;
     OIButton.PrioritizedButton prioritizedControlButton;
 
     SimpleButton prioritizedSimpleControlButton;
@@ -37,7 +38,7 @@ public class ShooterMO extends CommandBase {
      * @param controlButton the controller button used to control hood position
      * @param shootButton the button to fire.
      */
-    public ShooterMO(Shooter shooter, OIAxis controlAxis, OIButton controlButton, OIButton shootButton) {
+    public ShooterMO(Shooter shooter, OIAxis controlAxis, LEDButton controlButton, OIButton shootButton) {
         addRequirements(shooter);
 
         this.shooter = shooter;
@@ -66,6 +67,7 @@ public class ShooterMO extends CommandBase {
         // shooter.setMotorPower(controlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();
+            controlButton.setLED(shooter.getHoodPos());
         }
         if (prioritizedShootButton != null && prioritizedShootButton.get(false)) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
@@ -85,6 +87,7 @@ public class ShooterMO extends CommandBase {
         prioritizedControlAxis.destroy();
         prioritizedControlButton.destroy();
         prioritizedShootButton.destroy();
+        controlButton.setLED(false);
     }
 
     @Override

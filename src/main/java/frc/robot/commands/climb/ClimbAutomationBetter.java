@@ -2,12 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.climb.climbAutomationSteps;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.climb.StatefullSequentalCommandGroup;
+import frc.robot.commands.climb.climbAutomationSteps.AutoAlign;
+import frc.robot.commands.climb.climbAutomationSteps.CycleArms;
+import frc.robot.commands.climb.climbAutomationSteps.MoveArms;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -17,7 +19,7 @@ import frc.robot.subsystems.Drivetrain;
  * climb command to go automatically.
  */
 
-public class climbCommand extends StatefullSequentalCommandGroup {
+public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
     
     private Climb climb;
     private Drivetrain drivetrain;
@@ -27,7 +29,7 @@ public class climbCommand extends StatefullSequentalCommandGroup {
      * @param climb needs a climb subsystem to work
     */
 
-    public climbCommand(Drivetrain drivetrain, Climb climb) {
+    public ClimbAutomationBetter(Drivetrain drivetrain, Climb climb) {
         this.climb = climb;
         this.drivetrain = drivetrain;
         AutoAlign autoAlign = new AutoAlign(climb, drivetrain);
