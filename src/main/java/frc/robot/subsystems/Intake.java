@@ -175,16 +175,9 @@ public class Intake extends SubsystemBase implements Testable {
 
     @Override
     public CANSparkMax[] getMotors() {
-        CANSparkMax[] motors = {intakeMotor};
-        return motors;
+        return new CANSparkMax[] {intakeMotor};
     }
 
-    @Override
-    public String[] getMotorNames() {
-        String[] names = {"intakeMotor"};
-        return names;
-    }
-    
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");

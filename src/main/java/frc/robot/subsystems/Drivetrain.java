@@ -645,14 +645,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
 
     @Override
     public CANSparkMax[] getMotors() {
-        CANSparkMax[] motors = {left, right};
-        return motors;
-    }
-
-    @Override
-    public String[] getMotorNames() {
-        String[] names = {"drivetrainLeft", "drivetrainRight"};
-        return names;
+        return new CANSparkMax[] {left, right};
     }
 
     @Override

@@ -236,14 +236,7 @@ public class Shooter extends SubsystemBase implements Testable {
 
     @Override
     public CANSparkMax[] getMotors() {
-        CANSparkMax[] motors = {shooterMotorMain};
-        return motors;
-    }
-
-    @Override
-    public String[] getMotorNames() {
-        String[] names = {"shooterMotor"};
-        return names;
+        return new CANSparkMax[] {shooterMotorMain};
     }
 
     @Override

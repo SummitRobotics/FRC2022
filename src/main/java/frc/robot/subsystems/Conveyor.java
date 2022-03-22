@@ -374,14 +374,7 @@ public class Conveyor extends SubsystemBase implements Testable {
 
     @Override
     public CANSparkMax[] getMotors() {
-        CANSparkMax[] motors = {belt, index};
-        return motors;
-    }
-
-    @Override
-    public String[] getMotorNames() {
-        String[] names = {"conveyorBelt", "conveyorIndex"};
-        return names;
+        return new CANSparkMax[] {belt, index};
     }
 
     @Override

@@ -4,9 +4,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
+import java.util.HashMap;
 
 /**
  * Tests a testable subsystem.
@@ -16,9 +18,10 @@ public class TestSubsystem extends CommandBase {
     private CANSparkMax[] motors;
     private RelativeEncoder[] encoders;
     private double[] startingPositions;
-    private boolean[] areMotorsGood;
-    private String[] motorNames;
-
+    private HashMap<String, Boolean> testStates;
+    private Testable toTest;
+    private Subsystem subsystem;
+    
     private Timer timer;
     
     /**
@@ -27,24 +30,25 @@ public class TestSubsystem extends CommandBase {
      * @param toTest The testable object
      */
     public TestSubsystem(Testable toTest) {
+        this.toTest = toTest;
         motors = toTest.getMotors();
-        motorNames = toTest.getMotorNames();
+        subsystem = toTest.getSubsystemObject();
         
         for (int i = 0; i < motors.length; i++) {
-            areMotorsGood[i] = false;
+            testStates.put(Integer.toString(motors[i].getDeviceId()), false);
             encoders[i] = motors[i].getEncoder();
         }
 
         timer = new Timer();
 
-        addRequirements(toTest.getSubsystemObject());
+        addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
         for (int i = 0; i < motors.length; i++) {
             startingPositions[i] = encoders[i].getPosition();
-            motors[i].set(0.3);
+            motors[i].set(toTest.getMotorTestSpeed());
         }
 
         timer.start();
@@ -53,9 +57,9 @@ public class TestSubsystem extends CommandBase {
     @Override
     public void execute() {
         for (int i = 0; i < motors.length; i++) {
-            if (encoders[i].getPosition() > startingPositions[i] + 0.5) {
+            if (encoders[i].getPosition() > startingPositions[i] + toTest.getMotorTestRotations()) {
                 motors[i].set(0);
-                areMotorsGood[i] = true;
+                testStates.replace(Integer.toString(motors[i].getDeviceId()), true);
             }
         }
     }
@@ -71,15 +75,13 @@ public class TestSubsystem extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        String whatIsWrong = "";
+        boolean isSuccessful = true;
 
-        for (int i = 0; i < motors.length; i++) {
-            if (!areMotorsGood[i]) {
-                whatIsWrong += (" " + motorNames[i]);
-            }
+        for (HashMap.Entry<String, Boolean> set : testStates.entrySet()) {
+            isSuccessful &= set.getValue();
         }
 
-        if (whatIsWrong == "") {
+        if (isSuccessful) {
             ShuffleboardDriver.statusDisplay.addStatus(
                 "Test Status",
                 "Test was successful",
@@ -88,14 +90,23 @@ public class TestSubsystem extends CommandBase {
             );
             return true;
 
-        } else if (timer.hasElapsed(5)) {
+        } else if (timer.hasElapsed(toTest.getAllowedTimeSeconds())) {
+            String toPrint = "";
+
+            for (HashMap.Entry<String, Boolean> set : testStates.entrySet()) {
+                if (!set.getValue()) {
+                    toPrint += (" " + subsystem.getClass().getCanonicalName()
+                        + ": " + set.getKey() + ",");
+                }
+            }
+
             ShuffleboardDriver.statusDisplay.addStatus(
                 "Test Status",
-                "Test failed due to timeout |" + whatIsWrong,
+                "Test failed due to timeout |" + toPrint,
                 Colors.RED,
                 5
             );
-            throw new RuntimeException("Test failed due to timeout:" + whatIsWrong);
+            throw new RuntimeException("Test failed due to timeout:" + toPrint);
 
         } else {
             return false;

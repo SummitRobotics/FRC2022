@@ -398,14 +398,7 @@ public class Climb extends SubsystemBase implements Testable {
 
     @Override
     public CANSparkMax[] getMotors() {
-        CANSparkMax[] motors = {leftMotor, rightMotor};
-        return motors;
-    }
-
-    @Override
-    public String[] getMotorNames() {
-        String[] names = {"climbLeft", "climbRight"};
-        return names;
+        return new CANSparkMax[] {leftMotor, rightMotor};
     }
 
     /**
