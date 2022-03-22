@@ -46,7 +46,7 @@ public class TestSubsystem extends CommandBase {
         subsystem = toTest.getSubsystemObject();
         
         for (int i = 0; i < motors.length; i++) {
-            testStates.put(Integer.toString(motors[i].getDeviceId()), false);
+            testStates.put("Motor " + motors[i].getDeviceId(), false);
             encoders[i] = motors[i].getEncoder();
         }
 
@@ -74,6 +74,10 @@ public class TestSubsystem extends CommandBase {
             motors[i].set(toTest.getMotorTestSpeed());
         }
 
+        for (HashMap.Entry<String, Boolean> set : toTest.runCustomTests().entrySet()) {
+            testStates.put(set.getKey(), false);
+        }
+
         timer.start();
     }
 
@@ -82,7 +86,7 @@ public class TestSubsystem extends CommandBase {
         for (int i = 0; i < motors.length; i++) {
             if (encoders[i].getPosition() > startingPositions[i] + toTest.getMotorTestRotations()) {
                 motors[i].set(0);
-                testStates.replace(Integer.toString(motors[i].getDeviceId()), true);
+                testStates.replace("Motor " + motors[i].getDeviceId(), true);
             }
         }
 
@@ -113,6 +117,8 @@ public class TestSubsystem extends CommandBase {
                 testStates.replace("Limelight " + i, false);
             }
         }
+
+        testStates.putAll(toTest.runCustomTests());
     }
 
     @Override

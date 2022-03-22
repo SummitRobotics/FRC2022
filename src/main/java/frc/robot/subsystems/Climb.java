@@ -17,6 +17,7 @@ import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
+import java.util.HashMap;
 
 /**
  * Subsystem for the Climb Subsystem.
@@ -392,6 +393,20 @@ public class Climb extends SubsystemBase implements Testable {
     @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {leftMotor, rightMotor};
+    }
+
+    @Override
+    public HashMap<String, Boolean> runCustomTests() {
+        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+
+        if (!pivotPos) {
+            setPivotPos(false);
+        }
+
+        result.put("Left Limit Switch", getLeftLimit());
+        result.put("Right Limit Switch", getRightLimit());
+
+        return result;
     }
 
     /**
