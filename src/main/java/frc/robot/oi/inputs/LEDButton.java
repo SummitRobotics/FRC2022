@@ -19,6 +19,8 @@ public class LEDButton extends OIButton {
 
     protected Command controller;
 
+    private LED led;
+
     /**
      * Constructor to create a LED Button.
      *
@@ -27,6 +29,7 @@ public class LEDButton extends OIButton {
      */
     public LEDButton(BooleanSupplier getter, LED led) {
         super(getter);
+        this.led = led;
 
         controller = new StartEndCommand(() -> led.set(true), () -> led.set(false));
     }
@@ -37,6 +40,10 @@ public class LEDButton extends OIButton {
 
     private void triggerBind(Trigger trigger) {
         trigger.whileActiveOnce(controller);
+    }
+
+    public void setLED(boolean on){
+        led.set(on);
     }
 
     public void toggleBind() {

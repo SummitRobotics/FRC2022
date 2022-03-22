@@ -4,18 +4,22 @@
 
 package frc.robot.commands.climb;
 
-import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Climb;
-import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.PIDValues;
 
 /**
  * ClimbSemiAuto.
  */
-public class ClimbSemiAuto extends ClimbAutomation {
+public class ClimbSemiAuto extends CommandBase {
     protected static final double 
               CLIMB_P = PIDValues.CLIMB_P,
               CLIMB_I = PIDValues.CLIMB_I,
@@ -23,8 +27,7 @@ public class ClimbSemiAuto extends ClimbAutomation {
 
     // subsystems
     Climb climb;
-    Drivetrain drivetrain;
-
+    private boolean isClimbGood;
     // button for the pivot solenoid
     OIButton pivotButton;
     OIButton.PrioritizedButton prioritizedPivotButton;
@@ -46,38 +49,36 @@ public class ClimbSemiAuto extends ClimbAutomation {
     // button for partially retracting the arms
     OIButton midpointButton;
     OIButton.PrioritizedButton prioritizedMidpointButton;
-
+    //button for cycling
+    OIButton cycleButton;
+    OIButton.PrioritizedButton prioritizedCycleButton;
     // PID
-    PIDController leftPID;
-    PIDController rightPID;
+    SparkMaxPIDController leftPID;
+    SparkMaxPIDController rightPID;
 
     /**
      * Manual override for the climber. Many parameters!
      *
-     * @param drivetrain The drivetrain subsystem
      * @param climb The climb subsystem
      * @param pivotButton The button to control the pivot
      * @param detachButton The button to control the static hooks
      * @param retractButton The button to retract the pivoting arms
      * @param extendButton The button to extend the pivoting arms
      * @param midpointButton The button to partially retract the pivoting arms
+     * @param cycleButton pivot button, but with safety features.
      */
     public ClimbSemiAuto(
-        Drivetrain drivetrain,
         Climb climb,
         OIButton pivotButton,
         OIButton detachButton,
         OIButton retractButton,
         OIButton extendButton,
-        OIButton midpointButton
+        OIButton midpointButton, 
+        OIButton cycleButton
     ) {
-        
-        super(climb, drivetrain);
-        this.drivetrain = drivetrain;
+        isClimbGood = true;
         this.climb = climb;
-
-        this.leftPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
-        this.rightPID = new PIDController(CLIMB_P, CLIMB_I, CLIMB_D);
+        this.cycleButton = cycleButton;
 
         this.pivotButton = pivotButton;
         this.detachButton = detachButton;
@@ -85,70 +86,75 @@ public class ClimbSemiAuto extends ClimbAutomation {
         this.extendButton = extendButton;
         this.midpointButton = midpointButton;
 
-        // TODO - set these
-        leftPID.setTolerance(1, 1);
-        rightPID.setTolerance(1, 1);
-        leftPID.setSetpoint(0);
-        rightPID.setSetpoint(0);
 
-        addRequirements(drivetrain, climb);
+        addRequirements(climb);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-
+        LEDs.getInstance().addCall("Climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All));
         prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedDetachButton = detachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedRetractButton = retractButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedExtendButton = extendButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         prioritizedMidpointButton = midpointButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-
+        prioritizedCycleButton = cycleButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedDetachButton = new SimpleButton(prioritizedDetachButton::get);
-
-        leftPID.reset();
-        rightPID.reset();
         climb.stop();
 
-        climb.setDetachPos(false);
+        climb.setDetachPos(true);
         climb.setPivotPos(false);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        if (isClimbGood) {
+            if (prioritizedExtendButton.get()) {
+                climb.setMotorPosition(climb.FORWARD_LIMIT);
 
-        if (prioritizedExtendButton.get()) {
-            leftPID.setSetpoint(66);
-            rightPID.setSetpoint(66);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
 
-        } else if (prioritizedMidpointButton.get()) {
-            leftPID.setSetpoint(33);
-            rightPID.setSetpoint(33);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            } else if (prioritizedMidpointButton.get()) {
+                climb.setMotorPosition(climb.GRAB_POINT);
 
-        } else if (prioritizedRetractButton.get()) {
-            leftPID.setSetpoint(0);
-            rightPID.setSetpoint(0);
-            climb.setLeftMotorPower(leftPID.calculate(climb.getLeftEncoderValue()));
-            climb.setRightMotorPower(rightPID.calculate(climb.getRightEncoderValue()));
+            } else if (prioritizedRetractButton.get()) {
+                climb.setMotorPosition(climb.BACK_LIMIT);
 
-        } else {
-            climb.setMotorPower(0);
-        }
+            } else if (prioritizedCycleButton.get()) {
+                climb.setPivotPos(false);
+                climb.setMotorPosition(-5);
+                if ((climb.getLeftLimit() || climb.getRightLimit()) 
+                    && (climb.getRightEncoderValue() >= -6 && climb.getLeftEncoderValue() >= -6)) {
+                    isClimbGood = false;
+                }
+            } else {
+                climb.setMotorPower(0);
+            }
+            if (simplePrioritizedPivotButton.get()) {
+                climb.togglePivotPos();
+            }
+
+            if (prioritizedDetachButton.get()) {
+                if (climb.isHooked()) {
+                    climb.setDetachPos(false);
+                }
+            }
+        }   
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        leftPID.reset();
-        rightPID.reset();
-        leftPID.close();
-        rightPID.close();
+        LEDs.getInstance().removeCall("Climbing");
+        prioritizedCycleButton.destroy();
+        prioritizedDetachButton.destroy();
+        prioritizedExtendButton.destroy();
+        prioritizedMidpointButton.destroy();
+        prioritizedPivotButton.destroy();
+        prioritizedRetractButton.destroy();
+
     }
 
     // Returns true when the command should end.

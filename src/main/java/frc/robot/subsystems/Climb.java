@@ -24,15 +24,15 @@ import frc.robot.utilities.lists.Ports;
 public class Climb extends SubsystemBase implements Testable {
 
     private AHRS gyro;
-    private DigitalInput leftClimbLimit;
-    private DigitalInput rightClimbLimit;
+    private final DigitalInput leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
+    private final DigitalInput rightClimbLimit = new DigitalInput(Ports.RIGHT_LIMIT_SWITCH);
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
     private double oldGyroAngle = 0;
     private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
 
     //TODO set these
     public static final double
-            P = 0,
+            P = 1,
             I = 0,
             D = 0,
             FF = 0,
@@ -41,9 +41,9 @@ public class Climb extends SubsystemBase implements Testable {
             CLIMB_TILT_ANGLE = -2,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
-            FORWARD_LIMIT = -1,
-            BACK_LIMIT = -150,
-            GRAB_POINT = -110;
+            FORWARD_LIMIT = 0,
+            BACK_LIMIT = -155,
+            GRAB_POINT = -100;
 
 
     // Climb Motors
@@ -237,7 +237,7 @@ public class Climb extends SubsystemBase implements Testable {
      * @param position The position to set the motor to. (Revolutions)
      */
     public void setLeftMotorPosition(double position) {
-        rightPidController.setReference(position, CANSparkMax.ControlType.kPosition);
+        leftPidController.setReference(position, CANSparkMax.ControlType.kPosition);
     }
 
     /**
@@ -250,7 +250,7 @@ public class Climb extends SubsystemBase implements Testable {
         setRightMotorPosition(position);
         setLeftMotorPosition(position);
     }
-
+    
     /**
      * Sets the pivot position for the pneumatics.
      *
@@ -360,13 +360,6 @@ public class Climb extends SubsystemBase implements Testable {
         setLeftDetachPos(pos);
     }
 
-    // /** 
-    //  * zeros climb at the beginning of the match.
-    // */
-    // public void zeroClimb() {
-    //     setMotorPower(-.01);
-    // }
-
     /**
      * Stops the motors.
      */
@@ -406,16 +399,17 @@ public class Climb extends SubsystemBase implements Testable {
      */
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Climb");
+        // builder.setSmartDashboardType("Climb");
 
         builder.addDoubleProperty("leftEncoderPosition", this::getLeftEncoderValue, null);
         builder.addDoubleProperty("rightEncoderPosition", this::getRightEncoderValue, null);
-        builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
-        builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
-
-        builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
-        builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
-        builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
+        // builder.addDoubleProperty("leftMotorVelocity", this::getLeftMotorVelocity, null);
+        // builder.addDoubleProperty("rightMotorVelocity", this::getRightMotorVelocity, null);
+        builder.addBooleanProperty("leftLimitSwitch", this::getLeftLimit, null);
+        builder.addBooleanProperty("rightLimitSwitch", this::getRightLimit, null);
+        // builder.addBooleanProperty("pivotPosition", this::getPivotPos, null);
+        // builder.addBooleanProperty("leftDetachPosition", this::getLeftDetachPos, null);
+        // builder.addBooleanProperty("rightDetachPosition", this::getRightDetachPos, null);
     }
 
     /**

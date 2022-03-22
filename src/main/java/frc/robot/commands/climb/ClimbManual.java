@@ -5,6 +5,9 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
@@ -12,6 +15,7 @@ import frc.robot.subsystems.Climb;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
 import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.StatusPriorities;
 
 /**
@@ -78,6 +82,8 @@ public class ClimbManual extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        LEDs.getInstance().addCall("Climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All));
+
         prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.CLIMB);
         prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.CLIMB);
         prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.CLIMB);
@@ -118,7 +124,7 @@ public class ClimbManual extends CommandBase {
                     climb.setDetachPos(true);
                     ShuffleboardDriver.statusDisplay.removeStatus("bad_climb");
                 } else {
-                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb", "climb is not safe to relice " + Colors.RED, StatusPriorities.BAD_CLIMB);
+                    ShuffleboardDriver.statusDisplay.addStatus("bad_climb", "climb is not safe to release " + Colors.RED, StatusPriorities.BAD_CLIMB);
                 }
             }
         }
@@ -127,6 +133,7 @@ public class ClimbManual extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        LEDs.getInstance().removeCall("Climbing");
         climb.stop();
         prioritizedControlAxis.destroy();
         prioritizedLeftMotorButton.destroy();

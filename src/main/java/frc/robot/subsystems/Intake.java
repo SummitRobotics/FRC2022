@@ -28,7 +28,7 @@ public class Intake extends SubsystemBase implements Testable {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = -0.5;
+            INTAKE_MOTOR_SPEED = 0.5;
 
     // motor
     private final CANSparkMax intakeMotor =
@@ -115,7 +115,13 @@ public class Intake extends SubsystemBase implements Testable {
     public void zeroEncoder() {
         setIntakeEncoder(0);
     }
-
+    /**
+     * gets intake motor power
+     * @return power draw
+     */
+    public double getIntakePower(){
+        return intakeMotor.getOutputCurrent();
+    }
     /**
      * Stops the intake motor.
      */
@@ -181,8 +187,9 @@ public class Intake extends SubsystemBase implements Testable {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");
-        //builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
-        //builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
+        builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
+        builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
+        builder.addDoubleProperty("motor_current", this::getIntakePower, null);
         builder.addBooleanProperty("intake_solenoid_position", this::getIntakeSolenoid, null);
     }
 }

@@ -4,6 +4,7 @@ import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.Notifier;
 import frc.robot.utilities.RollingAverage;
 import java.nio.ByteBuffer;
 
@@ -14,13 +15,22 @@ public class LidarV3 implements Lidar, Sendable {
 
     private final RollingAverage rollingAverage;
 
-    private boolean hasStartedMeasuring;
-
     private static final byte DEVICE_ADDRESS = 0x62;
 
     private final byte port;
 
     private final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2);
+
+    private Object valueLock = new Object();
+    private short value;
+    private Notifier thread;
+
+    private final Runnable proximityReader = new Runnable() {
+        @Override
+        public void run() {
+            updateValue(readShort(0x8f));
+        }
+    };
 
     /**
      * Constructor to create a LidarV3.
@@ -32,25 +42,26 @@ public class LidarV3 implements Lidar, Sendable {
 
         rollingAverage = new RollingAverage(50, true);
 
-        hasStartedMeasuring = false;
-
+        thread = new Notifier(proximityReader);
         startMeasuring();
     }
 
     /**
      * Tells the lidar to start taking measurements. Must be called before getting measurements
      */
-    public void startMeasuring() {
+    private void startMeasuring() {
         writeRegister(0x04, 0x08 | 32); // default plus bit 5
         writeRegister(0x11, 0xff);
         writeRegister(0x00, 0x04);
+        thread.startPeriodic(0.02);
     }
 
     /**
      * Tells the lidar to stop taking measurements.
      */
-    public void stopMeasuring() {
+    private void stopMeasuring() {
         writeRegister(0x11, 0x00);
+        thread.stop();
     }
 
     /**
@@ -60,14 +71,9 @@ public class LidarV3 implements Lidar, Sendable {
      */
     @Override
     public int getDistance() {
-        if (!hasStartedMeasuring) {
-            startMeasuring();
-            hasStartedMeasuring = true;
+        synchronized (valueLock) {
+            return value;
         }
-        short value = readShort(0x8f);
-        rollingAverage.update(value);
-
-        return value;
     }
 
     /**
@@ -77,8 +83,16 @@ public class LidarV3 implements Lidar, Sendable {
      */
     @Override
     public int getAverageDistance() {
-        getDistance();
-        return (int) rollingAverage.getAverage();
+        synchronized (valueLock) {
+            return (int) rollingAverage.getAverage();
+        }
+    }
+
+    private void updateValue(short value) {
+        synchronized (valueLock) {
+            this.value = value;
+            rollingAverage.update(value);
+        }
     }
 
     // scary

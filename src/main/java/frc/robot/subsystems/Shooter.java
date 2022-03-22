@@ -12,8 +12,12 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.Testable;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 
 /**
@@ -38,15 +42,15 @@ public class Shooter extends SubsystemBase implements Testable {
 
     // TODO - Set these
     public static final double
-            P = 1.4217E-9,
+            P = 0.0005,
             I = 0,
             D = 0,
-            FF = 0.068605 / 12 / 30,
+            FF = 0.000204,
             IZ = 0,
             MAX_RPM = 5000;
 
     PIDController pidDum = new PIDController(1.4217E-11, 0, 0);
-    SimpleMotorFeedforward ffDum = new SimpleMotorFeedforward(0.5235, 0.066605, 0.011555);
+    SimpleMotorFeedforward ffDum = new SimpleMotorFeedforward(0.5235, 0.0666, 0.011555);
 
     private final CANSparkMax shooterMotorMain = new CANSparkMax(
             Ports.SHOOTER_MOTOR_1,
@@ -70,6 +74,8 @@ public class Shooter extends SubsystemBase implements Testable {
     // Hood position false - Piston not extended : true - Piston extended
     private boolean hoodPos = false;
 
+    private LEDCall firing = new LEDCall(LEDPriorities.SHOOTING, LEDRange.All).solid(Colors.PURPLE);
+
     /**
      * Creates a new shooter instance.
      */
@@ -80,12 +86,23 @@ public class Shooter extends SubsystemBase implements Testable {
         shooterMotorPIDController.setFF(FF);
         shooterMotorPIDController.setIZone(IZ);
         shooterMotorPIDController.setOutputRange(-1.0, 1.0);
+        shooterMotorMain.enableVoltageCompensation(12);
         
         zeroEncoders();
         shooterMotorFollow.follow(shooterMotorMain, true);
     }
 
+    /**
+     * sets the state of the shooter.
+     *
+     * @param state the new state of the shooter
+     */
     public void setState(States state) {
+        if (state.equals(States.READY_TO_FIRE)) {
+            firing.activate();
+        } else {
+            firing.cancel();
+        }
         shooterState = state;
     }
 
@@ -225,7 +242,7 @@ public class Shooter extends SubsystemBase implements Testable {
         setHoodPos(!hoodPos);
     }
 
-    private String getShooterStateAsText() {
+    public String getShooterStateAsText() {
         return shooterState.toString();
     }
 
@@ -242,10 +259,9 @@ public class Shooter extends SubsystemBase implements Testable {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Shooter");
-
-        //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
+        // //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
         builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
-        builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
-        builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
+        // builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

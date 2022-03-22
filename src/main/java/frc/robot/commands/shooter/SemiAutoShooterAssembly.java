@@ -38,7 +38,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         OIAxis controlAxis) {
 
         super(shooter, conveyor, drivetrain, limelight);
-        super.initialize();
         this.shootButton = shootButton;
         this.controlAxis = controlAxis;
 
@@ -67,6 +66,11 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         
         prioritizedShootButton = shootButton.prioritize(axisPriority);
         prioritizedControlAxis = controlAxis.prioritize(axisPriority);
+    }
+
+    @Override
+    public void execute() {
+        super.execute();
     }
 
     @Override

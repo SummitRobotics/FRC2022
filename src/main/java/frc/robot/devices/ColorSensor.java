@@ -6,6 +6,7 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -19,6 +20,20 @@ public class ColorSensor implements Sendable {
     private final Color blueTarget;
     private final Color redTarget;
     private final Color noTarget;
+    private double measuredProximity;
+    private Color measuredColor;
+
+    private final Runnable colorSensorReader = new Runnable() {
+        @Override
+        public void run() {
+            updateProximity(colorSensor.getProximity());
+            updateColor(colorSensor.getColor());
+        }
+    };
+
+    private final Notifier thread = new Notifier(colorSensorReader);
+    private Object proximityLock = new Object();
+    private Object colorLock = new Object();
 
     // The target RGB values for the specific shades of blue and red used for the balls.
     // We may need to re-adjust these later.
@@ -33,12 +48,11 @@ public class ColorSensor implements Sendable {
         NO_TARGET_GREEN = 0.475,
         NO_TARGET_BLUE = 0.274;
 
-
     /**
      * Creates a new ColorSensor object.
      */
     public ColorSensor() {
-        colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+        colorSensor = new ColorSensorV3(I2C.Port.kMXP);
         colorMatcher = new ColorMatch();
 
         blueTarget = new Color(BLUE_TARGET_RED, BLUE_TARGET_GREEN, BLUE_TARGET_BLUE);
@@ -48,10 +62,15 @@ public class ColorSensor implements Sendable {
         colorMatcher.addColorMatch(blueTarget);
         colorMatcher.addColorMatch(redTarget);
         colorMatcher.addColorMatch(noTarget);
+
+        measuredProximity = 0;
+        measuredColor = new Color(0, 0, 0);
+        thread.startPeriodic(0.02);
     }
 
     /**
      * Returns the raw infrared value detected by the sensor.
+     * If you are using this, consider putting the actual measurement in the other thread.
      *
      * @return IR the raw infrared value detected by the sensor
      */
@@ -65,7 +84,9 @@ public class ColorSensor implements Sendable {
      * @return proximity the raw proximity value detected by the sensor
      */
     public double getProximity() {
-        return colorSensor.getProximity();
+        synchronized (proximityLock) {
+            return measuredProximity;
+        }
     }
 
     /**
@@ -74,7 +95,9 @@ public class ColorSensor implements Sendable {
      * @return red the red value detected by the sensor
      */
     public double getRed() {
-        return colorSensor.getColor().red;
+        synchronized (colorLock) {
+            return measuredColor.red;
+        }
     }
 
     /**
@@ -83,7 +106,9 @@ public class ColorSensor implements Sendable {
      * @return green the green value detected by the sensor
      */
     public double getGreen() {
-        return colorSensor.getColor().green;
+        synchronized (colorLock) {
+            return measuredColor.green;
+        }
     }
 
     /**
@@ -92,7 +117,9 @@ public class ColorSensor implements Sendable {
      * @return blue the blue value detected by the sensor
      */
     public double getBlue() {
-        return colorSensor.getColor().blue;
+        synchronized (colorLock) {
+            return measuredColor.blue;
+        }
     }
 
     /**
@@ -102,7 +129,9 @@ public class ColorSensor implements Sendable {
      * @return colorMatch the ColorMatchResult containing the sensor's data.
      */
     public ColorMatchResult getColorMatch() {
-        return colorMatcher.matchClosestColor(colorSensor.getColor());
+        synchronized (colorLock) {
+            return colorMatcher.matchClosestColor(measuredColor);
+        }
     }
 
     /**
@@ -132,6 +161,17 @@ public class ColorSensor implements Sendable {
         return 1 - getColorMatch().confidence;
     }
 
+    private void updateProximity(double proximity) {
+        synchronized (proximityLock) {
+            measuredProximity = proximity;
+        }
+    }
+
+    private void updateColor(Color color) {
+        synchronized (colorLock) {
+            measuredColor = color;
+        }
+    }
 
     @Override
     public void initSendable(SendableBuilder builder) {

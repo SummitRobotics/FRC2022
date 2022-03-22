@@ -20,6 +20,10 @@ import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.climb.ClimbManual;
 import frc.robot.commands.climb.ClimbSemiAuto;
+import frc.robot.commands.climb.ClimbAutomationBetter;
+import frc.robot.commands.climb.climbAutomationSteps.AutoAlign;
+import frc.robot.commands.climb.climbAutomationSteps.CycleArms;
+import frc.robot.commands.climb.climbAutomationSteps.MoveArms;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
@@ -35,6 +39,7 @@ import frc.robot.commands.intake.RaiseIntake;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.commands.shooter.SemiAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterAtStart;
+import frc.robot.commands.shooter.ShooterLow;
 import frc.robot.commands.shooter.ShooterMO;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
@@ -101,6 +106,8 @@ public class RobotContainer {
     private final Command teleInit;
     private final Command autoInit;
     private Command auto;
+    private ClimbAutomationBetter autoClimbCommand;
+
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -116,15 +123,15 @@ public class RobotContainer {
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
 
-        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.addStatus(
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
         
-        targetingLimelight = new Lemonlight("gloworm", false, true);
+        targetingLimelight = new Lemonlight("limelight-target", false, false);
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("balldetect", true, true);
+        ballDetectionLimelight = new Lemonlight("limelight-balldetect", true, false);
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
@@ -134,8 +141,10 @@ public class RobotContainer {
         climb = new Climb(gyro);
 
         // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .15, 20, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+
+        autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
         
         autoInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -193,7 +202,7 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }), 
-                new LowerIntake(intake)
+                new RaiseIntake(intake)
                 );
 
         // Configure the button bindings
@@ -228,23 +237,27 @@ public class RobotContainer {
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 
-        // controller1.buttonA.whenPressed(new LowerIntake(intake));
-        // controller1.buttonB.whenPressed(
-        //     new RaiseIntake(intake)
-        // );
-
+        controller1.buttonA.whenPressed(new LowerIntake(intake));
+        controller1.buttonB.whenPressed(
+            new RaiseIntake(intake)
+        );
+        // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
+        // launchpad.buttonG.whileHeld(fullAutoShooterAssembly);
+        // launchpad.buttonG.commandBind(fullAutoShooterAssembly);
         // Conveyor
-        // launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
 
         // Intake
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        // launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
 
         // Shooter
-        // launchpad.funLeft.whileHeld(new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger));
+        ShooterMO shooterMO = new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger);
+        launchpad.buttonI.whileHeld(shooterMO);
+        launchpad.buttonI.commandBind(shooterMO);
         // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
-        // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+        //launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
 
         //Climb
@@ -253,9 +266,11 @@ public class RobotContainer {
                 joystick.button6, joystick.button8);
 
         launchpad.missileA.whileHeld(climbMO);
-
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(drivetrain, climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3);
-        launchpad.missileB.toggleWhenPressed(climbSemiAuto);
+        
+        // ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
+        // launchpad.missileB.toggleWhenPressed(climbSemiAuto);
+        launchpad.missileB.whileHeld(autoClimbCommand);
+        launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button7,
@@ -264,10 +279,14 @@ public class RobotContainer {
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
 
-        launchpad.missileB.whileHeld(climbSemiAuto);
+        Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY);
+        launchpad.buttonH.whileHeld(sas);
+        launchpad.buttonH.commandBind(sas);
+
+        //launchpad.missileB.whileHeld(climbSemiAuto);
         //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
-        launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
-        launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
+        // launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
+        // launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
 
         //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
         //launchpad.missileB.whileHeld(climbAutomation);
@@ -280,7 +299,7 @@ public class RobotContainer {
         //SmartDashboard.putData("PDP", pdp);
         SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
-        // SmartDashboard.putData("Lemonlight", targetingLimelight);
+        SmartDashboard.putData("Lemonlight", targetingLimelight);
         // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         //SmartDashboard.putData("Shooter", shooter);
         //SmartDashboard.putData("Conveyor", conveyor);
@@ -294,8 +313,9 @@ public class RobotContainer {
      * runs when the robot gets disabled.
      */
     public void disabledInit() {
+        autoClimbCommand.resetCommandState();
         LEDs.getInstance().removeAllCalls();
-        new LEDCall("disabled", LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN).activate();
+        LEDs.getInstance().addCall("disabled", new LEDCall(LEDPriorities.ON, LEDRange.All).solid(Colors.DIM_GREEN));
         ShuffleboardDriver.statusDisplay.removeStatus("enabled");
         ChangeRateLimiter.resetAllChangeRateLimiters();
     }

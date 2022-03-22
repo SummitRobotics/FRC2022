@@ -1,5 +1,7 @@
 package frc.robot.commands.conveyor;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
@@ -15,6 +17,10 @@ public class ConveyorAutomation extends CommandBase {
     private Conveyor conveyor;
     private Intake intake;
     private Shooter shooter;
+
+    private static final int indexLidarStop = Conveyor.MAX_INDEXED_LIDAR_DISTANCE - 3;
+
+
 
     public static double
         BELT_SPEED = -0.5,
@@ -40,59 +46,33 @@ public class ConveyorAutomation extends CommandBase {
     @Override
     public void execute() {
 
-        ConveyorState colorSensorState = conveyor.getColorSensorState();
         ConveyorState indexState = conveyor.getIndexState();
-        boolean isBallIndexed = conveyor.isBallIndexed();
+        ConveyorState beltState = conveyor.getBeltState();
+        int lidarDist = conveyor.getLidarDistance();
         Shooter.States shooterState = shooter.getState();
 
-        if (shooterState == Shooter.States.READY_TO_FIRE && isBallIndexed) {
-            conveyor.setIndexMotorPower(-1);
-            conveyor.setBeltMotorPower(BELT_SPEED);
-            return;
+        double beltSpeed = 0;
+        double indexSpeed = 0;
+
+        //if nothing in bent or belt has ball but index does not, run belt
+        if (beltState == ConveyorState.NONE) {
+            beltSpeed = BELT_SPEED;
+        } else if (indexState == ConveyorState.NONE) {
+            beltSpeed = BELT_SPEED;
         }
 
-        ConveyorState beltState = conveyor.getBeltState();
-
-        int numOfBalls = 0;
-
-        if (indexState != ConveyorState.NONE) {
-            numOfBalls++;
-        }
-        if (colorSensorState != ConveyorState.NONE) {
-            numOfBalls++;
-        }
-        if (beltState != ConveyorState.NONE) {
-            numOfBalls++;
+        if ((indexState != ConveyorState.NONE) && lidarDist > indexLidarStop) {
+            indexSpeed = INDEX_SPEED;
         }
 
-        Intake.States intakeState = intake.getState();
-        boolean doesBallExist = conveyor.doesBallExist();
-
-        if (!doesBallExist && intakeState == Intake.States.UP) {
-            conveyor.setBeltMotorPower(0);
-            conveyor.setIndexMotorPower(0);
-        } else {
-            if (numOfBalls == 0 && (doesBallExist || intakeState == Intake.States.DOWN)) {
-                conveyor.setBeltMotorPower(BELT_SPEED);
-                conveyor.setIndexMotorPower(0);
-                return;
-            }
-            if (numOfBalls == 1 && indexState != ConveyorState.NONE && intakeState == Intake.States.DOWN) {
-                conveyor.setBeltMotorPower(BELT_SPEED);
-                conveyor.setIndexMotorPower(0);
-                return;
-            } else if (numOfBalls == 1 && intakeState == Intake.States.UP && indexState != ConveyorState.NONE) {
-                conveyor.setBeltMotorPower(0);
-                conveyor.setIndexMotorPower(0);
-                return;
-            } else if (numOfBalls == 1) {
-                conveyor.setIndexMotorPower(INDEX_SPEED);
-                conveyor.setBeltMotorPower(BELT_SPEED);
-                return;
-            }
-            conveyor.setIndexMotorPower(0);
-            conveyor.setBeltMotorPower(0);
+        if (shooterState == Shooter.States.READY_TO_FIRE) {
+            indexSpeed = -1;
+            //conveyor.setBeltMotorPower(BELT_SPEED);
         }
+
+        conveyor.setIndexMotorPower(indexSpeed);
+        conveyor.setBeltMotorPower(beltSpeed);
+        
     }
 
     @Override
