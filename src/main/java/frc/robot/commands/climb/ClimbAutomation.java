@@ -164,11 +164,11 @@ public class ClimbAutomation extends CommandBase {
 
     // Extending to grab bar using screws
     private void extend() {
-        climb.setMotorPosition(climb.BACK_LIMIT);
+        climb.setMotorPosition(Climb.BACK_LIMIT);
         System.out.println("tryingToEnxtendDDDDDDDDDDDDDDDDDDDDDD");
         System.out.println(climb.getRightEncoderValue());
         System.out.println(extendLoop);
-        if (climb.getLeftEncoderValue() <= climb.BACK_LIMIT + 1 && climb.getRightEncoderValue() <= climb.BACK_LIMIT + 1) {
+        if (climb.getLeftEncoderValue() <= Climb.BACK_LIMIT + 1 && climb.getRightEncoderValue() <= Climb.BACK_LIMIT + 1) {
             if (barNumber == 0) {
                 climbSystem = ClimbStates.EXTENDED;
             } else if (extendLoop > 50) {
@@ -186,17 +186,17 @@ public class ClimbAutomation extends CommandBase {
     // retracting screws
     private void retract() {
         climb.setPivotPos(false);
-        climb.setMotorPosition(climb.FORWARD_LIMIT);
-        if (climb.isHooked() || barNumber == 0){
+        climb.setMotorPosition(Climb.FORWARD_LIMIT);
+        if (climb.isHooked() || barNumber == 0) {
             climb.setLeftDetachPos(true);
             climb.setRightDetachPos(true);
         } 
-        if (climb.getLeftEncoderValue() >= climb.FORWARD_LIMIT - .2 && climb.getRightEncoderValue() >= climb.FORWARD_LIMIT - .2) {
+        if (climb.getLeftEncoderValue() >= Climb.FORWARD_LIMIT - .2 && climb.getRightEncoderValue() >= Climb.FORWARD_LIMIT - .2) {
             System.out.println("WITHIN LIMIT");
             climb.setRightDetachPos(false);
             climb.setLeftDetachPos(false);
-            if (!climb.getLeftDetachPos() && !climb.getRightDetachPos()){
-                if (attachLoop >= 10){
+            if (!climb.getLeftDetachPos() && !climb.getRightDetachPos()) {
+                if (attachLoop >= 10) {
                     climbSystem = ClimbStates.LATCHED;
                     System.out.println("LATCHEEEEEEEEEEEEEEEEEEEEEEEEEED");
                 } else {
