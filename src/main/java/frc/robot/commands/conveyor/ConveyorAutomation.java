@@ -1,5 +1,7 @@
 package frc.robot.commands.conveyor;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
@@ -15,6 +17,9 @@ public class ConveyorAutomation extends CommandBase {
     private Conveyor conveyor;
     private Intake intake;
     private Shooter shooter;
+
+    static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("ball_count");
+
 
     public static double
         BELT_SPEED = -0.5,
@@ -32,6 +37,7 @@ public class ConveyorAutomation extends CommandBase {
         this.intake = intake;
         this.shooter = shooter;
         addRequirements(conveyor);
+        dumb.forceSetDouble(-100);
     }
 
     @Override
@@ -55,15 +61,25 @@ public class ConveyorAutomation extends CommandBase {
 
         int numOfBalls = 0;
 
+        //System.out.println("--------------------------");
+
         if (indexState != ConveyorState.NONE) {
             numOfBalls++;
+            //System.out.println("index add");
         }
         if (colorSensorState != ConveyorState.NONE) {
+            //System.out.println("color add");
             numOfBalls++;
+
         }
         if (beltState != ConveyorState.NONE) {
+            //System.out.println("belt add");
             numOfBalls++;
         }
+        //System.out.println(numOfBalls);
+
+
+        dumb.forceSetDouble(numOfBalls);
 
         Intake.States intakeState = intake.getState();
         boolean doesBallExist = conveyor.doesBallExist();

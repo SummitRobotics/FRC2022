@@ -41,10 +41,10 @@ public class Shooter extends SubsystemBase {
 
     // TODO - Set these
     public static final double
-            P = 1.4217E-4 * 3,
+            P = 0.0005,
             I = 0,
             D = 0,
-            FF = 0.075 / 12 / 30,
+            FF = 0.000204,
             IZ = 0,
             MAX_RPM = 5000;
 
@@ -85,6 +85,7 @@ public class Shooter extends SubsystemBase {
         shooterMotorPIDController.setFF(FF);
         shooterMotorPIDController.setIZone(IZ);
         shooterMotorPIDController.setOutputRange(-1.0, 1.0);
+        shooterMotorMain.enableVoltageCompensation(12);
         
         zeroEncoders();
         shooterMotorFollow.follow(shooterMotorMain, true);
