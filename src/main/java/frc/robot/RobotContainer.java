@@ -135,9 +135,9 @@ public class RobotContainer {
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        shooter = new Shooter();
+        shooter = new Shooter(targetingLimelight);
         conveyor = new Conveyor(colorSensor, lidar);
-        intake = new Intake();
+        intake = new Intake(ballDetectionLimelight);
         climb = new Climb(gyro);
 
         // TODO - set these values

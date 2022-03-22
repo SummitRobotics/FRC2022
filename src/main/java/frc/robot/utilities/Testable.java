@@ -4,7 +4,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.LidarV4;
+import frc.robot.devices.Lidar;
 import java.util.HashMap;
 
 /**
@@ -24,8 +24,8 @@ public interface Testable {
         return new Lemonlight[] {};
     }
 
-    public default LidarV4[] getLidarV4s() {
-        return new LidarV4[] {};
+    public default Lidar[] getLidars() {
+        return new Lidar[] {};
     }
 
     public default double getMotorTestSpeed() {
@@ -38,6 +38,10 @@ public interface Testable {
 
     public default double getAllowedTimeSeconds() {
         return 5;
+    }
+
+    public default double getMaxSensorLoopMilliseconds() {
+        return 10;
     }
 
     public default HashMap<String, Boolean> runCustomTests() {

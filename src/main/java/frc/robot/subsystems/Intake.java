@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.Lemonlight;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 
@@ -44,11 +45,16 @@ public class Intake extends SubsystemBase implements Testable {
     // variable to track the intake solenoid's position.
     private boolean intakeSolenoidPosition = false;
 
+    // ball limelight (tested in this subsystem)
+    private Lemonlight ballLimelight;
 
     /**
      * Subsystem to control the intake of the robot.
+     *
+     * @param ballLimelight The limelight used for ball tracking
      */
-    public Intake() {
+    public Intake(Lemonlight ballLimelight) {
+        this.ballLimelight = ballLimelight;
         zeroEncoder();
         state = States.UP;
         intakeMotor.setOpenLoopRampRate(INTAKE_RATE);
@@ -115,13 +121,16 @@ public class Intake extends SubsystemBase implements Testable {
     public void zeroEncoder() {
         setIntakeEncoder(0);
     }
+
     /**
-     * gets intake motor power
+     * gets intake motor power.
+     *
      * @return power draw
      */
-    public double getIntakePower(){
+    public double getIntakePower() {
         return intakeMotor.getOutputCurrent();
     }
+
     /**
      * Stops the intake motor.
      */
@@ -182,6 +191,11 @@ public class Intake extends SubsystemBase implements Testable {
     @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {intakeMotor};
+    }
+
+    @Override
+    public Lemonlight[] getLimelights() {
+        return new Lemonlight[] {ballLimelight};
     }
 
     @Override

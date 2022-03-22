@@ -5,6 +5,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.utilities.RollingAverage;
 import java.nio.ByteBuffer;
 
@@ -22,13 +23,20 @@ public class LidarV3 implements Lidar, Sendable {
     private final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2);
 
     private Object valueLock = new Object();
+    private Object loopLock = new Object();
+    private Timer loopTimer = new Timer();
+    private double measuredLoopTime = 0;
     private short value;
     private Notifier thread;
 
     private final Runnable proximityReader = new Runnable() {
         @Override
         public void run() {
+            loopTimer.start();
             updateValue(readShort(0x8f));
+            loopTimer.stop();
+            updateLoopTime(loopTimer.get());
+            loopTimer.reset();
         }
     };
 
@@ -77,6 +85,18 @@ public class LidarV3 implements Lidar, Sendable {
     }
 
     /**
+     * Returns how long measurements took.
+     *
+     * @return The amount of time, in milliseconds, that it took to measure distance
+     */
+    @Override
+    public double getLoopTimeMilliseconds() {
+        synchronized (loopLock) {
+            return measuredLoopTime * 1000;
+        }
+    }
+
+    /**
      * Gets the average distance from the lidar.
      *
      * @return the average distance in cm
@@ -109,6 +129,12 @@ public class LidarV3 implements Lidar, Sendable {
         I2CJNI.i2CWrite(port, DEVICE_ADDRESS, byteBuffer, (byte) 1);
         I2CJNI.i2CRead(port, DEVICE_ADDRESS, byteBuffer, (byte) 2);
         return byteBuffer.getShort(0);
+    }
+
+    private void updateLoopTime(double time) {
+        synchronized (loopLock) {
+            measuredLoopTime = time;
+        }
     }
 
     @Override

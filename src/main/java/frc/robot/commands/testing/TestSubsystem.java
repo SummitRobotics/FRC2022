@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.LidarV4;
+import frc.robot.devices.Lidar;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
@@ -21,7 +21,7 @@ public class TestSubsystem extends CommandBase {
     private CANSparkMax[] motors;
     private ColorSensor[] colorSensors;
     private Lemonlight[] limelights;
-    private LidarV4[] lidars;
+    private Lidar[] lidars;
     private RelativeEncoder[] encoders;
     private double[] startingPositions;
     private HashMap<String, Boolean> testStates;
@@ -41,7 +41,7 @@ public class TestSubsystem extends CommandBase {
         motors = toTest.getMotors();
         colorSensors = toTest.getColorSensors();
         limelights = toTest.getLimelights();
-        lidars = toTest.getLidarV4s();
+        lidars = toTest.getLidars();
 
         subsystem = toTest.getSubsystemObject();
         
@@ -55,7 +55,7 @@ public class TestSubsystem extends CommandBase {
         }
 
         for (int i = 0; i < lidars.length; i++) {
-            testStates.put("LidarV4 " + i, false);
+            testStates.put("Lidar " + i, false);
         }
 
         for (int i = 0; i < limelights.length; i++) {
@@ -87,11 +87,30 @@ public class TestSubsystem extends CommandBase {
         }
 
         for (int i = 0; i < colorSensors.length; i++) {
-            // TODO - adjust acceptable loop time
-            if (colorSensors[i].getLoopTimeMilliseconds() < 10) {
+            if (colorSensors[i].getLoopTimeMilliseconds() < toTest.getMaxSensorLoopMilliseconds()
+                && colorSensors[i].getProximity() > 0
+                && colorSensors[i].getColorString() != "Unknown") {
                 testStates.replace("Color Sensor " + i, true);
             } else {
                 testStates.replace("Color Sensor " + i, false);
+            }
+        }
+
+        for (int i = 0; i < lidars.length; i++) {
+            if (lidars[i].getLoopTimeMilliseconds() < toTest.getMaxSensorLoopMilliseconds()
+                && lidars[i].getDistance() > 0) {
+                testStates.replace("Lidar " + i, true);
+            } else {
+                testStates.replace("Lidar " + i, false);
+            }
+        }
+
+        for (int i = 0; i < limelights.length; i++) {
+            // TODO - What else can we test on limelights?
+            if (limelights[i] != null) {
+                testStates.replace("Limelight " + i, true);
+            } else {
+                testStates.replace("Limelight " + i, false);
             }
         }
     }

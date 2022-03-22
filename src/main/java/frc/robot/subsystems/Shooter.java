@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.Lemonlight;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.utilities.Functions;
@@ -76,10 +77,16 @@ public class Shooter extends SubsystemBase implements Testable {
 
     private LEDCall firing = new LEDCall(LEDPriorities.SHOOTING, LEDRange.All).solid(Colors.PURPLE);
 
+    // targeting limelight (for testing)
+    private Lemonlight targetingLimelight;
+
     /**
      * Creates a new shooter instance.
+     *
+     * @param targetingLimelight The limelight used for targeting
      */
-    public Shooter() {
+    public Shooter(Lemonlight targetingLimelight) {
+        this.targetingLimelight = targetingLimelight;
         shooterMotorPIDController.setP(P);
         shooterMotorPIDController.setI(I);
         shooterMotorPIDController.setD(D);
@@ -254,6 +261,11 @@ public class Shooter extends SubsystemBase implements Testable {
     @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {shooterMotorMain};
+    }
+
+    @Override
+    public Lemonlight[] getLimelights() {
+        return new Lemonlight[] {targetingLimelight};
     }
 
     @Override

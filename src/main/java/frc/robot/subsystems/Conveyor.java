@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import javax.lang.model.element.Element;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -353,6 +351,16 @@ public class Conveyor extends SubsystemBase implements Testable {
     @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {belt, index};
+    }
+
+    @Override
+    public ColorSensor[] getColorSensors() {
+        return new ColorSensor[] {colorSensor};
+    }
+
+    @Override
+    public Lidar[] getLidars() {
+        return new Lidar[] {lidar};
     }
 
     @Override

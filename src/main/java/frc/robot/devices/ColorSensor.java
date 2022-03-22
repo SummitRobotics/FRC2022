@@ -152,7 +152,7 @@ public class ColorSensor implements Sendable {
      */
     public double getLoopTimeMilliseconds() {
         synchronized (loopLock) {
-            return measuredLoopTime * 0.001;
+            return measuredLoopTime * 1000;
         }
     }
 
