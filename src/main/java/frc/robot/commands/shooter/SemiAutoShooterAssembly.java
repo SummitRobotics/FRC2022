@@ -67,11 +67,12 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         prioritizedShootButton = shootButton.prioritize(axisPriority);
         prioritizedControlAxis = controlAxis.prioritize(axisPriority);
     }
+
     @Override
-    public void execute(){
+    public void execute() {
         super.execute();
-        fire(shooter);
     }
+
     @Override
     public void end(final boolean interrupted) {
         super.end(interrupted);

@@ -18,7 +18,8 @@ public class ConveyorAutomation extends CommandBase {
     private Intake intake;
     private Shooter shooter;
 
-    static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("ball_count");
+    private static final int indexLidarStop = Conveyor.MAX_INDEXED_LIDAR_DISTANCE - 3;
+
 
 
     public static double
@@ -37,7 +38,6 @@ public class ConveyorAutomation extends CommandBase {
         this.intake = intake;
         this.shooter = shooter;
         addRequirements(conveyor);
-        dumb.forceSetDouble(-100);
     }
 
     @Override
@@ -46,69 +46,33 @@ public class ConveyorAutomation extends CommandBase {
     @Override
     public void execute() {
 
-        ConveyorState colorSensorState = conveyor.getColorSensorState();
         ConveyorState indexState = conveyor.getIndexState();
-        boolean isBallIndexed = conveyor.isBallIndexed();
+        ConveyorState beltState = conveyor.getBeltState();
+        int lidarDist = conveyor.getLidarDistance();
         Shooter.States shooterState = shooter.getState();
 
-        if (shooterState == Shooter.States.READY_TO_FIRE && isBallIndexed) {
-            conveyor.setIndexMotorPower(-1);
-            conveyor.setBeltMotorPower(BELT_SPEED);
-            return;
+        double beltSpeed = 0;
+        double indexSpeed = 0;
+
+        //if nothing in bent or belt has ball but index does not, run belt
+        if (beltState == ConveyorState.NONE) {
+            beltSpeed = BELT_SPEED;
+        } else if (indexState == ConveyorState.NONE) {
+            beltSpeed = BELT_SPEED;
         }
 
-        ConveyorState beltState = conveyor.getBeltState();
-
-        int numOfBalls = 0;
-
-        //System.out.println("--------------------------");
-
-        if (indexState != ConveyorState.NONE) {
-            numOfBalls++;
-            //System.out.println("index add");
+        if ((indexState != ConveyorState.NONE) && lidarDist > indexLidarStop) {
+            indexSpeed = INDEX_SPEED;
         }
-        if (colorSensorState != ConveyorState.NONE) {
-            //System.out.println("color add");
-            numOfBalls++;
 
+        if (shooterState == Shooter.States.READY_TO_FIRE) {
+            indexSpeed = -1;
+            //conveyor.setBeltMotorPower(BELT_SPEED);
         }
-        if (beltState != ConveyorState.NONE) {
-            //System.out.println("belt add");
-            numOfBalls++;
-        }
-        //System.out.println(numOfBalls);
 
-
-        dumb.forceSetDouble(numOfBalls);
-
-        Intake.States intakeState = intake.getState();
-        boolean doesBallExist = conveyor.doesBallExist();
-
-        if (!doesBallExist && intakeState == Intake.States.UP) {
-            conveyor.setBeltMotorPower(0);
-            conveyor.setIndexMotorPower(0);
-        } else {
-            if (numOfBalls == 0 && (doesBallExist || intakeState == Intake.States.DOWN)) {
-                conveyor.setBeltMotorPower(BELT_SPEED);
-                conveyor.setIndexMotorPower(0);
-                return;
-            }
-            if (numOfBalls == 1 && indexState != ConveyorState.NONE && intakeState == Intake.States.DOWN) {
-                conveyor.setBeltMotorPower(BELT_SPEED);
-                conveyor.setIndexMotorPower(0);
-                return;
-            } else if (numOfBalls == 1 && intakeState == Intake.States.UP && indexState != ConveyorState.NONE) {
-                conveyor.setBeltMotorPower(0);
-                conveyor.setIndexMotorPower(0);
-                return;
-            } else if (numOfBalls == 1) {
-                conveyor.setIndexMotorPower(INDEX_SPEED);
-                conveyor.setBeltMotorPower(BELT_SPEED);
-                return;
-            }
-            conveyor.setIndexMotorPower(0);
-            conveyor.setBeltMotorPower(0);
-        }
+        conveyor.setIndexMotorPower(indexSpeed);
+        conveyor.setBeltMotorPower(beltSpeed);
+        
     }
 
     @Override

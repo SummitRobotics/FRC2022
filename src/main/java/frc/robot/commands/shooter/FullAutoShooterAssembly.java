@@ -49,7 +49,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         RANGE_OVERLAP = 10,
         TARGET_HORIZONTAL_ACCURACY = 3,
         TARGET_WRONG_COLOR_MISS = 30,
-        TARGET_MOTOR_SPEED_ACCURACY = 100,
+        TARGET_MOTOR_SPEED_ACCURACY = 50,
         IDEAL_SHOOTING_DISTANCE = 80,
         SHOOTER_IDLE_SPEED = 1400;
 
@@ -159,19 +159,20 @@ public class FullAutoShooterAssembly extends CommandBase {
         double limelightDistanceEstimate) {
         
         //sets if align target based on ball color
-        // if (isAccurate) {
-        //     alignPID.setSetpoint(0);
-        // } else {
-        //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        // }
+        if (isAccurate) {
+            alignPID.setSetpoint(0);
+        } else {
+            alignPID.setSetpoint(0);
+            //alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
+        }
         
         double leftPower = 0;
         double rightPower = 0;
 
         //align to target
         double alignPower = alignPID.calculate(horizontalOffset);
-        leftPower += alignPower;
-        rightPower += -alignPower;
+        leftPower += -alignPower;
+        rightPower += alignPower;
 
 
         //move towards target
@@ -224,7 +225,7 @@ public class FullAutoShooterAssembly extends CommandBase {
 
         if (!Functions.isWithin(currentMotorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
 
-            shooter.setMotorTargetSpeed(targetMotorSpeed + 50);
+            shooter.setMotorTargetSpeed(targetMotorSpeed);
             return false;
 
         } else {
