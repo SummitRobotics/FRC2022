@@ -14,7 +14,9 @@ public interface Testable {
 
     public Subsystem getSubsystemObject();
 
-    public CANSparkMax[] getMotors();
+    public default CANSparkMax[] getMotors() {
+        return new CANSparkMax[] {};
+    }
 
     public default ColorSensor[] getColorSensors() {
         return new ColorSensor[] {};
