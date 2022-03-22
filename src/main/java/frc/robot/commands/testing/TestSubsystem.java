@@ -5,6 +5,9 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.devices.ColorSensor;
+import frc.robot.devices.Lemonlight;
+import frc.robot.devices.LidarV4;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
@@ -16,6 +19,9 @@ import java.util.HashMap;
 public class TestSubsystem extends CommandBase {
 
     private CANSparkMax[] motors;
+    private ColorSensor[] colorSensors;
+    private Lemonlight[] limelights;
+    private LidarV4[] lidars;
     private RelativeEncoder[] encoders;
     private double[] startingPositions;
     private HashMap<String, Boolean> testStates;
@@ -31,12 +37,29 @@ public class TestSubsystem extends CommandBase {
      */
     public TestSubsystem(Testable toTest) {
         this.toTest = toTest;
+
         motors = toTest.getMotors();
+        colorSensors = toTest.getColorSensors();
+        limelights = toTest.getLimelights();
+        lidars = toTest.getLidarV4s();
+
         subsystem = toTest.getSubsystemObject();
         
         for (int i = 0; i < motors.length; i++) {
             testStates.put(Integer.toString(motors[i].getDeviceId()), false);
             encoders[i] = motors[i].getEncoder();
+        }
+
+        for (int i = 0; i < colorSensors.length; i++) {
+            testStates.put("Color Sensor " + i, false);
+        }
+
+        for (int i = 0; i < lidars.length; i++) {
+            testStates.put("LidarV4 " + i, false);
+        }
+
+        for (int i = 0; i < limelights.length; i++) {
+            testStates.put("Limelight " + i, false);
         }
 
         timer = new Timer();
@@ -60,6 +83,15 @@ public class TestSubsystem extends CommandBase {
             if (encoders[i].getPosition() > startingPositions[i] + toTest.getMotorTestRotations()) {
                 motors[i].set(0);
                 testStates.replace(Integer.toString(motors[i].getDeviceId()), true);
+            }
+        }
+
+        for (int i = 0; i < colorSensors.length; i++) {
+            // TODO - adjust acceptable loop time
+            if (colorSensors[i].getLoopTimeMilliseconds() < 10) {
+                testStates.replace("Color Sensor " + i, true);
+            } else {
+                testStates.replace("Color Sensor " + i, false);
             }
         }
     }
