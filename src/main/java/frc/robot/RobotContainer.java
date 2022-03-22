@@ -132,7 +132,7 @@ public class RobotContainer {
         
         targetingLimelight = new Lemonlight("limelight-target", false, false);
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("limelight-balldetect", true, false);
+        ballDetectionLimelight = new Lemonlight("limelight-balls", true, false);
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
@@ -303,7 +303,7 @@ public class RobotContainer {
         SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
         SmartDashboard.putData("Lemonlight", targetingLimelight);
-        // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
+        SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         //SmartDashboard.putData("Shooter", shooter);
         //SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);

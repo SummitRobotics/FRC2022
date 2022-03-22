@@ -140,8 +140,9 @@ public class Lemonlight implements Sendable {
      *
      * @return the horizontal offset
      */
-    public double getHorizontalOffset() {
-        return tx.getDouble(0);
+    public double getHorizontalOffset() {       
+        return tx.getDouble(0); 
+        
     }
 
     /**
@@ -186,6 +187,46 @@ public class Lemonlight implements Sendable {
         return targetDistance * Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * 0.393701;
     }
 
+    public ArrayList<double[]> getCustomVisionDataReadable(){
+        ArrayList<double[]> v = new ArrayList<double[]>();
+        for(Integer x: getCustomVisionData()){
+            double[] c = new double[3];
+            if (ballExists(x)) {
+                if (isBlue(x)){
+                    c[0] = 1;
+                }else{
+                    c[0] = 0;
+                }
+                c[1] = getCustomDataOffsetAngle(x, true);
+                c[2] = getCustomDataOffsetAngle(x, false);
+                v.add(c);
+            }
+        }
+        return v;
+    }
+    public double getCustomDataOffsetAngle(double number, boolean isHorizontal) {
+        String x = String.valueOf(number);
+        Double b;
+        if (isHorizontal) { 
+            b = Double.valueOf(x.substring(2, 5)) / 10;
+            if (x.charAt(1) == '1') {
+                b *= -1;
+            }
+        } else {
+            b = Double.valueOf(x.substring(6, 9)) / 10;
+            if (x.charAt(5) == '1') {
+                b *= -1;
+            }
+        }
+        return b;
+    }
+
+    public boolean ballExists(double number) {
+        return number % 2 == 0;
+    }
+    public boolean isBlue(double number){
+        return String.valueOf(number).startsWith("1");
+    }
     /**
      * Returns the custom vision data output by the limelight when in python mode.
      * In the limelight you output to the array labeled llpython.

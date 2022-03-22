@@ -1,11 +1,14 @@
 package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
+import java.util.ArrayList;
+
 
 /**
  * Full auto intake mode.
@@ -16,7 +19,7 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     // subsystems
     private Drivetrain drivetrain;
-
+    private final String teamColor = DriverStation.getAlliance().toString();
     // devices
     private Lemonlight limelight;
 
@@ -61,16 +64,26 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     @Override
     public void execute() {
+        double distTest;
         limelightHasTarget = limelight.hasTarget();
-        limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
-            Lemonlight.BALL_MOUNT_HEIGHT,
-            Lemonlight.BALL_MOUNT_ANGLE,
-            Lemonlight.BALL_TARGET_HEIGHT,
-            limelight.getVerticalOffset());
-        horizontalOffset = limelight.getHorizontalOffset();
+        ArrayList<double[]> limelightData = limelight.getCustomVisionDataReadable();
+        for (double[] b : limelightData) {
+            if ((b[0] == 0 && teamColor == "kRed") || (b[0] == 1 && teamColor == "kBue")) {
+                distTest = Lemonlight.getLimelightDistanceEstimateIN(
+                    Lemonlight.BALL_MOUNT_HEIGHT,
+                    Lemonlight.BALL_MOUNT_ANGLE,
+                    Lemonlight.BALL_TARGET_HEIGHT,
+                    b[1]);
+                if (limelightDistanceEstimate > distTest) {
+                    limelightDistanceEstimate = distTest;
+                    horizontalOffset = b[2];
+                }
+            }
+
+        }
+
 
         System.out.println("distance : " + limelightDistanceEstimate + "   hzo: " + horizontalOffset);
-
         if (limelightHasTarget) {
             double alignPower = alignPID.calculate(horizontalOffset);
             double movePower =  -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
