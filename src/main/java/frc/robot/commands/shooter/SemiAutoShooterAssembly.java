@@ -18,7 +18,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private OIButton.PrioritizedButton prioritizedShootButton;
     private OIAxis controlAxis;
     private OIAxis.PrioritizedAxis prioritizedControlAxis;
-    private final int axisPriority = 5;
+    private final int axisPriority = 999999999;
 
     /**
      * Command for running the shooter in semi auto mode.
@@ -46,14 +46,16 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
     @Override
     public void findTarget(Drivetrain drivetrain) {
-        drivetrain.setLeftMotorPower(prioritizedControlAxis.get());
-        drivetrain.setRightMotorPower(-prioritizedControlAxis.get());
+        drivetrain.setLeftMotorPower(-prioritizedControlAxis.get());
+        drivetrain.setRightMotorPower(prioritizedControlAxis.get());
 
     }
 
     @Override
     public void fire(Shooter shooter) {
+        //System.out.println(prioritizedShootButton.get());
         if (prioritizedShootButton.get()) {
+            //System.out.println("semi fire");
             super.fire(shooter);
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
@@ -71,6 +73,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     @Override
     public void execute() {
         super.execute();
+        fire(shooter);
     }
 
     @Override

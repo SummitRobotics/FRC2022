@@ -23,8 +23,8 @@ public class Lemonlight implements Sendable {
             MAIN_MOUNT_HEIGHT = 81.915, 
             MAIN_MOUNT_ANGLE = 35.5,
             MAIN_TARGET_HEIGHT = 257,
-            BALL_MOUNT_HEIGHT = 22.0,
-            BALL_MOUNT_ANGLE = -20.0,
+            BALL_MOUNT_HEIGHT = 77.2,
+            BALL_MOUNT_ANGLE = -32.0,
             BALL_MOUNT_ANGLE_X = 0.0,
             BALL_TARGET_HEIGHT = 12.065;
 

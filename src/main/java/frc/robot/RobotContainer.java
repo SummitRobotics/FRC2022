@@ -32,6 +32,7 @@ import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
 import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.DefaultIntake;
+import frc.robot.commands.intake.FullAutoIntake;
 import frc.robot.commands.intake.IntakeMO;
 import frc.robot.commands.intake.IntakeToggle;
 import frc.robot.commands.intake.LowerIntake;
@@ -104,7 +105,7 @@ public class RobotContainer {
     private Command fullAutoShooterAssembly;
     private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
-    private final Command autoInit;
+    private final Supplier<Command> autoInit;
     private Command auto;
     private ClimbAutomationBetter autoClimbCommand;
 
@@ -146,7 +147,7 @@ public class RobotContainer {
 
         autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
         
-        autoInit = new SequentialCommandGroup(
+        autoInit = () -> new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
                                 "auto",
@@ -241,6 +242,8 @@ public class RobotContainer {
         controller1.buttonB.whenPressed(
             new RaiseIntake(intake)
         );
+
+        controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight));
         // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
         // launchpad.buttonG.whileHeld(fullAutoShooterAssembly);
         // launchpad.buttonG.commandBind(fullAutoShooterAssembly);
@@ -349,10 +352,20 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+        System.out.println("Called");
         // // An ExampleCommand will run in autonomous
         //  // sets up all the splines so we dont need to spend lots of time
+        Command auto = new PrintCommand("something went wrong");
         // // turning the json files into trajectorys when we want to run them
-        // String ball1 = "paths\1.path";
+        String ball1 = "paths/output/circle.wpilib.json";
+        try {
+            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+            auto = new SequentialCommandGroup(
+                autoInit.get(),
+                fball1);
+        } catch (Exception e) {
+            System.out.println("Spline error occurred: " + e);
+        }
         // try {
         //     Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
         //     // possible 4 ball auto
@@ -374,18 +387,7 @@ public class RobotContainer {
         //     System.out.println("An error occured when making autoInit: " + e);
         // }
 
-        return new SequentialCommandGroup(
-            //autoInit,
-            //new ShooterAtStart(shooter, conveyor).withTimeout(10),
-            //new InstantCommand(() -> {drivetrain.setLeftMotorPower(-0.3); drivetrain.setRightMotorPower(-0.3);}),
-            new DriveByTime(drivetrain, 3, -0.3)
-            //new InstantCommand(() -> drivetrain.stop())
-            // fullAutoShooterAssembly,
-            // fullAutoIntake.get(),
-            // fullAutoShooterAssembly,
-            // fullAutoIntake.get(),
-            // fullAutoShooterAssembly
-            );
+        return auto;
         
     }
 }
