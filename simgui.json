@@ -46,5 +46,7 @@
     "chronic": {
       "open": true
     }
+  },"shooter": {
+    "open": true
   }
 }

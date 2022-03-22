@@ -41,15 +41,15 @@ public class Shooter extends SubsystemBase {
 
     // TODO - Set these
     public static final double
-            P = 1.4217E-9,
+            P = 1.4217E-4 * 3,
             I = 0,
             D = 0,
-            FF = 0.068605 / 12 / 30,
+            FF = 0.075 / 12 / 30,
             IZ = 0,
             MAX_RPM = 5000;
 
     PIDController pidDum = new PIDController(1.4217E-11, 0, 0);
-    SimpleMotorFeedforward ffDum = new SimpleMotorFeedforward(0.5235, 0.066605, 0.011555);
+    SimpleMotorFeedforward ffDum = new SimpleMotorFeedforward(0.5235, 0.0666, 0.011555);
 
     private final CANSparkMax shooterMotorMain = new CANSparkMax(
             Ports.SHOOTER_MOTOR_1,
@@ -246,9 +246,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        // builder.setSmartDashboardType("Shooter");
+        builder.setSmartDashboardType("Shooter");
         // //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
-        // builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
+        builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
         // builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
         // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }

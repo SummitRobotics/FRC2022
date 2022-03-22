@@ -12,6 +12,8 @@ import frc.robot.subsystems.Drivetrain;
 public class AutoAlign extends CommandBase {
     private Climb climb;
     private Drivetrain drive;
+    private boolean oldLeftLimit;
+    private boolean oldRightLimit;
 
     private Timer moveTime;
 
@@ -22,6 +24,8 @@ public class AutoAlign extends CommandBase {
         this.climb = climb;
         this.drive = drive;
         moveTime = new Timer();
+        oldLeftLimit = true;
+        oldRightLimit = true;
        
     }
 
@@ -30,25 +34,35 @@ public class AutoAlign extends CommandBase {
     public void initialize() {
         moveTime.start();
         moveTime.reset();
-        drive.lowGear();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (!climb.getLeftLimit()) {
-            drive.setLeftMotorPower(0.6);
+        boolean align = false;
+
+        if ((!climb.getLeftLimit()) && (!oldLeftLimit)) {
+            drive.setLeftMotorPower(0.5);
             moveTime.reset();
+            align = true;
         } else {
             drive.setLeftMotorPower(0);
         }
 
-        if (!climb.getRightLimit()) {
-            drive.setRightMotorPower(0.6);
+        if ((!climb.getRightLimit()) && (!oldRightLimit)) {
+            drive.setRightMotorPower(0.5);
             moveTime.reset();
+            align = true;
         } else {
             drive.setRightMotorPower(0);
         }
+
+        if(!align){
+            drive.setBothMotorPower(0.5);
+        }
+
+        oldRightLimit = climb.getRightLimit();
+        oldLeftLimit = climb.getLeftLimit();
     }
 
     // Called once the command ends or is interrupted.
@@ -62,6 +76,6 @@ public class AutoAlign extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return moveTime.get() > 0.05;
+        return moveTime.get() > 0.1;
     }
 }

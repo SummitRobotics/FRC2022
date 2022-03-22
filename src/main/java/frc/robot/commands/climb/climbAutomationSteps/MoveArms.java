@@ -11,10 +11,10 @@ import frc.robot.utilities.Functions;
 public class MoveArms extends CommandBase {
     private Climb climb;
     private double target;
-    private final double error = 0.2;
+    private final double error = 0.4;
 
     /** Creates a new RaiseArms. */
-    public MoveArms(Climb climb, double Target) {
+    public MoveArms(Climb climb, double target) {
         this.climb = climb;
         this.target = target;
     }
@@ -39,6 +39,7 @@ public class MoveArms extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        //System.out.println("MOVE     LEFT: " + climb.getLeftEncoderValue() + "  RIGHT: " + climb.getRightEncoderValue());
         return Functions.isWithin(climb.getLeftEncoderValue(), target, error) && Functions.isWithin(climb.getRightEncoderValue(), target, error);
     }
 }

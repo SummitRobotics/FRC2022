@@ -253,9 +253,9 @@ public class Drivetrain extends SubsystemBase {
      */
     public void highGear() {
         lowGear.cancel();
-        oldShift = true;
+        oldShift = false;
         updateDistanceAcum();
-        shift.set(true);
+        shift.set(false);
     }
 
     /**
@@ -263,19 +263,20 @@ public class Drivetrain extends SubsystemBase {
      */
     public void lowGear() {
         lowGear.activate();
-        oldShift = false;
+        oldShift = true;
         updateDistanceAcum();
-        shift.set(false);
+        shift.set(true);
     }
 
     /**
      * Toggles the shift state.
      */
     public void toggleShift() {
+        //System.out.println("shift call");
         if (oldShift) {
-            lowGear();
-        } else {
             highGear();
+        } else {
+            lowGear();
         }
     }
 

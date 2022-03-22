@@ -1,12 +1,16 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
@@ -36,18 +40,17 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected double currentMotorSpeed;
     protected double currentIndexSpeed;
     protected boolean isDrivenAndAligned;
-       
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 160,
-        MIN_SHOOTER_RANGE = 20,
+        MAX_SHOOTER_RANGE = 120,
+        MIN_SHOOTER_RANGE = 50,
         OK_TO_MOVE_OFSET = 5,
-        HOOD_UP_RANGE = 5,
-        RANGE_OVERLAP = 1,
+        HOOD_UP_RANGE = 120,
+        RANGE_OVERLAP = 10,
         TARGET_HORIZONTAL_ACCURACY = 3,
-        TARGET_WRONG_COLOR_MISS = 45,
-        TARGET_MOTOR_SPEED_ACCURACY = 3,
-        IDEAL_SHOOTING_DISTANCE = 100,
+        TARGET_WRONG_COLOR_MISS = 30,
+        TARGET_MOTOR_SPEED_ACCURACY = 100,
+        IDEAL_SHOOTING_DISTANCE = 80,
         SHOOTER_IDLE_SPEED = 1400;
 
     // devices
@@ -67,7 +70,6 @@ public class FullAutoShooterAssembly extends CommandBase {
         Conveyor conveyor,
         Drivetrain drivetrain,
         Lemonlight limelight) {
-
         this.shooter = shooter;
         this.conveyor = conveyor;
         this.drivetrain = drivetrain;
@@ -117,10 +119,10 @@ public class FullAutoShooterAssembly extends CommandBase {
                 + 0;
         } else {
             return 
-                + (0.000257791 * distance * distance * distance)
-                + (-0.0448 * distance * distance)
-                + 9.24 * distance
-                + 1191.15;
+                + (0.0000402618 * distance * distance * distance)
+                + (0.026673 * distance * distance)
+                + 1.00381 * distance
+                + 1410.1;
         }
     }
 
@@ -157,11 +159,11 @@ public class FullAutoShooterAssembly extends CommandBase {
         double limelightDistanceEstimate) {
         
         //sets if align target based on ball color
-        if (isAccurate) {
-            alignPID.setSetpoint(0);
-        } else {
-            alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        }
+        // if (isAccurate) {
+        //     alignPID.setSetpoint(0);
+        // } else {
+        //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
+        // }
         
         double leftPower = 0;
         double rightPower = 0;
@@ -176,7 +178,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         if (Functions.isWithin(horizontalOffset, 0, OK_TO_MOVE_OFSET)) {
             //records current distance to be heald with pid, clamped to the max and min range of the shooter
             if (!hasRecordedLimelightDistance) {
-                movePID.setSetpoint(Functions.clampDouble(horizontalOffset, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
+                movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
                 hasRecordedLimelightDistance = true;
             }
 
@@ -222,7 +224,7 @@ public class FullAutoShooterAssembly extends CommandBase {
 
         if (!Functions.isWithin(currentMotorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
 
-            shooter.setMotorTargetSpeed(targetMotorSpeed);
+            shooter.setMotorTargetSpeed(targetMotorSpeed + 50);
             return false;
 
         } else {
@@ -239,15 +241,15 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return Whether or not the hood position was correct
      */
     public boolean setHood(Shooter shooter, double limelightDistanceEstimate, boolean hoodPos) {
-        if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
+        // if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
 
-            shooter.toggleHoodPos();
-            return false;
+        //     shooter.toggleHoodPos();
+        //     return false;
 
-        } else {
-            return true;
-        }
-
+        // } else {
+        //     return true;
+        // }
+        return true;
     }
 
     @Override
@@ -257,7 +259,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         movePID.reset();
         hasRecordedLimelightDistance = false;
     }
-
+    
     @Override
     public void execute() {
         limelightHasTarget = limelight.hasTarget();
@@ -266,22 +268,20 @@ public class FullAutoShooterAssembly extends CommandBase {
             Lemonlight.MAIN_MOUNT_ANGLE,
             Lemonlight.MAIN_TARGET_HEIGHT,
             limelight.getVerticalOffset());
-
         smoothedHorizontalOffset = limelight.getHorizontalOffset();
         indexState = conveyor.getIndexState();
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterRPM();
-
         if (limelightHasTarget) {
-
+            //TODO change this back
             isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
             isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
-            isDrivenAndAligned = driveAndAlign(drivetrain,
-                smoothedHorizontalOffset,
-                (indexState == teamColor),
-                limelightDistanceEstimate);
+            // isDrivenAndAligned = driveAndAlign(drivetrain,
+            //     smoothedHorizontalOffset,
+            //     true,
+            //     limelightDistanceEstimate);
 
-            if (isDrivenAndAligned && isHoodSet && isSpooled && isBallReady()) {
+            if (isHoodSet && isSpooled && isBallReady()) {
                 fire(shooter);
             }
 

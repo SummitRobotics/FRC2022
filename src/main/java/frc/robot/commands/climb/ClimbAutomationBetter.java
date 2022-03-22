@@ -4,6 +4,8 @@
 
 package frc.robot.commands.climb;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -33,27 +35,34 @@ public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
         this.climb = climb;
         this.drivetrain = drivetrain;
         AutoAlign autoAlign = new AutoAlign(climb, drivetrain);
-        CycleArms cycleArms = new CycleArms(climb, climb.FORWARD_LIMIT);
-        MoveArms moveArms = new MoveArms(climb, climb.BACK_LIMIT);
+        Supplier<CycleArms> cycleArms = () -> new CycleArms(climb, climb.FORWARD_LIMIT);
+        Supplier<MoveArms> moveArms = () -> new MoveArms(climb, climb.BACK_LIMIT);
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         //TODO Tune WaitCommand timings
-        addCommands(new InstantCommand(() -> climb.setDetachPos(true)),
-            moveArms,
+        addCommands(
+            new InstantCommand(() -> climb.setDetachPos(true)),
+            new MoveArms(climb, -140),
             autoAlign,
             new MoveArms(climb, climb.FORWARD_LIMIT),
             new InstantCommand(() -> climb.setDetachPos(false)),
+            new WaitCommand(.1),
             new InstantCommand(() -> climb.setPivotPos(true)),
-            new WaitCommand(.5),
-            moveArms,
+            new WaitCommand(.2),
+            moveArms.get(),
             new InstantCommand(()-> climb.setPivotPos(false)),
             new WaitCommand(.5),
-            cycleArms,
+            cycleArms.get(),
+            new InstantCommand(() -> climb.setDetachPos(false)),
+            new WaitCommand(.1),
             new InstantCommand(() -> climb.setPivotPos(true)),
-            new WaitCommand(.5),
-            moveArms,
+            new WaitCommand(.2),
+            moveArms.get(),
             new InstantCommand(()-> climb.setPivotPos(false)),
             new WaitCommand(.5),
-            cycleArms);
+            new CycleArms(climb, -50)
+            );
+    
+        
     }
 }

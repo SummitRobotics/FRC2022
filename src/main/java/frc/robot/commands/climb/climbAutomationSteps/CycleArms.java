@@ -12,7 +12,8 @@ public class CycleArms extends CommandBase {
     private Climb climb;
     private double target;
     static boolean isBroken = false;
-    private final double error = 0.2;
+    static boolean canBeBroken = true;
+    private final double error = 0.4;
     /** Creates a new CycleArms. */
     public CycleArms(Climb climb, double target) {
         this.target = target;
@@ -32,7 +33,8 @@ public class CycleArms extends CommandBase {
     public void execute() {
         if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && climb.isHooked()) {
             climb.setDetachPos(true);
-        } else if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && !climb.isHooked()) {
+            canBeBroken = false;
+        } else if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && !climb.isHooked() && canBeBroken) {
             climb.stop();
             isBroken = true;
         }   
@@ -49,9 +51,13 @@ public class CycleArms extends CommandBase {
     @Override
     public boolean isFinished() {
         if (isBroken) {
+            System.out.println("BROKEN");
             return false;
         } else {
-            return Functions.isWithin(climb.getLeftEncoderValue(), target, error) && Functions.isWithin(climb.getRightEncoderValue(), target, error);
+            //System.out.println("CYCLE    LEFT: " + climb.getLeftEncoderValue() + "  RIGHT: " + climb.getRightEncoderValue());
+            boolean done = Functions.isWithin(climb.getLeftEncoderValue(), target, error) && Functions.isWithin(climb.getRightEncoderValue(), target, error);
+            //System.out.println(done);
+            return done;
 
         }
         

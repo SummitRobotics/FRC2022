@@ -13,14 +13,15 @@ import java.util.Arrays;
  * Device driver for the limelight.
  */
 public class Lemonlight implements Sendable {
-    private final NetworkTableEntry tv, tx, ty, ta, ledMode, camMode, pipeline, llpython;
+    private final NetworkTableEntry tv, tx, ty, ta, llpython;
+    private NetworkTableEntry camMode, pipeline, ledMode;
     private final boolean forBall;
 
     // VALUES SHOULD BE IN CM and DEGREES
-    // TODO - Set these
+    // TODO - CALIBRATE FOR COMP
     public static final double
             MAIN_MOUNT_HEIGHT = 81.915, 
-            MAIN_MOUNT_ANGLE = 55.25,
+            MAIN_MOUNT_ANGLE = 35.5,
             MAIN_TARGET_HEIGHT = 257,
             BALL_MOUNT_HEIGHT = 22.0,
             BALL_MOUNT_ANGLE = -20.0,
@@ -61,10 +62,10 @@ public class Lemonlight implements Sendable {
         } else {
             llpython = null;
         }
-        ledMode = limelight.getEntry("ledMode");
-        camMode = limelight.getEntry("camMode");
+        //ledMode = limelight.getEntry("ledMode");
+        //camMode = limelight.getEntry("camMode");
 
-        pipeline = limelight.getEntry("pipeline");
+        //pipeline = limelight.getEntry("pipeline");
 
     }
 
@@ -104,7 +105,7 @@ public class Lemonlight implements Sendable {
      * @param mode the LED mode to switch to
      */
     public void setLEDMode(LEDModes mode) {
-        ledMode.setDouble(mode.value);
+        //ledMode.setDouble(mode.value);
     }
 
     /**
@@ -113,7 +114,7 @@ public class Lemonlight implements Sendable {
      * @param mode the new mode
      */
     public void setCamMode(CamModes mode) {
-        camMode.setDouble(mode.value);
+        //camMode.setDouble(mode.value);
     }
 
     /**
@@ -122,7 +123,7 @@ public class Lemonlight implements Sendable {
      * @param pipe sets the pipeline to an int between 0 and 9
      */
     public void setPipeline(int pipe) {
-        pipeline.setDouble(pipe);
+        //pipeline.setDouble(pipe);
     }
 
     /**
@@ -266,8 +267,8 @@ public class Lemonlight implements Sendable {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Lemonlight");
-        builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
-        builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
+        //builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
+        //builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
         builder.addDoubleProperty("distance Estimate", () -> {
             return Lemonlight.getLimelightDistanceEstimateIN(MAIN_MOUNT_HEIGHT, MAIN_MOUNT_ANGLE, MAIN_TARGET_HEIGHT, this.getVerticalOffset());
         }, null);

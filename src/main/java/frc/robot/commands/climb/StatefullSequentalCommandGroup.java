@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -83,6 +84,13 @@ public class StatefullSequentalCommandGroup extends CommandGroupBase {
         if (interrupted) {
             cmds.get(cmdIndex).setValue(CommandState.NotRun);
             cmds.get(cmdIndex).getKey().end(true);
+        }
+    }
+
+    public void resetCommandState(){
+        cmdIndex = 0;
+        for (Entry x : cmds){
+            x.setValue(CommandState.NotRun);
         }
     }
 
