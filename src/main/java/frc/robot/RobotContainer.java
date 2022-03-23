@@ -28,6 +28,7 @@ import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
 import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.drivetrain.DriveByTime;
+import frc.robot.commands.drivetrain.EncoderDrive;
 import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
 import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.homing.HomeByCurrent;
@@ -90,9 +91,8 @@ public class RobotContainer {
     private final Intake intake;
     private final Climb climb;
 
-    private final Lemonlight
-        targetingLimelight,
-        ballDetectionLimelight;
+    private final Lemonlight targetingLimelight,
+            ballDetectionLimelight;
     private final PCM pcm;
     private final AHRS gyro;
     private final PowerDistribution pdp;
@@ -108,7 +108,7 @@ public class RobotContainer {
     private final Supplier<Command> autoInit;
     private Command auto;
     private ClimbAutomationBetter autoClimbCommand;
-
+    private Command arcadeDrive;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -129,7 +129,7 @@ public class RobotContainer {
                 "default", "robot on", Colors.WHITE, StatusPriorities.ON);
 
         gyro = new AHRS();
-        
+
         targetingLimelight = new Lemonlight("limelight-target", false, false);
         // TODO: need to ensure that this name is set on the limelight as well.
         ballDetectionLimelight = new Lemonlight("limelight-balls", true, false);
@@ -141,12 +141,20 @@ public class RobotContainer {
         intake = new Intake();
         climb = new Climb(gyro);
 
+        arcadeDrive = new ArcadeDrive(
+            drivetrain,
+            intake,
+            controller1.rightTrigger,
+            controller1.leftTrigger,
+            controller1.leftX,
+            controller1.dPadAny);
+
         // TODO - set these values
         homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
         homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
 
         autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
-        
+
         autoInit = () -> new SequentialCommandGroup(
                 new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -159,8 +167,7 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(true);
-                })
-                );
+                }));
 
         teleInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -202,9 +209,8 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
-                }), 
-                new RaiseIntake(intake)
-                );
+                }),
+                new RaiseIntake(intake));
 
         // Configure the button bindings
         setDefaultCommands();
@@ -216,13 +222,7 @@ public class RobotContainer {
 
     private void setDefaultCommands() {
         // drive by controller
-        drivetrain.setDefaultCommand(new ArcadeDrive(
-                drivetrain,
-                intake,
-                controller1.rightTrigger,
-                controller1.leftTrigger,
-                controller1.leftX, 
-                controller1.dPadAny));
+        drivetrain.setDefaultCommand(arcadeDrive);
         intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
         conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
@@ -241,8 +241,7 @@ public class RobotContainer {
 
         controller1.buttonA.whenPressed(new LowerIntake(intake));
         controller1.buttonB.whenPressed(
-            new RaiseIntake(intake)
-        );
+                new RaiseIntake(intake));
 
         controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor));
         // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
@@ -259,19 +258,21 @@ public class RobotContainer {
         ShooterMO shooterMO = new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger);
         launchpad.buttonI.whileHeld(shooterMO);
         launchpad.buttonI.commandBind(shooterMO);
-        // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
+        // launchpad.funMiddle.whileHeld(new SemiAutoShooterAssembly(shooter, conveyor,
+        // drivetrain, targetingLimelight, joystick.trigger, joystick.axisY));
 
-        //launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
+        // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
-
-        //Climb
+        // Climb
         ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button7,
                 joystick.button6, joystick.button8);
 
         launchpad.missileA.whileHeld(climbMO);
-        
-        // ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2, joystick.button8, joystick.button4, joystick.button5, joystick.button3, joystick.button7);
+
+        // ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2,
+        // joystick.button8, joystick.button4, joystick.button5, joystick.button3,
+        // joystick.button7);
         // launchpad.missileB.toggleWhenPressed(climbSemiAuto);
         launchpad.missileB.whileHeld(autoClimbCommand);
         launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));
@@ -283,34 +284,38 @@ public class RobotContainer {
         launchpad.buttonA.whileHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
 
-        Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY);
+        Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
+                joystick.axisY, arcadeDrive);
         launchpad.buttonH.whileHeld(sas);
         launchpad.buttonH.commandBind(sas);
 
-        //launchpad.missileB.whileHeld(climbSemiAuto);
-        //launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY, joystick.axisX, joystick.button2));
-        // launchpad.buttonG.whenPressed(new InstantCommand(() -> climb.togglePivotPos()));
+        // launchpad.missileB.whileHeld(climbSemiAuto);
+        // launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY,
+        // joystick.axisX, joystick.button2));
+        // launchpad.buttonG.whenPressed(new InstantCommand(() ->
+        // climb.togglePivotPos()));
         // launchpad.buttonG.booleanSupplierBind(() -> climb.getPivotPos());
 
-        //ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain, launchpad.buttonG);
-        //launchpad.missileB.whileHeld(climbAutomation);
+        // ClimbAutomation climbAutomation = new ClimbAutomation(climb, drivetrain,
+        // launchpad.buttonG);
+        // launchpad.missileB.whileHeld(climbAutomation);
     }
 
     /**
      * Use this method to init all the subsystems' telemetry stuff.
      */
     private void initTelemetry() {
-        //SmartDashboard.putData("PDP", pdp);
+        // SmartDashboard.putData("PDP", pdp);
         SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
         SmartDashboard.putData("Lemonlight", targetingLimelight);
         SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
-        //SmartDashboard.putData("Shooter", shooter);
-        //SmartDashboard.putData("Conveyor", conveyor);
+        // SmartDashboard.putData("Shooter", shooter);
+        // SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
         // SmartDashboard.putData("Color Sensor", colorSensor);
         // SmartDashboard.putData("Lidar", lidar);
-        //SmartDashboard.putData("Climb", climb);
+        // SmartDashboard.putData("Climb", climb);
     }
 
     /**
@@ -330,7 +335,6 @@ public class RobotContainer {
     public void robotInit() {
         gyro.calibrate();
         ShuffleboardDriver.init();
-       
 
     }
 
@@ -358,15 +362,21 @@ public class RobotContainer {
         //  // sets up all the splines so we dont need to spend lots of time
         Command auto = new PrintCommand("something went wrong");
         // // turning the json files into trajectorys when we want to run them
-        String ball1 = "paths/output/circle.wpilib.json";
-        try {
-            Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
-            auto = new SequentialCommandGroup(
-                autoInit.get(),
-                fball1);
-        } catch (Exception e) {
-            System.out.println("Spline error occurred: " + e);
-        }
+        // String ball1 = "paths/output/circle.wpilib.json";
+        // try {
+        //     Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+        //     auto = new SequentialCommandGroup(
+        //         autoInit.get(),
+        //         fball1);
+        // } catch (Exception e) {
+        //     System.out.println("Spline error occurred: " + e);
+        // }
+
+
+
+
+
+
         // try {
         //     Command fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
         //     // possible 4 ball auto
@@ -387,6 +397,17 @@ public class RobotContainer {
         // } catch (Exception e) {
         //     System.out.println("An error occured when making autoInit: " + e);
         // }
+
+        auto = new SequentialCommandGroup(
+            new SequentialCommandGroup(
+            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
+            new WaitCommand(0.25)
+            ),
+            autoInit.get(),
+            new ShooterAtStart(shooter, conveyor),
+            new DriveByTime(drivetrain, 1.5, -0.5),
+            new PrintCommand("auto done")
+        );
 
         return auto;
         
