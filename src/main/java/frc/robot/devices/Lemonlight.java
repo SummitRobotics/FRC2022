@@ -186,29 +186,35 @@ public class Lemonlight implements Sendable {
     ) {
         return targetDistance * Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * 0.393701;
     }
-
+    /**
+     * Gets angles and ball colors supplied in an arraylist of double arrays
+     * @return array list with double arrays, each element is for each ball
+     *      element 1 of double array is for ball color; red = 0 & blue = 1
+     *      element 2 of double array is horizontal offset
+     *      element 3 of double array is vertical offset
+     */
     public ArrayList<double[]> getCustomVisionDataReadable(){
-        ArrayList<double[]> v = new ArrayList<double[]>();
-        for(Number l: getCustomVisionDataNumbers()){
-            int x = l.intValue();
-            double[] c = new double[3];
+        ArrayList<double[]> mainList = new ArrayList<double[]>();
+        for (Number numbers : getCustomVisionDataNumbers()) {
+            int data = numbers.intValue();
+            double[] doubleArray = new double[3];
             try {
-                if (ballExists(x)) {
-                    if (isBlue(x)){
-                        c[0] = 1;
-                    }else{
-                        c[0] = 0;
+                if (ballExists(data)) {
+                    if (isBlue(data)) {
+                        doubleArray[0] = 1;
+                    } else {
+                        doubleArray[0] = 0;
                     }
-                    c[1] = getCustomDataOffsetAngle(x, true);
-                    c[2] = getCustomDataOffsetAngle(x, false);
-                    v.add(c);
+                    doubleArray[1] = getCustomDataOffsetAngle(data, true);
+                    doubleArray[2] = getCustomDataOffsetAngle(data, false);
+                    mainList.add(doubleArray);
                 }
             } catch (Exception e) {
                 //TODO: handle exception
                 System.out.println("Limelight Exception " + e);
             }
         }
-        return v;
+        return mainList;
     }
     /** gets an angle from a number given by custom intake code. 
      *
@@ -233,13 +239,22 @@ public class Lemonlight implements Sendable {
         }
         return angle;
     }
+    /**
+     * checks to see if ball number given by data is legitimate
+     * @param number number given by custom vision code
+     * @return whether or not ball exists, used to check before doing processing
+     */
 
     public boolean ballExists(double number) {
         return number % 2 == 0;
     }
     /**
-     * 
+     * checks if ball is blue from number.
+     *
+     * @param number the number to check
+     * @return if ball is blue
      */
+
     public boolean isBlue(double number){
         return String.valueOf(number).startsWith("2");
     }
