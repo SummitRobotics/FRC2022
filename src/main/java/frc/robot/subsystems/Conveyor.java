@@ -52,8 +52,8 @@ public class Conveyor extends SubsystemBase implements Testable {
     private final ColorSensor colorSensor;
     private final Lidar lidar;
 
-    private static final int lidarRegisterShooting = 30;
-    private static final int lidarReliceShooting = 40;
+    private static final int lidarRegisterShooting = 36;
+    private static final int lidarReliceShooting = 45;
 
 
 
@@ -235,14 +235,6 @@ public class Conveyor extends SubsystemBase implements Testable {
             if (wasBallShot()) {
                 indexBall = ConveyorState.NONE;
             }
-            // } else {
-            //     //if there is a ball indexed not and there wasent before, make the idexed ball 
-            //     if (oldIndexBall == ConveyorState.NONE) {
-            //         indexBall = beltBall;
-            //         beltBall = ConveyorState.NONE;
-            //         oldBeltBall = ConveyorState.NONE;
-            //     }
-            // }
 
             //if color sensor reads a ball, make it the belts current ball
             //assumes belt is running foward
@@ -312,6 +304,7 @@ public class Conveyor extends SubsystemBase implements Testable {
         if (lidarDistance > lidarReliceShooting) {
             if (lidarAboveThreshold) {
                 lidarAboveThreshold = false;
+                System.out.println("ball dec");
                 return true;
             }
             lidarAboveThreshold = false;

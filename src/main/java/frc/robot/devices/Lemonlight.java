@@ -23,8 +23,8 @@ public class Lemonlight implements Sendable {
             MAIN_MOUNT_HEIGHT = 81.915, 
             MAIN_MOUNT_ANGLE = 35.5,
             MAIN_TARGET_HEIGHT = 257,
-            BALL_MOUNT_HEIGHT = 22.0,
-            BALL_MOUNT_ANGLE = -20.0,
+            BALL_MOUNT_HEIGHT = 77.2,
+            BALL_MOUNT_ANGLE = -32.0,
             BALL_MOUNT_ANGLE_X = 0.0,
             BALL_TARGET_HEIGHT = 12.065;
 
@@ -140,8 +140,9 @@ public class Lemonlight implements Sendable {
      *
      * @return the horizontal offset
      */
-    public double getHorizontalOffset() {
-        return tx.getDouble(0);
+    public double getHorizontalOffset() {       
+        return tx.getDouble(0); 
+        
     }
 
     /**
@@ -185,7 +186,84 @@ public class Lemonlight implements Sendable {
     ) {
         return targetDistance * Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * 0.393701;
     }
+    /**
+     * Gets angles and ball colors supplied in an arraylist of double arrays
+     * @return array list with double arrays, each element is for each ball
+     *      element 1 of double array is for ball color; red = 0 & blue = 1
+     *      element 2 of double array is horizontal offset
+     *      element 3 of double array is vertical offset
+     */
+    public ArrayList<double[]> getCustomVisionDataReadable(){
+        ArrayList<double[]> mainList = new ArrayList<double[]>();
+        for (Number numbers : getCustomVisionDataNumbers()) {
+            int data = numbers.intValue();
+            System.out.println(data);
+            double[] doubleArray = new double[3];
+            try {
+                if (ballExists(data)) {
+                    if (isBlue(data)) {
+                        doubleArray[0] = 1;
+                    } else {
+                        doubleArray[0] = 0;
+                    }
+                    doubleArray[1] = getCustomDataOffsetAngle(data, true);
+                    doubleArray[2] = getCustomDataOffsetAngle(data, false);
+                    mainList.add(doubleArray);
+                }
+            } catch (Exception e) {
+                //TODO: handle exception
+                System.out.println("Limelight Exception " + e);
+            }
+        }
+        return mainList;
+    }
+    /** gets an angle from a number given by custom intake code. 
+     *
+     * @param number the number to get the angle of, should be for ball tracking
+     * @param isHorizontal whether or not you want it to be horizonal 
+     * @return the angle
+     */
 
+    public double getCustomDataOffsetAngle(double number, boolean isHorizontal) {
+        String numString = String.valueOf(number);
+        Double angle;
+        if (isHorizontal) { 
+            angle = Double.valueOf(numString.substring(2, 5)) / 10;
+            System.out.println("x angle: " + angle);
+            // System.out.println("value at 1" + numString.charAt(1));
+            if (numString.charAt(1) == '1') {
+                angle *= -1;
+            }
+        } else {
+            angle = Double.valueOf(numString.substring(7, 10)) / 10;
+            System.out.println("y angle: " + angle);
+            //System.out.println("value at 6: " + numString.charAt(6));
+            if (numString.charAt(6) == '1') {
+                angle *= -1;
+
+            }
+        }
+        return angle;
+    }
+    /**
+     * checks to see if ball number given by data is legitimate
+     * @param number number given by custom vision code
+     * @return whether or not ball exists, used to check before doing processing
+     */
+
+    public boolean ballExists(double number) {
+        return number % 2 == 0;
+    }
+    /**
+     * checks if ball is blue from number.
+     *
+     * @param number the number to check
+     * @return if ball is blue
+     */
+
+    public boolean isBlue(double number){
+        return String.valueOf(number).startsWith("2");
+    }
     /**
      * Returns the custom vision data output by the limelight when in python mode.
      * In the limelight you output to the array labeled llpython.
@@ -276,7 +354,6 @@ public class Lemonlight implements Sendable {
         if (forBall) {
             builder.addDoubleArrayProperty(
                     "customDataArray", this::getCustomVisionDataForTelemetry, null);
-            builder.addDoubleProperty("customData", this::getFirstInstanceCustomVisionData, null);
         }
     }
 }

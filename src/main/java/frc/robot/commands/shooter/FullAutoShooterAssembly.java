@@ -93,7 +93,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return color The team color as a ConveyorState.
      */
     public ConveyorState getTeamColor() {
-        if (DriverStation.getAlliance().toString() == "kRed") {
+        if (DriverStation.getAlliance().toString() == "Red") {
             return ConveyorState.RED;
         } else {
             return ConveyorState.BLUE;
@@ -132,6 +132,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @param shooter The shooter subsystem
      */
     public void fire(Shooter shooter) {
+        //System.out.println("FFFFFFFFFFFIIIIIIIIIRRRRRRRRRRREEEEEEEEEEEEEEEE");
         shooter.setState(Shooter.States.READY_TO_FIRE);
     }
 
@@ -159,18 +160,20 @@ public class FullAutoShooterAssembly extends CommandBase {
         double limelightDistanceEstimate) {
         
         //sets if align target based on ball color
-        if (isAccurate) {
-            alignPID.setSetpoint(0);
-        } else {
-            alignPID.setSetpoint(0);
-            //alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        }
+        // if (isAccurate) {
+        //     alignPID.setSetpoint(0);
+        // } else {
+        //     //alignPID.setSetpoint(0);
+        //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
+        // }
+        alignPID.setSetpoint(0);
         
         double leftPower = 0;
         double rightPower = 0;
 
         //align to target
         double alignPower = alignPID.calculate(horizontalOffset);
+
         leftPower += -alignPower;
         rightPower += alignPower;
 
@@ -181,13 +184,18 @@ public class FullAutoShooterAssembly extends CommandBase {
             if (!hasRecordedLimelightDistance) {
                 movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
                 hasRecordedLimelightDistance = true;
+                System.out.println("new setpoing: " + movePID.getSetpoint());
             }
 
+            System.out.println(limelightDistanceEstimate);
             double movePower = movePID.calculate(limelightDistanceEstimate);
+            System.out.println(movePID.getPositionError());
+            System.out.println("movePower: " + movePower);
+            leftPower -= movePower;
+            rightPower -= movePower;
 
-            leftPower += movePower;
-            rightPower += movePower;
-
+        } else {
+            hasRecordedLimelightDistance = false;
         }
 
         //sets drivetrain powers
@@ -277,12 +285,14 @@ public class FullAutoShooterAssembly extends CommandBase {
             //TODO change this back
             isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
             isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
-            // isDrivenAndAligned = driveAndAlign(drivetrain,
-            //     smoothedHorizontalOffset,
-            //     true,
-            //     limelightDistanceEstimate);
+            isDrivenAndAligned = driveAndAlign(drivetrain,
+                smoothedHorizontalOffset,
+                true,
+                limelightDistanceEstimate);
 
-            if (isHoodSet && isSpooled && isBallReady()) {
+            //System.out.println("hood: " + isHoodSet + "  spool: " + isSpooled + "  ball: " + isBallReady());
+            if (isHoodSet && isSpooled && isBallReady() && isDrivenAndAligned) {
+                //System.out.println("fire");
                 fire(shooter);
             }
 
@@ -304,6 +314,7 @@ public class FullAutoShooterAssembly extends CommandBase {
             movePID.reset();
             findTarget(drivetrain);
             shooter.setState(Shooter.States.NO_TARGET);
+            hasRecordedLimelightDistance = false;
         }
     }
 
@@ -316,6 +327,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         alignPID.close();
         movePID.close();
         shooter.setState(Shooter.States.NOT_SHOOTING);
+        hasRecordedLimelightDistance = false;
     }
 
     /**

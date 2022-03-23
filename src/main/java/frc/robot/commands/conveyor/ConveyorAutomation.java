@@ -67,7 +67,7 @@ public class ConveyorAutomation extends CommandBase {
 
         if (shooterState == Shooter.States.READY_TO_FIRE) {
             indexSpeed = -1;
-            //conveyor.setBeltMotorPower(BELT_SPEED);
+            beltSpeed = BELT_SPEED;
         }
 
         conveyor.setIndexMotorPower(indexSpeed);

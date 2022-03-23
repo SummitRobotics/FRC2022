@@ -34,7 +34,7 @@ public class ShooterLow extends CommandBase {
      *
      * @param shooter the shooter subsystem
      * @param controlAxis the controller axis used to control flywheel speed
-     * @param controlButton the controller button used to control hood position
+     * @param HoodButton the controller button used to control hood position
      * @param shootButton the button to fire.
      */
     public ShooterLow(Shooter shooter, OIButton shootButton) {
@@ -57,7 +57,7 @@ public class ShooterLow extends CommandBase {
     public void execute() {
         // shooter.setMotorPower(controlAxis.get());
 
-        if (prioritizedShootButton != null && prioritizedShootButton.get(false)) {
+        if (prioritizedShootButton.get()) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
         } 
         else{

@@ -48,9 +48,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
         HIGH_KS = 0.18976,
         HIGH_KV = 1.9778,
         HIGH_KA = 0.16066,
-        HIGH_GEAR_RATIO = 5.088,
-        LOW_GEAR_RATIO = 11.022,
-        WHEEL_RADIUS_IN_METERS = 0.0508,
+        HIGH_GEAR_RATIO = 5.098,
+        LOW_GEAR_RATIO = 11.03102,
+        WHEEL_RADIUS_IN_METERS = 0.05207,
         WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858;
@@ -436,7 +436,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return The converstion to encover values.
      */
     public double distToEncoder(double dist) {
-        if (getShift()) {
+        if (!getShift()) {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * HIGH_GEAR_RATIO;
         } else {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
@@ -522,7 +522,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return the total distance in meters the side as travled sense the last reset
      */
     public double getLeftDistance() {
-        if (getShift()) {
+        if (!getShift()) {
             return ((getLeftEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
                 + leftDistanceAcum;
         } else {
@@ -537,7 +537,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return the total distance in meters the side as travled sense the last reset
      */
     public synchronized double getRightDistance() {
-        if (getShift()) {
+        if (!getShift()) {
             return ((getRightEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
                 + rightDistanceAcum;
         } else {
@@ -552,7 +552,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return the linear speed of the side in meters per second
      */
     public synchronized double getLeftSpeed() {
-        if (getShift()) {
+        if (!getShift()) {
             return convertRpmToMetersPerSecond((getLeftRPM() / HIGH_GEAR_RATIO));
         } else {
             return convertRpmToMetersPerSecond((getLeftRPM() / LOW_GEAR_RATIO));
@@ -565,7 +565,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return the linear speed of the side in meters per second
      */
     public synchronized double getRightSpeed() {
-        if (getShift()) {
+        if (!getShift()) {
             return convertRpmToMetersPerSecond((getRightRPM() / HIGH_GEAR_RATIO));
         } else {
             return convertRpmToMetersPerSecond((getRightRPM() / LOW_GEAR_RATIO));
@@ -731,17 +731,17 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public void initSendable(SendableBuilder builder) {
         //builder.setSmartDashboardType("Drivetrain");
 
-        //builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
-        //builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
+        builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
+        builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
         //builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
-        //builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
+        builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
 
         //builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
         //builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
         //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
         //builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
         //builder.addDoubleProperty("rotation", this::getRotation, null);
-        // f2d.initSendable(builder);
+        f2d.initSendable(builder);
 
         // builder.addBooleanProperty("shifterStatus", this::getShift, null);
         //builder.addDoubleArrayProperty("pidValues", this::getPid, null);

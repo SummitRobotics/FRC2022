@@ -20,7 +20,7 @@ public class ShooterMO extends CommandBase {
     OIAxis controlAxis;
     OIAxis.PrioritizedAxis prioritizedControlAxis;
 
-    LEDButton controlButton;
+    LEDButton HoodButton;
     OIButton.PrioritizedButton prioritizedControlButton;
 
     SimpleButton prioritizedSimpleControlButton;
@@ -28,7 +28,7 @@ public class ShooterMO extends CommandBase {
     OIButton shootButton;
     OIButton.PrioritizedButton prioritizedShootButton;
 
-    static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
+    //static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
 
     /**
      * Manual override for the shooter.
@@ -43,9 +43,9 @@ public class ShooterMO extends CommandBase {
 
         this.shooter = shooter;
         this.controlAxis = controlAxis;
-        this.controlButton = controlButton;
+        this.HoodButton = controlButton;
         this.shootButton = shootButton;
-        dumb.forceSetDouble(1800);
+        //dumb.forceSetDouble(1800);
     }
 
     @Override
@@ -53,10 +53,8 @@ public class ShooterMO extends CommandBase {
         shooter.stop();
 
         prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedControlButton = controlButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        if (shootButton != null) {
-            prioritizedShootButton = shootButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        }
+        prioritizedControlButton = HoodButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedShootButton = shootButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
 
         prioritizedSimpleControlButton = new SimpleButton(prioritizedControlButton::get);
         shooter.retractHood();
@@ -67,16 +65,16 @@ public class ShooterMO extends CommandBase {
         // shooter.setMotorPower(controlAxis.get());
         if (prioritizedSimpleControlButton.get()) {
             shooter.toggleHoodPos();
-            controlButton.setLED(shooter.getHoodPos());
+            HoodButton.setLED(shooter.getHoodPos());
         }
         if (prioritizedShootButton != null && prioritizedShootButton.get(false)) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
-        shooter.setMotorTargetSpeed(dumb.getDouble(0));
+        //shooter.setMotorTargetSpeed(dumb.getDouble(0));
         //shooter.setMotorVolts(shooter.calculateVoltageFromPid(dumb.getDouble(0)));
-        // shooter.setMotorPower(controlAxis.get());
+        shooter.setMotorPower(controlAxis.get());
     }
 
     @Override
@@ -88,7 +86,7 @@ public class ShooterMO extends CommandBase {
         prioritizedControlAxis.destroy();
         prioritizedControlButton.destroy();
         prioritizedShootButton.destroy();
-        controlButton.setLED(false);
+        HoodButton.setLED(false);
     }
 
     @Override
