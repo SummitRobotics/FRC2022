@@ -411,6 +411,18 @@ public class RobotContainer {
             new ShooterAtStart(shooter, conveyor, 1200),
             new PrintCommand("auto done"));
         ShuffleboardDriver.autoChooser.addOption("2 ball", twoBallAuto);
+        Command twoBallAutoDLC = new SequentialCommandGroup(
+            twoBallAuto,
+            new TurnByEncoder(60, drivetrain),
+            new EncoderDrive(10, 10, drivetrain),
+            new TurnByEncoder(35, drivetrain),
+            new EncoderDrive(.2, .2, drivetrain),
+            new WaitCommand(3),
+            new RaiseIntake(intake),
+            new TurnByEncoder(180, drivetrain),
+            new EncoderDrive(10, 10, drivetrain),
+            fullAutoShooterAssembly,
+            new PrintCommand("auto done"));
     }
     
     /**
