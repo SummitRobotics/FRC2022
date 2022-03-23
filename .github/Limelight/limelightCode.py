@@ -1,10 +1,10 @@
 def redCountours(image):
     frame_threshold = cv2.inRange(image, (0, 100, 100), (10, 255, 255))
     thresh2 = cv2.inRange(image, (150, 140, 100), (180, 255, 255))
-    frame_threshold = cv2.bitwise_or(frame_threshold, thresh2)
+    frame_threshold_both = frame_threshold + thresh2
 
         #Dialate Color Threshold Mask after Eroding to Beef Up detected areas for analysis
-    frame_threshold_dilated = cv2.dilate(frame_threshold, None, iterations=3)
+    frame_threshold_dilated = cv2.dilate(frame_threshold_both, None, iterations=3)
         #Erode Color Threshold Mask to remove noise
     frame_threshold_eroded = cv2.erode(frame_threshold_dilated, None, iterations=3)
 
@@ -27,6 +27,17 @@ def blueCountours(image):
     return gc(cnts)
 def makeNum(xCoord, yCoord, blue):
   mainNum = 0
+  if len(str(abs(xCoord))) > 3:
+      if xCoord < 0: 
+        xCoord = double(str(xCoord)[0:4])
+      else:
+        xCoord = double(str(xCoord)[0:3])
+  if len(str(abs(yCoord))) > 3:
+      if yCoord < 0: 
+        yCoord = double(str(yCoord)[0:4])
+      else:
+        yCoord = double(str(yCoord)[0:3])
+
   if xCoord < 0:
     xCoord *= -1
     mainNum += 100000000

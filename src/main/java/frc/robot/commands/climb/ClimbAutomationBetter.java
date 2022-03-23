@@ -4,16 +4,22 @@
 
 package frc.robot.commands.climb;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.climb.climbAutomationSteps.AutoAlign;
 import frc.robot.commands.climb.climbAutomationSteps.CycleArms;
 import frc.robot.commands.climb.climbAutomationSteps.MoveArms;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
+import frc.robot.oi.inputs.LEDButton.LED;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
+
+import java.util.function.Supplier;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html4
@@ -41,6 +47,7 @@ public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
         // addCommands(new FooCommand(), new BarCommand());
         //TODO Tune WaitCommand timings
         addCommands(
+            new InstantCommand(() -> LEDs.getInstance().addCall("climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All).flashing(Colors.RED, Colors.OFF))),
             new InstantCommand(() -> climb.setDetachPos(true)),
             new MoveArms(climb, -140),
             autoAlign,
@@ -60,8 +67,9 @@ public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
             moveArms.get(),
             new InstantCommand(()-> climb.setPivotPos(false)),
             new WaitCommand(.5),
-            new CycleArms(climb, -50)
-            );
+            new CycleArms(climb, -50),
+            new InstantCommand(() -> LEDs.getInstance().removeCall("climbing")), 
+            new InstantCommand(() -> LEDs.getInstance().addCall("celebration", new LEDCall(Integer.MAX_VALUE, LEDRange.All).rainbow())));
     
         
     }
