@@ -1,6 +1,8 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -30,6 +32,7 @@ import frc.robot.commands.drivetrain.ArcadeDrive;
 import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.drivetrain.EncoderDrive;
 import frc.robot.commands.drivetrain.FullAutoIntakeDrive;
+import frc.robot.commands.drivetrain.TurnByEncoder;
 import frc.robot.commands.drivetrain.DriveByTime;
 import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.DefaultIntake;
@@ -43,6 +46,7 @@ import frc.robot.commands.shooter.SemiAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterLow;
 import frc.robot.commands.shooter.ShooterMO;
+import frc.robot.commands.shooter.midrangeShooter;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -363,8 +367,9 @@ public class RobotContainer {
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
             new DriveByTime(drivetrain, 1.5, -0.5),
-            new PrintCommand("auto done")
-        );
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor).withTimeout(5), 
+            fullAutoShooterAssembly,
+            new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.setDefaultOption("shoot and drive", deafultAuto);
 
@@ -403,6 +408,31 @@ public class RobotContainer {
         );
 
         ShuffleboardDriver.autoChooser.addOption("wait and drive", driveOlnly);
+        String ball1 = "paths/output/circle.wpilib.json";
+        Command fball1 = new PrintCommand("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRORRRRRRRRRRRRRRRRRRRRRRRRRRR");
+        try {
+            fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
+        } catch (Exception e) {
+            //TODO: handle exception
+            System.out.println("Spline error: " + e);
+        }
+        Command twoBallAuto = new SequentialCommandGroup(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
+                new WaitCommand(0.25)
+            ),
+            autoInit.get(),
+            new InstantCommand(() -> intake.lowerIntake()),
+            new InstantCommand(() -> drivetrain.distanceToTravel(1)),
+            new WaitCommand(1),
+            new InstantCommand(() -> new TurnByEncoder(180, drivetrain)),
+            new WaitCommand(1),
+            new InstantCommand(() -> drivetrain.distanceToTravel(2)),
+            new WaitCommand(1),
+            new InstantCommand(() -> new TurnByEncoder(110, drivetrain)),
+            new WaitCommand(1),
+            new InstantCommand(() -> new midrangeShooter(shooter, conveyor)),
+            new PrintCommand("auto done"));
 
     }
 

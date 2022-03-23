@@ -425,7 +425,14 @@ public class Drivetrain extends SubsystemBase {
         rightMiddlePID.setReference(position, ControlType.kPosition);
         rightBackPID.setReference(position, ControlType.kPosition);
     }
-
+    /** drives to distance.
+     *
+     * @param position position to go to in rotations
+     */
+    public synchronized void setBothMotorTarget(double position){
+        setLeftMotorTarget(position);
+        setRightMotorTarget(position);
+    }
     /**
      * Convert distance to encoder values.
      * TODO: STILL NEED TO TEST THIS
@@ -433,14 +440,22 @@ public class Drivetrain extends SubsystemBase {
      * @param dist the distance in meters.
      * @return The converstion to encover values.
      */
-    public double distToEncoder(double dist) {
+       public double distToEncoder(double dist) {
         if (!getShift()) {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * HIGH_GEAR_RATIO;
         } else {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
         }
     }
-    
+    /**
+     * goes a distance.
+     *
+     * @param position distance to travel in meters
+     */
+
+    public void distanceToTravel(double position) {
+        setBothMotorTarget(distToEncoder(position));
+    }
     /**
      * The position you want the left side to register.
      * When it is in the position it is currently in
@@ -465,7 +480,6 @@ public class Drivetrain extends SubsystemBase {
         rightBackEncoder.setPosition(position);
         
     }
-
     /**
      * Zeros the raw encoder values (PROBABLY NOT WHAT YOU WANT).
      *
