@@ -210,26 +210,36 @@ public class Lemonlight implements Sendable {
         }
         return v;
     }
+    /** gets an angle from a number given by custom intake code. 
+     *
+     * @param number the number to get the angle of, should be for ball tracking
+     * @param isHorizontal whether or not you want it to be horizonal 
+     * @return the angle
+     */
+
     public double getCustomDataOffsetAngle(double number, boolean isHorizontal) {
-        String x = String.valueOf(number);
-        Double b;
+        String numString = String.valueOf(number);
+        Double angle;
         if (isHorizontal) { 
-            b = Double.valueOf(x.substring(2, 5)) / 10;
-            if (x.charAt(1) == '1') {
-                b *= -1;
+            angle = Double.valueOf(numString.substring(2, 5)) / 10;
+            if (numString.charAt(1) == '1') {
+                angle *= -1;
             }
         } else {
-            b = Double.valueOf(x.substring(6, 9)) / 10;
-            if (x.charAt(5) == '1') {
-                b *= -1;
+            angle = Double.valueOf(numString.substring(6, 9)) / 10;
+            if (numString.charAt(5) == '1') {
+                angle *= -1;
             }
         }
-        return b;
+        return angle;
     }
 
     public boolean ballExists(double number) {
         return number % 2 == 0;
     }
+    /**
+     * 
+     */
     public boolean isBlue(double number){
         return String.valueOf(number).startsWith("2");
     }

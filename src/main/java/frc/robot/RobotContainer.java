@@ -244,7 +244,7 @@ public class RobotContainer {
             new RaiseIntake(intake)
         );
 
-        controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight));
+        controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor));
         // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
         // launchpad.buttonG.whileHeld(fullAutoShooterAssembly);
         // launchpad.buttonG.commandBind(fullAutoShooterAssembly);
