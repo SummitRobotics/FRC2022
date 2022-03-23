@@ -26,7 +26,6 @@ public class TestSubsystem extends CommandBase {
     private double[] startingPositions;
     private HashMap<String, Boolean> testStates;
     private Testable toTest;
-    private Subsystem subsystem;
     
     private Timer timer;
     
@@ -43,8 +42,6 @@ public class TestSubsystem extends CommandBase {
         limelights = toTest.getLimelights();
         lidars = toTest.getLidars();
 
-        subsystem = toTest.getSubsystemObject();
-        
         for (int i = 0; i < motors.length; i++) {
             testStates.put("Motor " + motors[i].getDeviceId(), false);
             encoders[i] = motors[i].getEncoder();
@@ -64,7 +61,9 @@ public class TestSubsystem extends CommandBase {
 
         timer = new Timer();
 
-        addRequirements(subsystem);
+        if (toTest instanceof Subsystem && toTest.getSubsystemObject() != null) {
+            addRequirements(toTest.getSubsystemObject());
+        }
     }
 
     @Override
@@ -74,7 +73,7 @@ public class TestSubsystem extends CommandBase {
             motors[i].set(toTest.getMotorTestSpeed());
         }
 
-        for (HashMap.Entry<String, Boolean> set : toTest.runCustomTests().entrySet()) {
+        for (HashMap.Entry<String, Boolean> set : toTest.initCustomTests().entrySet()) {
             testStates.put(set.getKey(), false);
         }
 
@@ -152,7 +151,7 @@ public class TestSubsystem extends CommandBase {
 
             for (HashMap.Entry<String, Boolean> set : testStates.entrySet()) {
                 if (!set.getValue()) {
-                    toPrint += (" " + subsystem.getClass().getCanonicalName()
+                    toPrint += (" " + toTest.getTestName()
                         + ": " + set.getKey() + ",");
                 }
             }

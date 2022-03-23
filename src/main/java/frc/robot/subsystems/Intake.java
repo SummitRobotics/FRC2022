@@ -184,6 +184,11 @@ public class Intake extends SubsystemBase implements Testable {
     }
 
     @Override
+    public String getTestName() {
+        return "Intake";
+    }
+
+    @Override
     public Subsystem getSubsystemObject() {
         return this;
     }

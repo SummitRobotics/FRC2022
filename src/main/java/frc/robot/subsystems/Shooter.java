@@ -254,6 +254,11 @@ public class Shooter extends SubsystemBase implements Testable {
     }
 
     @Override
+    public String getTestName() {
+        return "Shooter";
+    }
+
+    @Override
     public Subsystem getSubsystemObject() {
         return this;
     }

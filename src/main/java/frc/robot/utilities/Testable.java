@@ -12,7 +12,11 @@ import java.util.HashMap;
  */
 public interface Testable {
 
-    public Subsystem getSubsystemObject();
+    public String getTestName();
+
+    public default Subsystem getSubsystemObject() {
+        return null;
+    }
 
     public default CANSparkMax[] getMotors() {
         return new CANSparkMax[] {};
@@ -44,6 +48,10 @@ public interface Testable {
 
     public default double getMaxSensorLoopMilliseconds() {
         return 10;
+    }
+
+    public default HashMap<String, Boolean> initCustomTests() {
+        return new HashMap<String, Boolean>();
     }
 
     public default HashMap<String, Boolean> runCustomTests() {

@@ -384,6 +384,11 @@ public class Climb extends SubsystemBase implements Testable {
         oldGyroAngle = pa;
     }
 
+    @Override
+    public String getTestName() {
+        return "Climb";
+    }
+
 
     @Override
     public Subsystem getSubsystemObject() {
@@ -396,10 +401,19 @@ public class Climb extends SubsystemBase implements Testable {
     }
 
     @Override
+    public HashMap<String, Boolean> initCustomTests() {
+        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+        result.put("Left Limit Switch", false);
+        result.put("Right Limit Swtich", false);
+
+        return result;
+    }
+
+    @Override
     public HashMap<String, Boolean> runCustomTests() {
         HashMap<String, Boolean> result = new HashMap<String, Boolean>();
 
-        if (!pivotPos) {
+        if (pivotPos) {
             setPivotPos(false);
         }
 

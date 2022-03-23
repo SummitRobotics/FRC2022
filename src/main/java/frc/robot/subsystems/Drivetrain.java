@@ -718,6 +718,11 @@ public class Drivetrain extends SubsystemBase implements Testable {
     }
 
     @Override
+    public String getTestName() {
+        return "Drivetrain";
+    }
+
+    @Override
     public Subsystem getSubsystemObject() {
         return this;
     }

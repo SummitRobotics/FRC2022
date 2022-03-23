@@ -344,6 +344,11 @@ public class Conveyor extends SubsystemBase implements Testable {
     }
 
     @Override
+    public String getTestName() {
+        return "Conveyor";
+    }
+
+    @Override
     public Subsystem getSubsystemObject() {
         return this;
     }
