@@ -360,24 +360,14 @@ public class RobotContainer {
     private void createAutoCommands(){
 
         Command deafultAuto = new SequentialCommandGroup(
-            new SequentialCommandGroup(
-            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
-            new WaitCommand(0.25)
-            ),
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
             new DriveByTime(drivetrain, 1.5, -0.5),
-            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor).withTimeout(5), 
-            fullAutoShooterAssembly,
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.setDefaultOption("shoot and drive", deafultAuto);
 
         Command shootWaitDrive = new SequentialCommandGroup(
-            new SequentialCommandGroup(
-            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
-            new WaitCommand(0.25)
-            ),
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
             new WaitCommand(8),
@@ -388,10 +378,6 @@ public class RobotContainer {
         ShuffleboardDriver.autoChooser.addOption("shoot, wait, drive", shootWaitDrive);
 
         Command shootOnly = new SequentialCommandGroup(
-            new SequentialCommandGroup(
-            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
-            new WaitCommand(0.25)
-            ),
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
             new PrintCommand("auto done")
@@ -407,25 +393,24 @@ public class RobotContainer {
                 new PrintCommand("auto done")
         );
 
+        ShuffleboardDriver.autoChooser.addOption("drive only", driveOlnly);
+
+
         
         Command twoBallAuto = new SequentialCommandGroup(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
-                new WaitCommand(0.25)
-            ),
             autoInit.get(),
-            new InstantCommand(() -> intake.lowerIntake()),
-            new InstantCommand(() -> drivetrain.distanceToTravel(1)),
+            new LowerIntake(intake),
+            new EncoderDrive(1, 1, drivetrain),
             new WaitCommand(1),
-            new InstantCommand(() -> new TurnByEncoder(180, drivetrain)),
+            new TurnByEncoder(180, drivetrain),
             new WaitCommand(1),
-            new InstantCommand(() -> drivetrain.distanceToTravel(2)),
+            new EncoderDrive(2, 2, drivetrain),
             new WaitCommand(1),
-            new InstantCommand(() -> new TurnByEncoder(110, drivetrain)),
+            new TurnByEncoder(110, drivetrain),
             new WaitCommand(1),
-            new InstantCommand(() -> new midrangeShooter(shooter, conveyor)),
+            new ShooterAtStart(shooter, conveyor, 1200),
             new PrintCommand("auto done"));
-        ShuffleboardDriver.autoChooser.addOption("shoot only", twoBallAuto);
+        ShuffleboardDriver.autoChooser.addOption("2 ball", twoBallAuto);
     }
     
     /**

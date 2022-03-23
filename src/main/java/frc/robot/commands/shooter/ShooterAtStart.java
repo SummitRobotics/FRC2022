@@ -20,7 +20,7 @@ public class ShooterAtStart extends CommandBase {
     RollingAverage avg = new RollingAverage(5, false);
 
     private double speed = 1000;
-    private double error = 25;
+    private double error = 50;
 
     /**
      * Manual override for the shooter.
@@ -33,6 +33,11 @@ public class ShooterAtStart extends CommandBase {
 
         this.shooter = shooter;
         this.conveyor = conveyor;
+    }
+
+    public ShooterAtStart(Shooter shooter, Conveyor conveyor, double rpm){
+        this(shooter, conveyor);
+        speed = rpm;
     }
 
     @Override
@@ -66,7 +71,6 @@ public class ShooterAtStart extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        System.out.println("existssssss: " + conveyor.doesBallExist());
         return !conveyor.doesBallExist();
     }
 }
