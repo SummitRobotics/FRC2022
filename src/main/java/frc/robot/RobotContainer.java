@@ -407,15 +407,7 @@ public class RobotContainer {
                 new PrintCommand("auto done")
         );
 
-        ShuffleboardDriver.autoChooser.addOption("wait and drive", driveOlnly);
-        String ball1 = "paths/output/circle.wpilib.json";
-        Command fball1 = new PrintCommand("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRORRRRRRRRRRRRRRRRRRRRRRRRRRR");
-        try {
-            fball1 = Functions.splineCommandFromFile(drivetrain, ball1);
-        } catch (Exception e) {
-            //TODO: handle exception
-            System.out.println("Spline error: " + e);
-        }
+        
         Command twoBallAuto = new SequentialCommandGroup(
             new SequentialCommandGroup(
                 new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
@@ -433,9 +425,9 @@ public class RobotContainer {
             new WaitCommand(1),
             new InstantCommand(() -> new midrangeShooter(shooter, conveyor)),
             new PrintCommand("auto done"));
-
+        ShuffleboardDriver.autoChooser.addOption("shoot only", twoBallAuto);
     }
-
+    
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
