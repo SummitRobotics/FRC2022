@@ -51,6 +51,8 @@ def makeNum(xCoord, yCoord, blue):
   else: 
     mainNum += 1000000000
   mainNum += 2
+  if mainNum % 2 != 0:
+      mainNum += 1
   return mainNum
 import cv2
 import numpy as np

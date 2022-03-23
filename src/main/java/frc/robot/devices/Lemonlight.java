@@ -6,6 +6,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.utilities.CustomVisionData;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -196,8 +198,7 @@ public class Lemonlight implements Sendable {
     public ArrayList<double[]> getCustomVisionDataReadable(){
         ArrayList<double[]> mainList = new ArrayList<double[]>();
         for (Number numbers : getCustomVisionDataNumbers()) {
-            int data = numbers.intValue();
-            System.out.println(data);
+            double data = numbers.doubleValue();
             double[] doubleArray = new double[3];
             try {
                 if (ballExists(data)) {
@@ -225,23 +226,24 @@ public class Lemonlight implements Sendable {
      */
 
     public double getCustomDataOffsetAngle(double number, boolean isHorizontal) {
-        String numString = String.valueOf(number);
+        String numString = new BigDecimal(number).toPlainString();
         Double angle;
         if (isHorizontal) { 
             angle = Double.valueOf(numString.substring(2, 5)) / 10;
-            System.out.println("x angle: " + angle);
             // System.out.println("value at 1" + numString.charAt(1));
             if (numString.charAt(1) == '1') {
                 angle *= -1;
             }
+            System.out.println("x angle: " + angle);
         } else {
-            angle = Double.valueOf(numString.substring(7, 10)) / 10;
-            System.out.println("y angle: " + angle);
+            System.out.println(numString);
+            angle = Double.valueOf(numString.substring(6, 9)) / 10;
             //System.out.println("value at 6: " + numString.charAt(6));
-            if (numString.charAt(6) == '1') {
+            if (numString.charAt(5) == '1') {
                 angle *= -1;
 
             }
+            System.out.println("y angle: " + angle);
         }
         return angle;
     }

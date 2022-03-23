@@ -27,7 +27,7 @@ public class FullAutoIntakeDrive extends CommandBase {
     private boolean changed;
     // subsystems
     private Drivetrain drivetrain;
-    private final String teamColor = DriverStation.getAlliance().toString();
+    private String teamColor;
     // devices
     private Lemonlight limelight;
     private int loopCount;
@@ -51,12 +51,11 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     public FullAutoIntakeDrive(Drivetrain drivetrain,
         Lemonlight limelight, Conveyor conveyor) {
-        timeStart = System.currentTimeMillis() / 1000;
         this.drivetrain = drivetrain;
         this.limelight = limelight;
         this.conveyor = conveyor;
-        this.movePID = new PIDController(PIDValues.MOVE_P, PIDValues.MOVE_I, PIDValues.MOVE_D);
-        this.alignPID = new PIDController(PIDValues.ALIGN_P, PIDValues.ALIGN_I, PIDValues.ALIGN_D);
+        this.movePID = new PIDController(0.02, 0, 0);
+        this.alignPID = new PIDController(0.005, 0, 0);
 
         // TODO - set these
         movePID.setTolerance(1, 1);
@@ -65,15 +64,18 @@ public class FullAutoIntakeDrive extends CommandBase {
         alignPID.setSetpoint(0);
 
         addRequirements(drivetrain);
+        teamColor = DriverStation.getAlliance().toString();
     }
 
     @Override
     public void initialize() {
+        teamColor = DriverStation.getAlliance().toString();
         movePID.reset();
         alignPID.reset();
         oldDistance = 999;
         loopCount = 0;
         changed = false;
+        lastState = conveyor.getBeltState();
     }
 
     @Override
@@ -86,7 +88,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         limelightDistanceEstimate = 999;
         if (limelightData.size() < 1) {
             System.out.println("NO BALL");
-            drivetrain.stop();
+            //drivetrain.stop();
             return;
         }
         for (double[] eachLimelight : limelightData) {
@@ -95,7 +97,7 @@ public class FullAutoIntakeDrive extends CommandBase {
                     Lemonlight.BALL_MOUNT_HEIGHT,
                     Lemonlight.BALL_MOUNT_ANGLE,
                     Lemonlight.BALL_TARGET_HEIGHT,
-                    eachLimelight[2]);
+                    -eachLimelight[2]) + 19;
                 if (limelightDistanceEstimate > distTest) {
                     color = eachLimelight[0];
                     limelightDistanceEstimate = distTest;
@@ -111,27 +113,24 @@ public class FullAutoIntakeDrive extends CommandBase {
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
             double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
-            //drivetrain.setLeftMotorPower(movePower - alignPower);
-            //drivetrain.setRightMotorPower(movePower + alignPower);
-        } else if (oldDistance < DISTANCE_TO_CONTINUE && loopCount < 50) {
-            loopCount++;
-        } else {
-            timeStart = System.currentTimeMillis() / 1000;
-            drivetrain.stop();
-            changed = true;
-            oldDistance = 999;
-            loopCount = 0;
-        }
+            drivetrain.setLeftMotorPower(movePower - alignPower);
+            drivetrain.setRightMotorPower(movePower + alignPower);
+        } 
         if (lastState != thisState) {
             lastState = thisState;
             changed = true;
-            drivetrain.stop();
+            //drivetrain.stop();
         }
     }
 
     @Override
+    public void end(boolean interrupted) {
+        System.out.println("END");
+        drivetrain.stop();
+    }
+
+    @Override
     public boolean isFinished() {
-        return (System.currentTimeMillis() / 1000 - timeStart > 5)
-            || movePID.atSetpoint() || changed;
+        return movePID.atSetpoint() || changed || (conveyor.getBeltState() != ConveyorState.NONE && conveyor.getIndexState() != ConveyorState.NONE);
     }
 }
