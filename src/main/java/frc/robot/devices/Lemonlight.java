@@ -197,6 +197,7 @@ public class Lemonlight implements Sendable {
         ArrayList<double[]> mainList = new ArrayList<double[]>();
         for (Number numbers : getCustomVisionDataNumbers()) {
             int data = numbers.intValue();
+            System.out.println(data);
             double[] doubleArray = new double[3];
             try {
                 if (ballExists(data)) {
@@ -228,13 +229,18 @@ public class Lemonlight implements Sendable {
         Double angle;
         if (isHorizontal) { 
             angle = Double.valueOf(numString.substring(2, 5)) / 10;
+            System.out.println("x angle: " + angle);
+            // System.out.println("value at 1" + numString.charAt(1));
             if (numString.charAt(1) == '1') {
                 angle *= -1;
             }
         } else {
-            angle = Double.valueOf(numString.substring(6, 9)) / 10;
-            if (numString.charAt(5) == '1') {
+            angle = Double.valueOf(numString.substring(7, 10)) / 10;
+            System.out.println("y angle: " + angle);
+            //System.out.println("value at 6: " + numString.charAt(6));
+            if (numString.charAt(6) == '1') {
                 angle *= -1;
+
             }
         }
         return angle;
@@ -348,7 +354,6 @@ public class Lemonlight implements Sendable {
         if (forBall) {
             builder.addDoubleArrayProperty(
                     "customDataArray", this::getCustomVisionDataForTelemetry, null);
-            builder.addDoubleProperty("customData", this::getFirstInstanceCustomVisionData, null);
         }
     }
 }

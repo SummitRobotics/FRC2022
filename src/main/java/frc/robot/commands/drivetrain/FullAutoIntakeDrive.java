@@ -46,6 +46,7 @@ public class FullAutoIntakeDrive extends CommandBase {
      *
      * @param drivetrain The drivetrain subsystem
      * @param limelight The ball detection limelight
+     * @param conveyor for states to check if ball was intaked (what is the past tense verb for intake? intook?)
      */
 
     public FullAutoIntakeDrive(Drivetrain drivetrain,
@@ -83,7 +84,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         horizontalOffset = 0;
         ArrayList<double[]> limelightData = limelight.getCustomVisionDataReadable();
         limelightDistanceEstimate = 999;
-        if (limelightData.size() < 1){
+        if (limelightData.size() < 1) {
             System.out.println("NO BALL");
             drivetrain.stop();
             return;
@@ -110,9 +111,8 @@ public class FullAutoIntakeDrive extends CommandBase {
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
             double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
-            movePower = 0;
-            drivetrain.setLeftMotorPower(movePower - alignPower);
-            drivetrain.setRightMotorPower(movePower + alignPower);
+            //drivetrain.setLeftMotorPower(movePower - alignPower);
+            //drivetrain.setRightMotorPower(movePower + alignPower);
         } else if (oldDistance < DISTANCE_TO_CONTINUE && loopCount < 50) {
             loopCount++;
         } else {
@@ -122,7 +122,7 @@ public class FullAutoIntakeDrive extends CommandBase {
             oldDistance = 999;
             loopCount = 0;
         }
-        if (lastState != thisState){
+        if (lastState != thisState) {
             lastState = thisState;
             changed = true;
             drivetrain.stop();
