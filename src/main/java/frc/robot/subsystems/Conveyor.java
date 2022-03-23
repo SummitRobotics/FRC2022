@@ -305,7 +305,7 @@ public class Conveyor extends SubsystemBase {
         if (lidarDistance > lidarReliceShooting) {
             if (lidarAboveThreshold) {
                 lidarAboveThreshold = false;
-                System.out.println("ball dec");
+                //System.out.println("ball dec");
                 return true;
             }
             lidarAboveThreshold = false;

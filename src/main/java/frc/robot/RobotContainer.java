@@ -335,6 +335,8 @@ public class RobotContainer {
     public void robotInit() {
         gyro.calibrate();
         ShuffleboardDriver.init();
+        createAutoCommands();
+
 
     }
 
@@ -351,6 +353,59 @@ public class RobotContainer {
         scheduler.schedule(teleInit);
     }
 
+    private void createAutoCommands(){
+
+        Command deafultAuto = new SequentialCommandGroup(
+            new SequentialCommandGroup(
+            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
+            new WaitCommand(0.25)
+            ),
+            autoInit.get(),
+            new ShooterAtStart(shooter, conveyor),
+            new DriveByTime(drivetrain, 1.5, -0.5),
+            new PrintCommand("auto done")
+        );
+
+        ShuffleboardDriver.autoChooser.setDefaultOption("shoot and drive", deafultAuto);
+
+        Command shootWaitDrive = new SequentialCommandGroup(
+            new SequentialCommandGroup(
+            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
+            new WaitCommand(0.25)
+            ),
+            autoInit.get(),
+            new ShooterAtStart(shooter, conveyor),
+            new WaitCommand(8),
+            new DriveByTime(drivetrain, 1.5, -0.5),
+            new PrintCommand("auto done")
+        );
+
+        ShuffleboardDriver.autoChooser.addOption("shoot, wait, drive", shootWaitDrive);
+
+        Command shootOnly = new SequentialCommandGroup(
+            new SequentialCommandGroup(
+            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
+            new WaitCommand(0.25)
+            ),
+            autoInit.get(),
+            new ShooterAtStart(shooter, conveyor),
+            new PrintCommand("auto done")
+        );
+
+        ShuffleboardDriver.autoChooser.addOption("shoot only", shootOnly);
+
+
+        Command driveOlnly = new SequentialCommandGroup(
+                autoInit.get(),
+                new WaitCommand(10),
+                new DriveByTime(drivetrain, 1.5, -0.5),
+                new PrintCommand("auto done")
+        );
+
+        ShuffleboardDriver.autoChooser.addOption("wait and drive", driveOlnly);
+
+    }
+
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
@@ -360,7 +415,6 @@ public class RobotContainer {
         System.out.println("Called");
         // // An ExampleCommand will run in autonomous
         //  // sets up all the splines so we dont need to spend lots of time
-        Command auto = new PrintCommand("something went wrong");
         // // turning the json files into trajectorys when we want to run them
         // String ball1 = "paths/output/circle.wpilib.json";
         // try {
@@ -398,18 +452,9 @@ public class RobotContainer {
         //     System.out.println("An error occured when making autoInit: " + e);
         // }
 
-        auto = new SequentialCommandGroup(
-            new SequentialCommandGroup(
-            new InstantCommand(() -> conveyor.setBeltMotorPower(-0.5), conveyor),
-            new WaitCommand(0.25)
-            ),
-            autoInit.get(),
-            new ShooterAtStart(shooter, conveyor),
-            new DriveByTime(drivetrain, 1.5, -0.5),
-            new PrintCommand("auto done")
-        );
+        
 
-        return auto;
+        return ShuffleboardDriver.autoChooser.getSelected();
         
     }
 }
