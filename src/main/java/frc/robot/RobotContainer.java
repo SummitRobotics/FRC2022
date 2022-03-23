@@ -41,6 +41,7 @@ import frc.robot.commands.shooter.SemiAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterLow;
 import frc.robot.commands.shooter.ShooterMO;
+import frc.robot.commands.testing.TestSubsystem;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -60,6 +61,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.GeneralTests;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
@@ -105,6 +107,7 @@ public class RobotContainer {
     private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
     private final Command autoInit;
+    private final Command testInit;
     private Command auto;
     private ClimbAutomationBetter autoClimbCommand;
 
@@ -204,6 +207,24 @@ public class RobotContainer {
                 }), 
                 new RaiseIntake(intake)
                 );
+
+        testInit = new SequentialCommandGroup(
+            new InstantCommand(
+                        () -> ShuffleboardDriver.statusDisplay.addStatus(
+                                "testing",
+                                "robot testing",
+                                Colors.TEAM,
+                                StatusPriorities.ENABLED)),
+            new InstantCommand(() -> pcm.enableCompressorDigital()),
+            new ParallelCommandGroup(homeLeftArm, homeRightArm),
+            new InstantCommand(() -> new TestSubsystem(new GeneralTests(drivetrain, pcm))),
+            new ParallelCommandGroup(
+                new TestSubsystem(shooter),
+                new TestSubsystem(intake),
+                new TestSubsystem(drivetrain),
+                new TestSubsystem(conveyor),
+                new TestSubsystem(climb)
+        ));
 
         // Configure the button bindings
         setDefaultCommands();
@@ -341,6 +362,10 @@ public class RobotContainer {
      */
     public void teleopInit() {
         scheduler.schedule(teleInit);
+    }
+
+    public void testInit() {
+        scheduler.schedule(testInit);
     }
 
     /**

@@ -1,7 +1,6 @@
 package frc.robot.utilities;
 
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.Lidar;
@@ -13,10 +12,6 @@ import java.util.HashMap;
 public interface Testable {
 
     public String getTestName();
-
-    public default Subsystem getSubsystemObject() {
-        return null;
-    }
 
     public default CANSparkMax[] getMotors() {
         return new CANSparkMax[] {};
@@ -47,7 +42,7 @@ public interface Testable {
     }
 
     public default double getMaxSensorLoopMilliseconds() {
-        return 10;
+        return 5;
     }
 
     public default HashMap<String, Boolean> initCustomTests() {

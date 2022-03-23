@@ -189,11 +189,6 @@ public class Intake extends SubsystemBase implements Testable {
     }
 
     @Override
-    public Subsystem getSubsystemObject() {
-        return this;
-    }
-
-    @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {intakeMotor};
     }

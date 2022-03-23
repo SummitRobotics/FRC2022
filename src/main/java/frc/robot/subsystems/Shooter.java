@@ -259,11 +259,6 @@ public class Shooter extends SubsystemBase implements Testable {
     }
 
     @Override
-    public Subsystem getSubsystemObject() {
-        return this;
-    }
-
-    @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {shooterMotorMain};
     }

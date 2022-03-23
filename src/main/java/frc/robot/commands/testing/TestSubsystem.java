@@ -61,8 +61,11 @@ public class TestSubsystem extends CommandBase {
 
         timer = new Timer();
 
-        if (toTest instanceof Subsystem && toTest.getSubsystemObject() != null) {
-            addRequirements(toTest.getSubsystemObject());
+        try {
+            addRequirements((Subsystem) toTest);
+        } catch (RuntimeException runtimeException) {
+            System.out.println(
+                "No requirements were added because the Testable object was not a subsystem.");
         }
     }
 
@@ -147,22 +150,24 @@ public class TestSubsystem extends CommandBase {
             return true;
 
         } else if (timer.hasElapsed(toTest.getAllowedTimeSeconds())) {
-            String toPrint = "";
+            String toPrint = toTest.getTestName() + ":";
 
             for (HashMap.Entry<String, Boolean> set : testStates.entrySet()) {
                 if (!set.getValue()) {
-                    toPrint += (" " + toTest.getTestName()
-                        + ": " + set.getKey() + ",");
+                    toPrint += (" " + set.getKey() + ",");
                 }
             }
 
+            toPrint = toPrint.substring(0, toPrint.length() - 1);
+
             ShuffleboardDriver.statusDisplay.addStatus(
                 "Test Status",
-                "Test failed due to timeout |" + toPrint,
+                "Test failed due to timeout | " + toPrint,
                 Colors.RED,
                 5
             );
-            throw new RuntimeException("Test failed due to timeout:" + toPrint);
+
+            throw new RuntimeException("Test failed due to timeout: " + toPrint);
 
         } else {
             return false;

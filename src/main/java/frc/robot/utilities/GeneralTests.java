@@ -42,6 +42,11 @@ public class GeneralTests implements Testable {
     }
 
     @Override
+    public double getAllowedTimeSeconds() {
+        return 20;
+    }
+
+    @Override
     public HashMap<String, Boolean> initCustomTests() {
         HashMap<String, Boolean> result = new HashMap<String, Boolean>();
         result.put("Compressor", false);
@@ -61,7 +66,7 @@ public class GeneralTests implements Testable {
             if (hasReachedPartialPressure) {
                 pressureStatus = true;
             } else {
-                if (timer.hasElapsed(0.25)) {
+                if (timer.hasElapsed(0.5)) {
                     drivetrain.toggleShift();
                     timer.reset();
                     if (pcm.getPressure() < PARTIAL_PRESSURE) {

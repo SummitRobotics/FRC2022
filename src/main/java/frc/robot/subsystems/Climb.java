@@ -389,12 +389,6 @@ public class Climb extends SubsystemBase implements Testable {
         return "Climb";
     }
 
-
-    @Override
-    public Subsystem getSubsystemObject() {
-        return this;
-    }
-
     @Override
     public CANSparkMax[] getMotors() {
         return new CANSparkMax[] {leftMotor, rightMotor};
