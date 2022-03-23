@@ -189,17 +189,23 @@ public class Lemonlight implements Sendable {
 
     public ArrayList<double[]> getCustomVisionDataReadable(){
         ArrayList<double[]> v = new ArrayList<double[]>();
-        for(Integer x: getCustomVisionData()){
+        for(Number l: getCustomVisionDataNumbers()){
+            int x = l.intValue();
             double[] c = new double[3];
-            if (ballExists(x)) {
-                if (isBlue(x)){
-                    c[0] = 1;
-                }else{
-                    c[0] = 0;
+            try {
+                if (ballExists(x)) {
+                    if (isBlue(x)){
+                        c[0] = 1;
+                    }else{
+                        c[0] = 0;
+                    }
+                    c[1] = getCustomDataOffsetAngle(x, true);
+                    c[2] = getCustomDataOffsetAngle(x, false);
+                    v.add(c);
                 }
-                c[1] = getCustomDataOffsetAngle(x, true);
-                c[2] = getCustomDataOffsetAngle(x, false);
-                v.add(c);
+            } catch (Exception e) {
+                //TODO: handle exception
+                System.out.println("Limelight Exception " + e);
             }
         }
         return v;
@@ -225,7 +231,7 @@ public class Lemonlight implements Sendable {
         return number % 2 == 0;
     }
     public boolean isBlue(double number){
-        return String.valueOf(number).startsWith("1");
+        return String.valueOf(number).startsWith("2");
     }
     /**
      * Returns the custom vision data output by the limelight when in python mode.

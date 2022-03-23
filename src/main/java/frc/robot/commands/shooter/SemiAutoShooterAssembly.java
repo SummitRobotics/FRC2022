@@ -6,6 +6,7 @@ import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.lists.AxisPriorities;
 
 
 /**
@@ -18,7 +19,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private OIButton.PrioritizedButton prioritizedShootButton;
     private OIAxis controlAxis;
     private OIAxis.PrioritizedAxis prioritizedControlAxis;
-    private final int axisPriority = 999999999;
+    private final int axisPriority = AxisPriorities.MANUAL_OVERRIDE;
 
     /**
      * Command for running the shooter in semi auto mode.

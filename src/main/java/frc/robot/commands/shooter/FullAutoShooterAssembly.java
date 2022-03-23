@@ -93,7 +93,7 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return color The team color as a ConveyorState.
      */
     public ConveyorState getTeamColor() {
-        if (DriverStation.getAlliance().toString() == "kRed") {
+        if (DriverStation.getAlliance().toString() == "Red") {
             return ConveyorState.RED;
         } else {
             return ConveyorState.BLUE;

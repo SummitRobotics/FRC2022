@@ -7,7 +7,7 @@ public final class PIDValues {
     // TODO - configure
     public static final double
         // move PID
-        MOVE_P = 0.04,
+        MOVE_P = 0.01,
         MOVE_I = 0.0,
         MOVE_D = 0,
 

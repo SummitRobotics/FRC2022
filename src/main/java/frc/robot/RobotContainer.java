@@ -218,6 +218,7 @@ public class RobotContainer {
         // drive by controller
         drivetrain.setDefaultCommand(new ArcadeDrive(
                 drivetrain,
+                intake,
                 controller1.rightTrigger,
                 controller1.leftTrigger,
                 controller1.leftX, 

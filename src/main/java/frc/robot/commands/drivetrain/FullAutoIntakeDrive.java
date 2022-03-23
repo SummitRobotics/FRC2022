@@ -65,43 +65,50 @@ public class FullAutoIntakeDrive extends CommandBase {
     @Override
     public void execute() {
         double distTest;
-        limelightHasTarget = limelight.hasTarget();
+        double color = -100;
+        horizontalOffset = 0;
         ArrayList<double[]> limelightData = limelight.getCustomVisionDataReadable();
+        limelightDistanceEstimate = 999;
+        if (limelightData.size() < 1){
+            System.out.println("NO BALL");
+            drivetrain.stop();
+            return;
+        }
         for (double[] b : limelightData) {
-            if ((b[0] == 0 && teamColor == "kRed") || (b[0] == 1 && teamColor == "kBue")) {
+            if ((b[0] == 0.0 && teamColor == "Red") || (b[0] == 1.0 && teamColor == "Blue")) {
                 distTest = Lemonlight.getLimelightDistanceEstimateIN(
                     Lemonlight.BALL_MOUNT_HEIGHT,
                     Lemonlight.BALL_MOUNT_ANGLE,
                     Lemonlight.BALL_TARGET_HEIGHT,
-                    b[1]);
+                    b[2]);
                 if (limelightDistanceEstimate > distTest) {
+                    color = b[0];
                     limelightDistanceEstimate = distTest;
-                    horizontalOffset = b[2];
+                    horizontalOffset = b[1];
                 }
             }
 
         }
 
+        System.out.println("DIST: " + limelightDistanceEstimate + " offset: " + horizontalOffset + " COLOR: " + color);
 
-        System.out.println("distance : " + limelightDistanceEstimate + "   hzo: " + horizontalOffset);
-        if (limelightHasTarget) {
+        if (limelightDistanceEstimate < 999) {
             double alignPower = alignPID.calculate(horizontalOffset);
-            double movePower =  -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
-
-            System.out.println("align: " + alignPower + "   drive: " + movePower);
+            double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
+            movePower = 0;
             drivetrain.setLeftMotorPower(movePower - alignPower);
             drivetrain.setRightMotorPower(movePower + alignPower);
         } else {
-            timeStart = System.currentTimeMillis() / 1000;
-            drivetrain.stop();
-            drivetrain.setLeftMotorPower(.1);
-            drivetrain.setRightMotorPower(-.1);
+            // timeStart = System.currentTimeMillis() / 1000;
+            // drivetrain.stop();
+            // drivetrain.setLeftMotorPower(.1);
+            // drivetrain.setRightMotorPower(-.1);
         }
     }
 
     @Override
     public boolean isFinished() {
-        return (!limelight.hasTarget() && System.currentTimeMillis() / 1000 - timeStart > 5)
+        return (System.currentTimeMillis() / 1000 - timeStart > 5)
             || movePID.atSetpoint();
     }
 }

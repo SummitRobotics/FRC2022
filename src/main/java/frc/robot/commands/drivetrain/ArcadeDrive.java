@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
@@ -23,6 +24,8 @@ import frc.robot.utilities.lists.AxisPriorities;
 public class ArcadeDrive extends CommandBase {
 
     private final Drivetrain drivetrain;
+    private final Intake intake;
+
     private double forwardPower;
     private double reversePower;
     private boolean activateSwitchfoot;
@@ -34,6 +37,8 @@ public class ArcadeDrive extends CommandBase {
     private final OIAxis.PrioritizedAxis turnAxis;
 
     private final ChangeRateLimiter limiter;
+    private final ChangeRateLimiter turnLimiter;
+
 
     private static final double DEAD_ZONE = .01;
 
@@ -55,7 +60,8 @@ public class ArcadeDrive extends CommandBase {
      * @param switchfoot         drive in reverse
      */
     public ArcadeDrive(
-        Drivetrain drivetrain, 
+        Drivetrain drivetrain,
+        Intake intake, 
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
         OIAxis turnAxis,
@@ -63,11 +69,14 @@ public class ArcadeDrive extends CommandBase {
         switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
         this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
+        this.intake = intake;
         this.forwardPowerAxis = forwardPowerAxis.prioritize(AxisPriorities.DRIVE);
         this.reversePowerAxis = reversePowerAxis.prioritize(AxisPriorities.DRIVE);
         this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
+        turnLimiter = new ChangeRateLimiter(0.05);
+
 
         addRequirements(drivetrain);
         isSingleAxis = false;
@@ -83,17 +92,20 @@ public class ArcadeDrive extends CommandBase {
      */
     public ArcadeDrive(
         Drivetrain drivetrain, 
+        Intake intake,
         OIAxis powerAxis, 
         OIAxis turnAxis, 
         OIButton switchfoot) {
         switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
         this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
+        this.intake = intake;
         this.forwardPowerAxis = powerAxis.prioritize(AxisPriorities.DRIVE);
         this.reversePowerAxis = null;
         this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
+        turnLimiter = new ChangeRateLimiter(0.05);
 
         addRequirements(drivetrain);
         isSingleAxis = true;
@@ -141,6 +153,12 @@ public class ArcadeDrive extends CommandBase {
         }
 
         double turn = Math.pow(turnAxis.get(), 3);
+
+        double limiterTurn = turnLimiter.getRateLimitedValue(turn);
+
+        if (intake.getState() == Intake.States.DOWN){
+            turn = limiterTurn;
+        }
 
         if (activateSwitchfoot) {
             turn = -turn;
