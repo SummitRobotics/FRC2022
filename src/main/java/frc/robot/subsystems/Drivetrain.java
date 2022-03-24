@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -749,7 +750,8 @@ public class Drivetrain extends SubsystemBase {
         //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
         //builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
         //builder.addDoubleProperty("rotation", this::getRotation, null);
-        f2d.initSendable(builder);
+        //f2d.initSendable(builder);
+        SmartDashboard.putData(f2d);
 
         // builder.addBooleanProperty("shifterStatus", this::getShift, null);
         //builder.addDoubleArrayProperty("pidValues", this::getPid, null);

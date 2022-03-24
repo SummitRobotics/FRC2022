@@ -4,6 +4,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -51,8 +52,9 @@ public class RobotContainer {
     private final AHRS gyro;
     private final PowerDistribution pdp;
 
-    private final HomeByCurrent homeLeftArm;
-    private final HomeByCurrent homeRightArm;
+    private final Supplier<Command> homeArms;
+
+
 
     private final ColorSensor colorSensor;
     private final LidarV4 lidar;
@@ -99,9 +101,8 @@ public class RobotContainer {
             controller1.leftX,
             controller1.dPadAny);
 
-        // TODO - set these values
-        homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
-        homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
+        homeArms = ()-> new ParallelCommandGroup(new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT), new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT));
+
 
         autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
 
@@ -140,7 +141,7 @@ public class RobotContainer {
                 // new InstantCommand(() ->
                 // ballDetectionLimelight.setLEDMode(LEDModes.FORCE_OFF)),
 
-                new ParallelCommandGroup(homeLeftArm, homeRightArm),
+                homeArms.get(),
 
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
@@ -172,6 +173,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        ShuffleboardDriver.homeArms.commandBind(homeArms.get(), ShuffleboardDriver.homeArms::whenPressed);
+
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
 

@@ -21,17 +21,17 @@ import java.util.Vector;
  */
 public class ShuffleboardDriver {
 
-    private static final String[] BAD_SHUFFLE_HELL_ITEMS = {"navX", "Solenoid", "Compressor"};
+    private static final String[] BAD_SHUFFLE_HELL_ITEMS = {"navX", "Solenoid", "Compressor", "PID", "DigitalInput"};
     private static NetworkTable InfoTable = NetworkTableInstance.getDefault().getTable("RobotInfo"),
             ButtonTable = NetworkTableInstance.getDefault().getTable("Buttons");
     public static ShuffleboardLEDButton
             //recordStart = new ShuffleboardLEDButton(ButtonTable.getEntry("record Start")),
-            intake = new ShuffleboardLEDButton(ButtonTable.getEntry("record Intake")),
-            shoot = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shoot")),
-            shift = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shift"));
+            //intake = new ShuffleboardLEDButton(ButtonTable.getEntry("record Intake")),
+            //shoot = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shoot")),
+            //shift = new ShuffleboardLEDButton(ButtonTable.getEntry("record Shift"));
             //finish = new ShuffleboardLEDButton(ButtonTable.getEntry("record Stop")),
             //homeTurret = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Turret")),
-            //homeHood = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Hood"));
+            homeArms = new ShuffleboardLEDButton(ButtonTable.getEntry("Home Arms"));
             
         // public static DoubleDisplayWidget
         //         hoodIndicator = new DoubleDisplayWidget(InfoTable.getEntry("hood")),
@@ -40,16 +40,16 @@ public class ShuffleboardDriver {
     public static StatusDisplayWidget statusDisplay =
             new StatusDisplayWidget(InfoTable.getEntry("status"));
 
-    public static NetworkTableEntry shooterSpeed = InfoTable.getEntry("Shooter Speed"),
-            shooterTemp = InfoTable.getEntry("Shooter Temp"),
-            pressure = InfoTable.getEntry("pressure"),
-            shotBalls = InfoTable.getEntry("shotBalls");
+    // public static NetworkTableEntry shooterSpeed = InfoTable.getEntry("Shooter Speed"),
+    //         shooterTemp = InfoTable.getEntry("Shooter Temp"),
+    //         pressure = InfoTable.getEntry("pressure"),
+    //         shotBalls = InfoTable.getEntry("shotBalls");
 
     public static SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
     public static void init() {
         SmartDashboard.putData(ShuffleboardDriver.autoChooser);
-        // removeBadItems();
+        removeBadItems();
     }
 
     /**
