@@ -56,11 +56,7 @@ public class RobotContainer {
 
     private final ColorSensor colorSensor;
     private final LidarV4 lidar;
-    private Command fullAutoShooterAssembly;
-    private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
-    private final Supplier<Command> autoInit;
-    private Command auto;
     private ClimbAutomationBetter autoClimbCommand;
     private Command arcadeDrive;
 
@@ -108,20 +104,6 @@ public class RobotContainer {
         homeRightArm = new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
 
         autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
-
-        autoInit = () -> new SequentialCommandGroup(
-                new InstantCommand(
-                        () -> ShuffleboardDriver.statusDisplay.addStatus(
-                                "auto",
-                                "robot in auto",
-                                Colors.TEAM,
-                                StatusPriorities.ENABLED)),
-                new InstantCommand(drivetrain::highGear),
-                new InstantCommand(intake::lowerIntake),
-                new InstantCommand(() -> {
-                    launchpad.bigLEDRed.set(false);
-                    launchpad.bigLEDGreen.set(true);
-                }));
 
         teleInit = new SequentialCommandGroup(
                 new InstantCommand(
@@ -235,7 +217,7 @@ public class RobotContainer {
                 joystick.button5, joystick.button2, joystick.button7,
                 joystick.button6, joystick.button8);
 
-        launchpad.buttonA.whileHeld(climbManual);
+        launchpad.buttonA.whenHeld(climbManual);
         launchpad.buttonA.commandBind(climbManual);
 
         Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
@@ -287,11 +269,9 @@ public class RobotContainer {
      * runs when the robot is powered on.
      */
     public void robotInit() {
+        createAutoCommands();
         gyro.calibrate();
         ShuffleboardDriver.init();
-        createAutoCommands();
-
-
     }
 
     /**
@@ -308,6 +288,20 @@ public class RobotContainer {
     }
 
     private void createAutoCommands(){
+
+        Supplier<Command> autoInit = () -> new SequentialCommandGroup(
+            new InstantCommand(
+                    () -> ShuffleboardDriver.statusDisplay.addStatus(
+                            "auto",
+                            "robot in auto",
+                            Colors.TEAM,
+                            StatusPriorities.ENABLED)),
+            new InstantCommand(drivetrain::highGear),
+            new InstantCommand(intake::lowerIntake),
+            new InstantCommand(() -> {
+                launchpad.bigLEDRed.set(false);
+                launchpad.bigLEDGreen.set(true);
+            }));
 
         Command deafultAuto = new SequentialCommandGroup(
             autoInit.get(),
@@ -360,9 +354,24 @@ public class RobotContainer {
             new WaitCommand(1),
             new ShooterAtStart(shooter, conveyor, 1200),
             new PrintCommand("auto done"));
+
         ShuffleboardDriver.autoChooser.addOption("2 ball", twoBallAuto);
+
+
         Command twoBallAutoDLC = new SequentialCommandGroup(
-            twoBallAuto,
+            //2 ball
+            autoInit.get(),
+            new LowerIntake(intake),
+            new EncoderDrive(1, 1, drivetrain),
+            new WaitCommand(1),
+            new TurnByEncoder(180, drivetrain),
+            new WaitCommand(1),
+            new EncoderDrive(2, 2, drivetrain),
+            new WaitCommand(1),
+            new TurnByEncoder(110, drivetrain),
+            new WaitCommand(1),
+            new ShooterAtStart(shooter, conveyor, 1200),
+            //new stuff
             new TurnByEncoder(60, drivetrain),
             new EncoderDrive(10, 10, drivetrain),
             new TurnByEncoder(35, drivetrain),
@@ -371,8 +380,11 @@ public class RobotContainer {
             new RaiseIntake(intake),
             new TurnByEncoder(180, drivetrain),
             new EncoderDrive(10, 10, drivetrain),
-            fullAutoShooterAssembly,
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
             new PrintCommand("auto done"));
+
+        ShuffleboardDriver.autoChooser.addOption("4 ball", twoBallAutoDLC);
+
     }
     
     /**

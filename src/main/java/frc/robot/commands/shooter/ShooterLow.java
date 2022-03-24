@@ -25,7 +25,7 @@ public class ShooterLow extends CommandBase {
     OIButton.PrioritizedButton prioritizedControlButton;
 
     SimpleButton prioritizedSimpleControlButton;
-    private final double LOW_GOAL_SPEED = 1100;
+    private final double LOW_GOAL_SPEED = 1000;
     private final double error = 70;
     OIButton shootButton;
     OIButton.PrioritizedButton prioritizedShootButton;
@@ -72,6 +72,7 @@ public class ShooterLow extends CommandBase {
 
     @Override
     public void end(final boolean interrupted) {
+        shooter.retractHood();
         shooter.stop();
         prioritizedShootButton.destroy();
         shooter.setState(Shooter.States.NOT_SHOOTING);
