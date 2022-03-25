@@ -75,6 +75,8 @@ public class Shooter extends SubsystemBase {
 
     private LEDCall firing = new LEDCall(LEDPriorities.SHOOTING, LEDRange.All).solid(Colors.PURPLE);
 
+    private double setPoint = 0;
+
     /**
      * Creates a new shooter instance.
      */
@@ -89,6 +91,7 @@ public class Shooter extends SubsystemBase {
         
         zeroEncoders();
         shooterMotorFollow.follow(shooterMotorMain, true);
+        setPoint = 0;
     }
 
     /**
@@ -142,6 +145,7 @@ public class Shooter extends SubsystemBase {
      */
     public void setMotorTargetSpeed(double speed) {
         speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
+        setPoint = speed;
         shooterMotorPIDController.setReference(speed, CANSparkMax.ControlType.kVelocity);
     }
 
@@ -250,7 +254,8 @@ public class Shooter extends SubsystemBase {
         builder.setSmartDashboardType("Shooter");
         // //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
         builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
-        // builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        builder.addDoubleProperty("shooterSetpoint", () -> setPoint, null);
+        builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
         // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

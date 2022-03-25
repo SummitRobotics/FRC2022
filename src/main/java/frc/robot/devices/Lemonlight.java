@@ -352,7 +352,9 @@ public class Lemonlight implements Sendable {
         builder.addDoubleProperty("distance Estimate", () -> {
             return Lemonlight.getLimelightDistanceEstimateIN(MAIN_MOUNT_HEIGHT, MAIN_MOUNT_ANGLE, MAIN_TARGET_HEIGHT, this.getVerticalOffset());
         }, null);
+        
         builder.addBooleanProperty("hasTarget", this::hasTarget, null);
+        
         if (forBall) {
             builder.addDoubleArrayProperty(
                     "customDataArray", this::getCustomVisionDataForTelemetry, null);

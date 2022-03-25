@@ -740,10 +740,10 @@ public class Drivetrain extends SubsystemBase {
     public void initSendable(SendableBuilder builder) {
         //builder.setSmartDashboardType("Drivetrain");
 
-        builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
-        builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
+        //builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
+        //builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
         //builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
-        builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
+        //builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
 
         //builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
         //builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
