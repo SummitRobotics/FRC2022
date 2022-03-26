@@ -31,7 +31,6 @@ public class DriveToHub extends CommandBase {
     private double limelightDistanceEstimate;
     private boolean limelightHasTarget;
     private double horizontalOffset;
-    private Timer timer;
 
     /**
      * Constructor.
@@ -41,7 +40,6 @@ public class DriveToHub extends CommandBase {
      */
     public DriveToHub(Drivetrain drivetrain,
         Lemonlight limelight) {
-        timer = new Timer();
         this.drivetrain = drivetrain;
         this.limelight = limelight;
         this.movePID = new PIDController(PIDValues.MOVE_P, PIDValues.MOVE_I, PIDValues.MOVE_D);
@@ -60,7 +58,6 @@ public class DriveToHub extends CommandBase {
     public void initialize() {
         movePID.reset();
         alignPID.reset();
-        timer.start();
     }
 
     @Override
@@ -83,16 +80,15 @@ public class DriveToHub extends CommandBase {
             drivetrain.setLeftMotorPower(movePower - alignPower);
             drivetrain.setRightMotorPower(movePower + alignPower);
         } else {
-            timer.reset();
-            drivetrain.stop();
-            drivetrain.setLeftMotorPower(.1);
-            drivetrain.setRightMotorPower(-.1);
+            // timer.reset();
+            // drivetrain.stop();
+            // drivetrain.setLeftMotorPower(.1);
+            // drivetrain.setRightMotorPower(-.1);
         }
     }
 
     @Override
     public boolean isFinished() {
-        return (!limelight.hasTarget() && timer.hasElapsed(5))
-            || movePID.atSetpoint();
+        return movePID.atSetpoint();
     }
 }

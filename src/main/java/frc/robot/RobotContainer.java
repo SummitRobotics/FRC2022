@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.commands.DriveToHub;
 import frc.robot.commands.climb.*;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
@@ -347,15 +348,13 @@ public class RobotContainer {
         Command twoBallAuto = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
-            new EncoderDrive(1, 1, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
             new WaitCommand(1),
-            new TurnByEncoder(180, drivetrain),
-            new WaitCommand(1),
-            new EncoderDrive(2, 2, drivetrain),
-            new WaitCommand(1),
-            new TurnByEncoder(110, drivetrain),
-            new WaitCommand(1),
-            new ShooterAtStart(shooter, conveyor, 1200),
+            new TurnByEncoder(190, drivetrain),
+            new RaiseIntake(intake),
+            new WaitCommand(.5),
+            new DriveToHub(drivetrain, targetingLimelight).withTimeout(3),
+            new ShooterAtStart(shooter, conveyor, 1000),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball", twoBallAuto);
