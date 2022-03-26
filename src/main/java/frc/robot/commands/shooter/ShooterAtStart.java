@@ -20,7 +20,7 @@ public class ShooterAtStart extends CommandBase {
     RollingAverage avg = new RollingAverage(5, false);
 
     private double speed = 1000;
-    private double error = 50;
+    private double error = 60;
 
     /**
      * Manual override for the shooter.

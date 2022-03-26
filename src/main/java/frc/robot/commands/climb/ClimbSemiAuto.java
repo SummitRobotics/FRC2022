@@ -112,14 +112,14 @@ public class ClimbSemiAuto extends CommandBase {
     @Override
     public void execute() {
         if (isClimbGood) {
-            if (prioritizedExtendButton.get()) {
+            if (prioritizedRetractButton.get()) {
                 climb.setMotorPosition(climb.FORWARD_LIMIT);
 
 
             } else if (prioritizedMidpointButton.get()) {
                 climb.setMotorPosition(climb.GRAB_POINT);
 
-            } else if (prioritizedRetractButton.get()) {
+            } else if (prioritizedExtendButton.get()) {
                 climb.setMotorPosition(climb.BACK_LIMIT);
 
             } else if (prioritizedCycleButton.get()) {

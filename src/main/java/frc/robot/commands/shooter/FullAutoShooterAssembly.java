@@ -42,8 +42,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected boolean isDrivenAndAligned;
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 120,
-        MIN_SHOOTER_RANGE = 50,
+        MAX_SHOOTER_RANGE = 90,
+        MIN_SHOOTER_RANGE = 65,
         OK_TO_MOVE_OFSET = 5,
         HOOD_UP_RANGE = 120,
         RANGE_OVERLAP = 10,

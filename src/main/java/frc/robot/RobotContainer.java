@@ -176,8 +176,9 @@ public class RobotContainer {
     private void configureButtonBindings() {
         ShuffleboardDriver.homeArms.commandBind(homeArms.get(), ShuffleboardDriver.homeArms::whenPressed);
 
-        controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
-        controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::toggleShift));
+        controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::highGear));
+        controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::lowGear));
+
 
         controller1.buttonA.whenPressed(new LowerIntake(intake));
         controller1.buttonB.whenPressed(
@@ -210,25 +211,28 @@ public class RobotContainer {
 
         launchpad.missileA.whileHeld(climbMO);
 
-        // ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2,
-        // joystick.button8, joystick.button4, joystick.button5, joystick.button3,
-        // joystick.button7);
+        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2,
+        joystick.button8, joystick.button4, joystick.button5, joystick.button3,
+        joystick.button7);
         // launchpad.missileB.toggleWhenPressed(climbSemiAuto);
         launchpad.missileB.whileHeld(autoClimbCommand);
         launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));
 
-        ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
-                joystick.button5, joystick.button2, joystick.button7,
-                joystick.button6, joystick.button8);
+        // ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
+        //         joystick.button5, joystick.button2, joystick.button7,
+        //         joystick.button6, joystick.button8);
 
-        launchpad.buttonA.whenHeld(climbManual);
-        launchpad.buttonA.commandBind(climbManual);
-
+        launchpad.buttonA.whenHeld(climbSemiAuto);
+        launchpad.buttonA.commandBind(climbSemiAuto);
+        launchpad.buttonE.whileHeld(homeArms.get());
         Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
                 joystick.axisY, arcadeDrive);
         launchpad.buttonH.whileHeld(sas);
         launchpad.buttonH.commandBind(sas);
+        ClimbAutomationBetter2 climbAutomationBetter2 = new ClimbAutomationBetter2(drivetrain, climb);
 
+        
+        launchpad.buttonD.commandBind(climbAutomationBetter2, launchpad.buttonD::whileHeld);
         // launchpad.missileB.whileHeld(climbSemiAuto);
         // launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY,
         // joystick.axisX, joystick.button2));
@@ -301,7 +305,7 @@ public class RobotContainer {
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
             new InstantCommand(drivetrain::highGear),
-            new InstantCommand(intake::lowerIntake),
+            homeArms.get(),
             new InstantCommand(() -> {
                 launchpad.bigLEDRed.set(false);
                 launchpad.bigLEDGreen.set(true);
@@ -310,7 +314,7 @@ public class RobotContainer {
         Command deafultAuto = new SequentialCommandGroup(
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
-            new DriveByTime(drivetrain, 1.5, -0.5),
+            new DriveByTime(drivetrain, 1.2, -0.5),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.setDefaultOption("shoot and drive", deafultAuto);
@@ -319,7 +323,7 @@ public class RobotContainer {
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
             new WaitCommand(8),
-            new DriveByTime(drivetrain, 1.5, -0.5),
+            new DriveByTime(drivetrain, 1.2, -0.5),
             new PrintCommand("auto done")
         );
 
@@ -337,7 +341,7 @@ public class RobotContainer {
         Command driveOlnly = new SequentialCommandGroup(
                 autoInit.get(),
                 new WaitCommand(10),
-                new DriveByTime(drivetrain, 1.5, -0.5),
+                new DriveByTime(drivetrain, 1.2, -0.5),
                 new PrintCommand("auto done")
         );
 
@@ -364,11 +368,11 @@ public class RobotContainer {
             //2 ball
             autoInit.get(),
             new LowerIntake(intake),
-            new EncoderDrive(1, 1, drivetrain),
-            new WaitCommand(1),
-            new TurnByEncoder(180, drivetrain),
-            new WaitCommand(1),
             new EncoderDrive(2, 2, drivetrain),
+            new WaitCommand(1),
+                        new TurnByEncoder(180, drivetrain),
+            new WaitCommand(1),
+            new EncoderDrive(3, 3, drivetrain),
             new WaitCommand(1),
             new TurnByEncoder(110, drivetrain),
             new WaitCommand(1),

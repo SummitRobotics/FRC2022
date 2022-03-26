@@ -12,7 +12,7 @@ public final class PIDValues {
         MOVE_D = 0,
 
         // align PID
-        ALIGN_P = 0.02,
+        ALIGN_P = 0.015,
         ALIGN_I = 0.02,
         ALIGN_D = 0.00,
 
