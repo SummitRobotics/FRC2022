@@ -32,6 +32,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
      * @param limelight The limelight device.
      * @param shootButton The button to enable the shooter.
      * @param controlAxis The joystick used to manually align the robot to find a target.
+     * @param arcadeDrive The arcadeDrive command
      */
     public SemiAutoShooterAssembly(Shooter shooter,
         Conveyor conveyor,
@@ -52,7 +53,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     @Override
     public void findTarget(Drivetrain drivetrain) {
         arcadeDrive.execute();
-
     }
 
     @Override

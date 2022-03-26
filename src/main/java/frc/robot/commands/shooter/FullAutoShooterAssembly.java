@@ -222,22 +222,29 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @param limelightDistanceEstimate The limelight's reported distance estimate from the target
      * @param currentMotorSpeed The current motor speed
      * @param hoodPos The current hood position
+     * @param isAligned Whether or not we are aligned
      * @return Whether or not the motor was already spooled
      */
     public boolean spool(Shooter shooter,
         double limelightDistanceEstimate,
         double currentMotorSpeed,
-        boolean hoodPos) {
+        boolean hoodPos,
+        boolean isAligned) {
 
         double targetMotorSpeed = solveMotorSpeed(limelightDistanceEstimate, hoodPos);
 
-        if (!Functions.isWithin(currentMotorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
-
-            shooter.setMotorTargetSpeed(targetMotorSpeed);
-            return false;
-
+        if (isAligned) {
+            if (!Functions.isWithin(currentMotorSpeed, targetMotorSpeed, TARGET_MOTOR_SPEED_ACCURACY)) {
+    
+                shooter.setMotorTargetSpeed(targetMotorSpeed);
+                return false;
+    
+            } else {
+                return true;
+            }
         } else {
-            return true;
+            shooter.setMotorTargetSpeed(1500);
+            return false;
         }
     }
 
@@ -284,11 +291,12 @@ public class FullAutoShooterAssembly extends CommandBase {
         if (limelightHasTarget) {
             //TODO change this back
             isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
-            isSpooled = spool(shooter, limelightDistanceEstimate, currentMotorSpeed, hoodPos);
             isDrivenAndAligned = driveAndAlign(drivetrain,
                 smoothedHorizontalOffset,
                 true,
                 limelightDistanceEstimate);
+            isSpooled = spool(shooter, limelightDistanceEstimate,
+                currentMotorSpeed, hoodPos, isDrivenAndAligned);
 
             //System.out.println("hood: " + isHoodSet + "  spool: " + isSpooled + "  ball: " + isBallReady());
             if (isHoodSet && isSpooled && isBallReady() && isDrivenAndAligned) {
