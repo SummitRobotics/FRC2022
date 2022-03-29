@@ -28,7 +28,7 @@ public class ShooterMO extends CommandBase {
     OIButton shootButton;
     OIButton.PrioritizedButton prioritizedShootButton;
 
-    //static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
+    static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
 
     /**
      * Manual override for the shooter.
@@ -45,7 +45,7 @@ public class ShooterMO extends CommandBase {
         this.controlAxis = controlAxis;
         this.HoodButton = controlButton;
         this.shootButton = shootButton;
-        //dumb.forceSetDouble(1800);
+        dumb.forceSetDouble(1800);
     }
 
     @Override
@@ -72,9 +72,9 @@ public class ShooterMO extends CommandBase {
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
-        //shooter.setMotorTargetSpeed(dumb.getDouble(0));
+        shooter.setMotorTargetSpeed(dumb.getDouble(0));
         //shooter.setMotorVolts(shooter.calculateVoltageFromPid(dumb.getDouble(0)));
-        shooter.setMotorPower(controlAxis.get());
+        //shooter.setMotorPower(controlAxis.get());
     }
 
     @Override

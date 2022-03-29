@@ -108,6 +108,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         }
 
         System.out.println("DIST: " + limelightDistanceEstimate + " offset: " + horizontalOffset + " COLOR: " + color);
+        System.out.println("Full auto intake drive is running");
 
         if (limelightDistanceEstimate < 999) {
             double alignPower = alignPID.calculate(horizontalOffset);
@@ -118,7 +119,9 @@ public class FullAutoIntakeDrive extends CommandBase {
         } 
         if (lastState != thisState) {
             lastState = thisState;
-            changed = true;
+            if(thisState != ConveyorState.NONE){
+                changed = true;
+            }
             //drivetrain.stop();
         }
     }
@@ -131,6 +134,6 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return movePID.atSetpoint() || changed || (conveyor.getBeltState() != ConveyorState.NONE && conveyor.getIndexState() != ConveyorState.NONE);
+        return movePID.atSetpoint() || (conveyor.getIndexState() != ConveyorState.NONE && conveyor.getBeltState() != ConveyorState.NONE) || changed;
     }
 }

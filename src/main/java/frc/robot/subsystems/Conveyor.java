@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import javax.lang.model.element.Element;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -66,8 +64,8 @@ public class Conveyor extends SubsystemBase {
     private boolean doesBallExist;
     private boolean lidarAboveThreshold;
 
-    private ConveyorState beltBall = ConveyorState.NONE;
-    private ConveyorState indexBall = ConveyorState.NONE;
+    private ConveyorState beltBall;
+    private ConveyorState indexBall;
 
 
     // Constants storing acceptable distance data
@@ -104,7 +102,7 @@ public class Conveyor extends SubsystemBase {
 
         lidarAboveThreshold = false;
     
-        beltBall = ConveyorState.NONE;
+        beltBall = getColorSensorDetctedBall();
         indexBall = ConveyorState.NONE;
 
         index.setInverted(true);
