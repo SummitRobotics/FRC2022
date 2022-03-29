@@ -349,15 +349,18 @@ public class Lemonlight implements Sendable {
         builder.setSmartDashboardType("Lemonlight");
         //builder.addDoubleProperty("verticalOffset", this::getVerticalOffset, null);
         //builder.addDoubleProperty("horizontalOffset", this::getHorizontalOffset, null);
-        builder.addDoubleProperty("distance Estimate", () -> {
-            return Lemonlight.getLimelightDistanceEstimateIN(MAIN_MOUNT_HEIGHT, MAIN_MOUNT_ANGLE, MAIN_TARGET_HEIGHT, this.getVerticalOffset());
-        }, null);
-        
-        builder.addBooleanProperty("hasTarget", this::hasTarget, null);
+       
         
         if (forBall) {
             builder.addDoubleArrayProperty(
                     "customDataArray", this::getCustomVisionDataForTelemetry, null);
+        }
+        else{
+            builder.addDoubleProperty("distance Estimate", () -> {
+                return Lemonlight.getLimelightDistanceEstimateIN(MAIN_MOUNT_HEIGHT, MAIN_MOUNT_ANGLE, MAIN_TARGET_HEIGHT, this.getVerticalOffset());
+            }, null);
+            
+            builder.addBooleanProperty("hasTarget", this::hasTarget, null);
         }
     }
 }

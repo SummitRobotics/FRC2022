@@ -253,7 +253,7 @@ public class RobotContainer {
         SmartDashboard.putData("PCM", pcm);
         // SmartDashboard.putData("Drivetrain", drivetrain);
         SmartDashboard.putData("Lemonlight", targetingLimelight);
-        SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
+        // SmartDashboard.putData("Lemonlight", ballDetectionLimelight);
         // SmartDashboard.putData("Shooter", shooter);
         // SmartDashboard.putData("Conveyor", conveyor);
         // SmartDashboard.putData("Intake", intake);
@@ -313,7 +313,7 @@ public class RobotContainer {
 
         Command deafultAuto = new SequentialCommandGroup(
             autoInit.get(),
-            new ShooterAtStart(shooter, conveyor),
+            new ShooterAtStart(shooter, conveyor, 1250),
             new DriveByTime(drivetrain, 1.2, -0.5),
             new PrintCommand("auto done"));
 
@@ -353,12 +353,15 @@ public class RobotContainer {
             autoInit.get(),
             new LowerIntake(intake),
             new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            // new EncoderDrive(2.5, 2.5, drivetrain),
             new WaitCommand(1),
             new TurnByEncoder(190, drivetrain),
             new RaiseIntake(intake),
             new WaitCommand(.5),
-            new DriveToHub(drivetrain, targetingLimelight).withTimeout(3),
-            new ShooterAtStart(shooter, conveyor, 1000),
+            // new DriveToHub(drivetrain, targetingLimelight).withTimeout(3),
+            // new ShooterAtStart(shooter, conveyor, 1000),
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
+            new DriveByTime(drivetrain, 1.2, -0.5),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball", twoBallAuto);
@@ -380,6 +383,7 @@ public class RobotContainer {
             //new stuff
             new TurnByEncoder(60, drivetrain),
             new EncoderDrive(10, 10, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
             new TurnByEncoder(35, drivetrain),
             new EncoderDrive(.2, .2, drivetrain),
             new WaitCommand(3),
