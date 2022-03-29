@@ -16,7 +16,7 @@ public class DriveToHub extends CommandBase {
 
     // TODO - set this
     private static final double DISTANCE_FROM_HUB = 0;
-
+    private final Timer timer = new Timer();
     // subsystems
     private Drivetrain drivetrain;
 
@@ -79,12 +79,19 @@ public class DriveToHub extends CommandBase {
             System.out.println("align: " + alignPower + "   drive: " + movePower);
             drivetrain.setLeftMotorPower(movePower - alignPower);
             drivetrain.setRightMotorPower(movePower + alignPower);
+            timer.reset();
+            timer.stop();
+        } else if (timer.get() > 1) {
+            drivetrain.setLeftMotorPower(.1);
+            drivetrain.setRightMotorPower(-.1);
         } else {
-            // timer.reset();
-            // drivetrain.stop();
-            // drivetrain.setLeftMotorPower(.1);
-            // drivetrain.setRightMotorPower(-.1);
+            timer.start();
         }
+    }
+    
+    @Override
+    public void end(boolean interrupted) {
+        drivetrain.stop();
     }
 
     @Override
