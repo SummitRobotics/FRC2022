@@ -211,8 +211,8 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @param drivetrain The drivetrain subsystem
      */
     public void findTarget(Drivetrain drivetrain) {
-        drivetrain.setLeftMotorPower(0.5);
-        drivetrain.setRightMotorPower(-0.5);
+        drivetrain.setLeftMotorPower(0.25);
+        drivetrain.setRightMotorPower(-0.25);
     }
 
     /**

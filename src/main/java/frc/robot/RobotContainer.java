@@ -383,6 +383,7 @@ public class RobotContainer {
             //new stuff
             new TurnByEncoder(60, drivetrain),
             new EncoderDrive(10, 10, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
             new TurnByEncoder(35, drivetrain),
             new EncoderDrive(.2, .2, drivetrain),
             new WaitCommand(3),
