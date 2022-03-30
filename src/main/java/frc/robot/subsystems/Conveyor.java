@@ -5,16 +5,16 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lidar;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem to control the conveyor of the robot.
  */
-public class Conveyor extends SubsystemBase {
+public class Conveyor extends SubsystemBase implements Testable {
 
     // TODO - Set these
     public static final double
@@ -333,6 +333,26 @@ public class Conveyor extends SubsystemBase {
 
     public int getLidarDistance() {
         return lidar.getAverageDistance();
+    }
+
+    @Override
+    public String getTestName() {
+        return "Conveyor";
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        return new CANSparkMax[] {belt, index};
+    }
+
+    @Override
+    public ColorSensor[] getColorSensors() {
+        return new ColorSensor[] {colorSensor};
+    }
+
+    @Override
+    public Lidar[] getLidars() {
+        return new Lidar[] {lidar};
     }
 
     @Override

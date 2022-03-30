@@ -7,6 +7,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -22,18 +23,26 @@ public class ColorSensor implements Sendable {
     private final Color noTarget;
     private double measuredProximity;
     private Color measuredColor;
+    private double measuredLoopTime;
+    private Timer loopTimer;
 
     private final Runnable colorSensorReader = new Runnable() {
         @Override
         public void run() {
+            loopTimer.start();
             updateProximity(colorSensor.getProximity());
             updateColor(colorSensor.getColor());
+            loopTimer.stop();
+            updateLoopTime(loopTimer.get());
+            loopTimer.reset();
+
         }
     };
 
     private final Notifier thread = new Notifier(colorSensorReader);
     private Object proximityLock = new Object();
     private Object colorLock = new Object();
+    private Object loopLock = new Object();
 
     // The target RGB values for the specific shades of blue and red used for the balls.
     // We may need to re-adjust these later.
@@ -65,6 +74,8 @@ public class ColorSensor implements Sendable {
 
         measuredProximity = 0;
         measuredColor = new Color(0, 0, 0);
+        measuredLoopTime = 0;
+        loopTimer = new Timer();
         thread.startPeriodic(0.02);
     }
 
@@ -135,6 +146,17 @@ public class ColorSensor implements Sendable {
     }
 
     /**
+     * Returns how long measurements took.
+     *
+     * @return The amount of time, in milliseconds, that it took to measure proximity and color
+     */
+    public double getLoopTimeMilliseconds() {
+        synchronized (loopLock) {
+            return measuredLoopTime * 1000;
+        }
+    }
+
+    /**
      * Returns the name of the color detected.
      *
      * @return color_name the name of the color detected
@@ -170,6 +192,12 @@ public class ColorSensor implements Sendable {
     private void updateColor(Color color) {
         synchronized (colorLock) {
             measuredColor = color;
+        }
+    }
+
+    private void updateLoopTime(double time) {
+        synchronized (loopLock) {
+            measuredLoopTime = time;
         }
     }
 

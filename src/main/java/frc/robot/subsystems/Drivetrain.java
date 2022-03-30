@@ -24,6 +24,7 @@ import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
@@ -31,7 +32,7 @@ import frc.robot.utilities.lists.Ports;
 /**
  * Subsystem to control the drivetrain of the robot.
  */
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain extends SubsystemBase implements Testable {
 
     // TODO re tune/calculate all these
     public static final double 
@@ -50,7 +51,7 @@ public class Drivetrain extends SubsystemBase {
         HIGH_GEAR_RATIO = 5.098,
         LOW_GEAR_RATIO = 11.03102,
         WHEEL_RADIUS_IN_METERS = 0.05207,
-        WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
+        WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858;
 
@@ -432,14 +433,16 @@ public class Drivetrain extends SubsystemBase {
         rightMiddlePID.setReference(position, ControlType.kPosition);
         rightBackPID.setReference(position, ControlType.kPosition);
     }
+
     /** drives to distance.
      *
      * @param position position to go to in rotations
      */
-    public synchronized void setBothMotorTarget(double position){
+    public synchronized void setBothMotorTarget(double position) {
         setLeftMotorTarget(position);
         setRightMotorTarget(position);
     }
+
     /**
      * Convert distance to encoder values.
      * TODO: STILL NEED TO TEST THIS
@@ -447,11 +450,25 @@ public class Drivetrain extends SubsystemBase {
      * @param dist the distance in meters.
      * @return The converstion to encover values.
      */
-       public double distToEncoder(double dist) {
+    public double distToEncoder(double dist) {
         if (!getShift()) {
-            return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * HIGH_GEAR_RATIO;
+            return (dist / WHEEL_CIRCUMFERENCE_IN_METERS) * HIGH_GEAR_RATIO;
         } else {
-            return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
+            return (dist / WHEEL_CIRCUMFERENCE_IN_METERS) * LOW_GEAR_RATIO;
+        }
+    }
+
+    /**
+     * Convert encoder values to distance.
+     *
+     * @param encoder The encoder value
+     * @return The conversion to distance in meters
+     */
+    public double encoderToDist(double encoder) {
+        if (!getShift()) {
+            return encoder * WHEEL_CIRCUMFERENCE_IN_METERS / HIGH_GEAR_RATIO;
+        } else {
+            return encoder * WHEEL_CIRCUMFERENCE_IN_METERS / LOW_GEAR_RATIO;
         }
     }
     /**
@@ -463,6 +480,7 @@ public class Drivetrain extends SubsystemBase {
     public void distanceToTravel(double position) {
         setBothMotorTarget(distToEncoder(position));
     }
+    
     /**
      * The position you want the left side to register.
      * When it is in the position it is currently in
@@ -487,6 +505,7 @@ public class Drivetrain extends SubsystemBase {
         rightBackEncoder.setPosition(position);
         
     }
+    
     /**
      * Zeros the raw encoder values (PROBABLY NOT WHAT YOU WANT).
      *
@@ -542,10 +561,10 @@ public class Drivetrain extends SubsystemBase {
      */
     public double getLeftDistance() {
         if (!getShift()) {
-            return ((getLeftEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+            return ((getLeftEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS)
                 + leftDistanceAcum;
         } else {
-            return ((getLeftEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+            return ((getLeftEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS)
                 + leftDistanceAcum;
         }
     }
@@ -557,10 +576,10 @@ public class Drivetrain extends SubsystemBase {
      */
     public synchronized double getRightDistance() {
         if (!getShift()) {
-            return ((getRightEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+            return ((getRightEncoderPosition() / HIGH_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS)
                 + rightDistanceAcum;
         } else {
-            return ((getRightEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFRENCE_IN_METERS)
+            return ((getRightEncoderPosition() / LOW_GEAR_RATIO) * WHEEL_CIRCUMFERENCE_IN_METERS)
                 + rightDistanceAcum;
         }
     }
@@ -734,6 +753,16 @@ public class Drivetrain extends SubsystemBase {
         // System.out.println(MPStoRPM(getRightSpeed()));
         // System.out.println(rightEncoder.getVelocity());
         // System.out.println("------------------------");
+    }
+
+    @Override
+    public String getTestName() {
+        return "Drivetrain";
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        return new CANSparkMax[] {left, right};
     }
 
     @Override

@@ -38,10 +38,11 @@ public class EncoderDrive extends CommandBase {
     @Override
     public void initialize() {
         drivetrain.stop();
-        drivetrain.zeroDistance();
         // TODO test if this is accurate
-        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
-        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right));
+        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left)
+            + drivetrain.getLeftEncoderPosition());
+        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right)
+            + drivetrain.getRightEncoderPosition());
     }
 
     @Override

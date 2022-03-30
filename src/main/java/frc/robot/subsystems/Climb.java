@@ -15,12 +15,14 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
+import java.util.HashMap;
 
 /**
  * Subsystem for the Climb Subsystem.
  */
-public class Climb extends SubsystemBase {
+public class Climb extends SubsystemBase implements Testable {
 
     private AHRS gyro;
     private final DigitalInput leftClimbLimit = new DigitalInput(Ports.LEFT_LIMIT_SWITCH);
@@ -28,15 +30,16 @@ public class Climb extends SubsystemBase {
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
     private double oldGyroAngle = 0;
     private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
+    private boolean wereSwitchesFalse = false;
 
-    //TODO set these
+    // TODO set these
     public static final double
             P = 1,
             I = 0,
             D = 0,
             FF = 0,
             IZ = 0,
-            //TODO tune these values
+            // TODO tune these values
             CLIMB_TILT_ANGLE = -2,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
@@ -382,6 +385,47 @@ public class Climb extends SubsystemBase {
         oldGyroAngle = pa;
     }
 
+    @Override
+    public String getTestName() {
+        return "Climb";
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        return new CANSparkMax[] {leftMotor, rightMotor};
+    }
+
+    @Override
+    public HashMap<String, Boolean> initCustomTests() {
+        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+        result.put("Left Limit Switch", false);
+        result.put("Right Limit Swtich", false);
+
+        return result;
+    }
+
+    @Override
+    public HashMap<String, Boolean> runCustomTests() {
+        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+
+        if (!pivotPos && !wereSwitchesFalse) {
+            setPivotPos(true);
+        } else if (pivotPos && !getLeftLimit() && !getRightLimit()) {
+            wereSwitchesFalse = true;
+            setPivotPos(false);
+        }
+
+        if (wereSwitchesFalse) {
+            result.put("Left Limit Switch", getLeftDetachPos());
+            result.put("Right Limit Switch",  getRightDetachPos());
+        } else {
+            result.put("Left Limit Switch", false);
+            result.put("Right Limit Switch",  false);
+        }
+
+        return result;
+    }
+
     /**
      * Function to init telemetry for the climb subsystem.
      */
@@ -514,4 +558,3 @@ public class Climb extends SubsystemBase {
         };
     }
 }
-

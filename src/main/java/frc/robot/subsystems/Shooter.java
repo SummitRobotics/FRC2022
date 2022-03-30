@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
@@ -10,19 +9,21 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.Lemonlight;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
+import java.util.HashMap;
 
 /**
  * Subsystem for the Shooter mechanism.
  */
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements Testable {
 
     /**
      * Enum describing shooter state.
@@ -75,12 +76,18 @@ public class Shooter extends SubsystemBase {
 
     private LEDCall firing = new LEDCall(LEDPriorities.SHOOTING, LEDRange.All).solid(Colors.PURPLE);
 
+    // targeting limelight (for testing)
+    private Lemonlight targetingLimelight;
+    
     private double setPoint = 0;
 
     /**
      * Creates a new shooter instance.
+     *
+     * @param targetingLimelight The limelight used for targeting
      */
-    public Shooter() {
+    public Shooter(Lemonlight targetingLimelight) {
+        this.targetingLimelight = targetingLimelight;
         shooterMotorPIDController.setP(P);
         shooterMotorPIDController.setI(I);
         shooterMotorPIDController.setD(D);
@@ -245,8 +252,25 @@ public class Shooter extends SubsystemBase {
         setHoodPos(!hoodPos);
     }
 
-    private String getShooterStateAsText() {
+    public String getShooterStateAsText() {
         return shooterState.toString();
+    }
+
+    @Override
+    public String getTestName() {
+        return "Shooter";
+    }
+
+    @Override
+    public CANSparkMax[] getMotors() {
+        return new CANSparkMax[] {shooterMotorMain};
+    }
+
+    @Override
+    public HashMap<String, Lemonlight> getLimelights() {
+        HashMap<String, Lemonlight> result = new HashMap<String, Lemonlight>();
+        result.put("limelight-target", targetingLimelight);
+        return result;
     }
 
     @Override

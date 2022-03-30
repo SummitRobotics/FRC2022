@@ -16,6 +16,7 @@ import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.*;
 import frc.robot.commands.shooter.*;
+import frc.robot.commands.testing.TestComponent;
 import frc.robot.devices.*;
 import frc.robot.devices.LEDs.*;
 import frc.robot.oi.drivers.*;
@@ -60,6 +61,7 @@ public class RobotContainer {
     private final ColorSensor colorSensor;
     private final LidarV4 lidar;
     private final Command teleInit;
+    private final Command testInit;
     private ClimbAutomationBetter autoClimbCommand;
     private Command arcadeDrive;
 
@@ -72,7 +74,6 @@ public class RobotContainer {
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
-        pcm = new PCM(Ports.PCM_1);
         lidar = new LidarV4(0x62);
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
@@ -89,10 +90,12 @@ public class RobotContainer {
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);
-        shooter = new Shooter();
+        shooter = new Shooter(targetingLimelight);
         conveyor = new Conveyor(colorSensor, lidar);
-        intake = new Intake();
+        intake = new Intake(ballDetectionLimelight);
         climb = new Climb(gyro);
+
+        pcm = new PCM(Ports.PCM_1, drivetrain);
 
         arcadeDrive = new ArcadeDrive(
             drivetrain,
@@ -102,8 +105,7 @@ public class RobotContainer {
             controller1.leftX,
             controller1.dPadAny);
 
-        homeArms = ()-> new ParallelCommandGroup(new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT), new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT));
-
+        homeArms = () -> new ParallelCommandGroup(new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT), new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT));
 
         autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
 
@@ -149,6 +151,23 @@ public class RobotContainer {
                     launchpad.bigLEDGreen.set(false);
                 }),
                 new RaiseIntake(intake));
+
+        testInit = new SequentialCommandGroup(
+            new InstantCommand(
+                        () -> ShuffleboardDriver.statusDisplay.addStatus(
+                                "testing",
+                                "robot testing",
+                                Colors.TEAM,
+                                StatusPriorities.ENABLED)),
+            new InstantCommand(() -> pcm.enableCompressorDigital()),
+            homeArms.get(),
+            new TestComponent(pcm),
+            new TestComponent(shooter),
+            new TestComponent(intake),
+            new TestComponent(drivetrain),
+            new TestComponent(conveyor),
+            new TestComponent(climb)
+        );
 
         // Configure the button bindings
         setDefaultCommands();
@@ -295,7 +314,11 @@ public class RobotContainer {
         scheduler.schedule(teleInit);
     }
 
-    private void createAutoCommands(){
+    public void testInit() {
+        scheduler.schedule(testInit);
+    }
+
+    private void createAutoCommands() {
 
         Supplier<Command> autoInit = () -> new SequentialCommandGroup(
             new InstantCommand(

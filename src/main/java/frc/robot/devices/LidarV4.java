@@ -5,6 +5,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.utilities.RollingAverage;
 
 /**
@@ -21,6 +22,9 @@ public class LidarV4 implements Lidar, Sendable {
     private final Runnable proximityReader;
     private Notifier thread;
     private Object valueLock;
+    private Object loopLock;
+    private Timer loopTimer;
+    private double measuredLoopTime;
 
     /**
      * constructor.
@@ -30,14 +34,21 @@ public class LidarV4 implements Lidar, Sendable {
     public LidarV4(int id) {
         portI2C = new I2C(Port.kMXP, id);
         value = 0;
+        measuredLoopTime = 0;
 
         rollingAverage = new RollingAverage(5, true);
 
         valueLock = new Object();
+        loopLock = new Object();
+        loopTimer = new Timer();
         proximityReader = new Runnable() {
             @Override
             public void run() {
+                loopTimer.start();
                 updateValue(readDistance());
+                loopTimer.stop();
+                updateLoopTime(loopTimer.get());
+                loopTimer.reset();
             }
         };
         thread = new Notifier(proximityReader);
@@ -103,6 +114,18 @@ public class LidarV4 implements Lidar, Sendable {
     }
 
     /**
+     * Returns how long measurements took.
+     *
+     * @return The amount of time, in milliseconds, that it took to measure distance
+     */
+    @Override
+    public double getLoopTimeMilliseconds() {
+        synchronized (loopLock) {
+            return measuredLoopTime * 1000;
+        }
+    }
+
+    /**
      * Changes the i2c id of the v4.
      *
      * @param id the id to change to
@@ -134,6 +157,12 @@ public class LidarV4 implements Lidar, Sendable {
                 this.value = value;
                 rollingAverage.update(value);
             }
+        }
+    }
+
+    private void updateLoopTime(double time) {
+        synchronized (loopLock) {
+            measuredLoopTime = time;
         }
     }
 

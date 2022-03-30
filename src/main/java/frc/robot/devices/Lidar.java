@@ -12,6 +12,8 @@ public interface Lidar {
 
     int getAverageDistance();
 
+    double getLoopTimeMilliseconds();
+
     /**
      * Compensated the lidar distance for the lidar mount angle in inches.
      *

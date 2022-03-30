@@ -3,14 +3,38 @@ package frc.robot.devices;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.utilities.Testable;
+import java.util.HashMap;
 
-// TODO - Find better documentation and figure out what more of these methods do
-/** Contains methods for interfacing with the PCM (Pneumatics Control Module). */
-public class PCM implements Sendable {
+/**
+ * Contains methods for interfacing with the PCM (Pneumatics Control Module).
+*/
+public class PCM implements Sendable, Testable {
 
     private PneumaticHub hub;
+    private Drivetrain drivetrain;
+    private Timer timer;
 
-    public PCM(int module) {
+    private static final double
+        FULL_PRESSURE = 100,
+        PARTIAL_PRESSURE = 50;
+
+    private boolean hasReachedFullPressure;
+    private boolean hasReachedPartialPressure;
+
+    /**
+     * Contains methods for interfacing with the PCM (Pneumatics Control Module).
+     *
+     * @param module The module number to construct
+     * @param drivetrain The drivetrain subsystem
+     */
+    public PCM(int module, Drivetrain drivetrain) {
+        this.drivetrain = drivetrain;
+        hasReachedFullPressure = false;
+        hasReachedPartialPressure = false;
+        timer = new Timer();
         hub = new PneumaticHub(module);
     }
 
@@ -96,6 +120,56 @@ public class PCM implements Sendable {
 
     public boolean getPressureSwitch() {
         return hub.getPressureSwitch();
+    }
+
+    @Override
+    public String getTestName() {
+        return "Pneumatics";
+    }
+
+    @Override
+    public double getAllowedTimeSeconds() {
+        return 20;
+    }
+
+    @Override
+    public HashMap<String, Boolean> initCustomTests() {
+        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+        result.put("Compressor", false);
+        result.put("Pressure", false);
+
+        timer.reset();
+        timer.start();
+
+        return result;
+    }
+
+    @Override
+    public HashMap<String, Boolean> runCustomTests() {
+        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+        boolean pressureStatus = false;
+
+        if (hasReachedFullPressure) {
+            if (hasReachedPartialPressure) {
+                pressureStatus = true;
+            } else {
+                if (timer.hasElapsed(0.25)) {
+                    drivetrain.toggleShift();
+                    timer.reset();
+                    if (getPressure() < PARTIAL_PRESSURE) {
+                        hasReachedPartialPressure = true;
+                    }
+                }
+            }
+
+        } else if (getPressure() > FULL_PRESSURE) {
+            hasReachedFullPressure = true;
+        }
+
+        result.put("Compressor", getCompressor() && getCompressorCurrent() > 0);
+        result.put("Pressure", pressureStatus);
+        
+        return result;
     }
 
     @Override
