@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Intake;
-import frc.robot.utilities.Functions;
 
 /**
  * Default command for Intake.
@@ -19,7 +18,8 @@ public class DefaultIntake extends CommandBase {
     private final Intake intake;
     private final Conveyor conveyor;
     private final AHRS gyro;
-    static NetworkTableEntry dumb = NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
+    static NetworkTableEntry dumb =
+        NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
 
     /**
      * Default command for Intake.
@@ -50,10 +50,10 @@ public class DefaultIntake extends CommandBase {
                 // } else {
                 //     double robotVelocity = Math.sqrt(gyro.getVelocityX() * gyro.getVelocityX()
                 //         + gyro.getVelocityY() * gyro.getVelocityY());
-                //     intake.setIntakeMotorPower(Functions.clampDouble(calculatePower(robotVelocity), 1, -1));
+                //     intake.setIntakeSpeed(calculatePower(robotVelocity));
                 // }
-                // break;
                 intake.setIntakeSpeed(dumb.getDouble(0));
+                break;
             default:
                 break;
         }

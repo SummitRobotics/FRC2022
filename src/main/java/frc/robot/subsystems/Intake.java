@@ -4,8 +4,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -21,6 +19,7 @@ public class Intake extends SubsystemBase {
         P = 0.004,
         I = 0.0,
         D = 0.0;
+
     /**
      * Enum for Intake States.
      */
@@ -53,6 +52,7 @@ public class Intake extends SubsystemBase {
     private boolean intakeSolenoidPosition = false;
 
     private final SparkMaxPIDController intakePidController = intakeMotor.getPIDController();
+
     /**
      * Subsystem to control the intake of the robot.
      */
@@ -102,21 +102,21 @@ public class Intake extends SubsystemBase {
     public double getIntakeRPM() {
         return intakeEncoder.getVelocity();
     }
+
     /**
      * sets Intake State.
      *
      * @param states Sets the intake state
      */
-
     public void setState(States states) {
         state = states;
     }
+
     /**
      * Manually overrides the intake motor's encoder position.
      *
      * @param position The desired position of the intake motor's encoder.
      */
-    
     public void setIntakeEncoder(double position) {
         intakeEncoder.setPosition(position);
     }
@@ -136,6 +136,7 @@ public class Intake extends SubsystemBase {
         intakePidController.setReference(speed, CANSparkMax.ControlType.kVelocity);
 
     }
+
     /**
      * Resets the intake motor's encoder position.
      */
