@@ -42,7 +42,7 @@ import frc.robot.commands.shooter.SemiAutoShooterAssembly;
 import frc.robot.commands.shooter.ShooterAtStart;
 import frc.robot.commands.shooter.ShooterLow;
 import frc.robot.commands.shooter.ShooterMO;
-import frc.robot.commands.testing.TestSubsystem;
+import frc.robot.commands.testing.TestComponent;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -62,7 +62,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.ChangeRateLimiter;
 import frc.robot.utilities.Functions;
-import frc.robot.utilities.GeneralTests;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
@@ -122,7 +121,6 @@ public class RobotContainer {
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
-        pcm = new PCM(Ports.PCM_1);
         lidar = new LidarV4(0x62);
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
@@ -143,6 +141,8 @@ public class RobotContainer {
         conveyor = new Conveyor(colorSensor, lidar);
         intake = new Intake(ballDetectionLimelight);
         climb = new Climb(gyro);
+
+        pcm = new PCM(Ports.PCM_1, drivetrain);
 
         // TODO - set these values
         homeLeftArm = new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT);
@@ -218,12 +218,12 @@ public class RobotContainer {
                                 StatusPriorities.ENABLED)),
             new InstantCommand(() -> pcm.enableCompressorDigital()),
             new ParallelCommandGroup(homeLeftArm, homeRightArm),
-            new TestSubsystem(new GeneralTests(drivetrain, pcm)),
-            new TestSubsystem(shooter),
-            new TestSubsystem(intake),
-            new TestSubsystem(drivetrain),
-            new TestSubsystem(conveyor),
-            new TestSubsystem(climb)
+            new TestComponent(pcm),
+            new TestComponent(shooter),
+            new TestComponent(intake),
+            new TestComponent(drivetrain),
+            new TestComponent(conveyor),
+            new TestComponent(climb)
         );
 
         // Configure the button bindings

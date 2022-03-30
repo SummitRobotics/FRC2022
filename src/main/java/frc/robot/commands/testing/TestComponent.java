@@ -16,7 +16,7 @@ import java.util.HashMap;
 /**
  * Tests a testable subsystem.
  */
-public class TestSubsystem extends CommandBase {
+public class TestComponent extends CommandBase {
 
     private CANSparkMax[] motors;
     private ColorSensor[] colorSensors;
@@ -34,7 +34,7 @@ public class TestSubsystem extends CommandBase {
      *
      * @param toTest The testable object
      */
-    public TestSubsystem(Testable toTest) {
+    public TestComponent(Testable toTest) {
         this.toTest = toTest;
 
         motors = toTest.getMotors();
