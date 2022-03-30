@@ -2,6 +2,8 @@ package frc.robot.commands.testing;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -20,13 +22,13 @@ public class TestComponent extends CommandBase {
 
     private CANSparkMax[] motors;
     private ColorSensor[] colorSensors;
-    private Lemonlight[] limelights;
+    private HashMap<String, Lemonlight> limelights;
     private Lidar[] lidars;
     private RelativeEncoder[] encoders;
     private double[] startingPositions;
     private HashMap<String, Boolean> testStates;
     private Testable toTest;
-    
+
     private Timer timer;
     
     /**
@@ -55,8 +57,8 @@ public class TestComponent extends CommandBase {
             testStates.put("Lidar " + i, false);
         }
 
-        for (int i = 0; i < limelights.length; i++) {
-            testStates.put("Limelight " + i, false);
+        for (HashMap.Entry<String, Lemonlight> set : limelights.entrySet()) {
+            testStates.put(set.getKey(), false);
         }
 
         timer = new Timer();
@@ -112,11 +114,18 @@ public class TestComponent extends CommandBase {
             }
         }
 
-        for (int i = 0; i < limelights.length; i++) {
-            if (limelights[i] != null) {
-                testStates.replace("Limelight " + i, true);
+        for (HashMap.Entry<String, Lemonlight> set : limelights.entrySet()) {
+            NetworkTable networkTable =
+                NetworkTableInstance.getDefault().getTable(set.getKey());
+            if (set.getValue() != null
+                && networkTable.getEntry("tv").getDouble(-1) != -1
+                && networkTable.getEntry("tx").getDouble(10000) != 10000
+                && networkTable.getEntry("ty").getDouble(10000) != 10000
+                && networkTable.getEntry("ta").getDouble(10000) != 10000) {
+
+                testStates.replace(set.getKey(), true);
             } else {
-                testStates.replace("Limelight " + i, false);
+                testStates.replace(set.getKey(), false);
             }
         }
 
@@ -127,8 +136,8 @@ public class TestComponent extends CommandBase {
     public void end(final boolean interrupted) {
         timer.stop();
 
-        for (int i = 0; i < motors.length; i++) {
-            motors[i].set(0);
+        for (CANSparkMax motor : motors) {
+            motor.set(0);
         }
     }
 

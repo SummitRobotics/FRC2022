@@ -6,11 +6,11 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
+import java.util.HashMap;
 
 /**
  * Subsystem to control the intake of the robot.
@@ -194,8 +194,10 @@ public class Intake extends SubsystemBase implements Testable {
     }
 
     @Override
-    public Lemonlight[] getLimelights() {
-        return new Lemonlight[] {ballLimelight};
+    public HashMap<String, Lemonlight> getLimelights() {
+        HashMap<String, Lemonlight> result = new HashMap<String, Lemonlight>();
+        result.put("limelight-balls", ballLimelight);
+        return result;
     }
 
     @Override

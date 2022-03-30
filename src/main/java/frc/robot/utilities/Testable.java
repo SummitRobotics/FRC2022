@@ -21,8 +21,9 @@ public interface Testable {
         return new ColorSensor[] {};
     }
 
-    public default Lemonlight[] getLimelights() {
-        return new Lemonlight[] {};
+    // The HashMap includes network table names and limelight objects
+    public default HashMap<String, Lemonlight> getLimelights() {
+        return new HashMap<String, Lemonlight>();
     }
 
     public default Lidar[] getLidars() {

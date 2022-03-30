@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
@@ -10,16 +9,16 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.devices.Lemonlight;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.Lemonlight;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
+import java.util.HashMap;
 
 /**
  * Subsystem for the Shooter mechanism.
@@ -264,8 +263,10 @@ public class Shooter extends SubsystemBase implements Testable {
     }
 
     @Override
-    public Lemonlight[] getLimelights() {
-        return new Lemonlight[] {targetingLimelight};
+    public HashMap<String, Lemonlight> getLimelights() {
+        HashMap<String, Lemonlight> result = new HashMap<String, Lemonlight>();
+        result.put("limelight-target", targetingLimelight);
+        return result;
     }
 
     @Override
