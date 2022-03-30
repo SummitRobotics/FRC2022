@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -158,16 +159,44 @@ public class Drivetrain extends SubsystemBase implements Testable {
         // sets pid values
         zeroDistance();
 
-        // pid for position
-        leftPID.setP(14.301);
-        leftPID.setI(0);
-        leftPID.setD(581.73);
-        leftPID.setOutputRange(-.25, .25);
+        double posP = 0.5;
 
-        rightPID.setP(14.301);
-        rightPID.setI(0);
-        rightPID.setD(581.73);
-        rightPID.setOutputRange(-.25, .25);
+        double posI = 0;
+
+        double posD = 0.01;
+
+        // pid for position
+        leftPID.setP(posP);
+        leftPID.setI(posI);
+        leftPID.setD(posD);
+        leftPID.setOutputRange(-.5, .5);
+
+        rightPID.setP(posP);
+        rightPID.setI(posI);
+        rightPID.setD(posD);
+        rightPID.setOutputRange(-.5, .5);
+
+        // pid for position
+        leftMiddlePID.setP(posP);
+        leftMiddlePID.setI(posI);
+        leftMiddlePID.setD(posD);
+        leftMiddlePID.setOutputRange(-.5, .5);
+
+        rightMiddlePID.setP(posP);
+        rightMiddlePID.setI(posI);
+        rightMiddlePID.setD(posD);
+        rightMiddlePID.setOutputRange(-.5, .5);
+
+        // pid for position
+        leftBackPID.setP(posP);
+        leftBackPID.setI(posI);
+        leftBackPID.setD(posD);
+        leftBackPID.setOutputRange(-.5, .5);
+
+        rightBackPID.setP(posP);
+        rightBackPID.setI(posI);
+        rightBackPID.setD(posD);
+        rightBackPID.setOutputRange(-.5, .5);
 
         // pid for velocity
         leftPID.setP(0.00012245, 2);
@@ -178,17 +207,6 @@ public class Drivetrain extends SubsystemBase implements Testable {
         rightPID.setI(0, 2);
         rightPID.setD(0.0, 2);
         
-        // pid for position
-        leftMiddlePID.setP(14.301);
-        leftMiddlePID.setI(0);
-        leftMiddlePID.setD(581.73);
-        leftMiddlePID.setOutputRange(-.25, .25);
-
-        rightMiddlePID.setP(14.301);
-        rightMiddlePID.setI(0);
-        rightMiddlePID.setD(581.73);
-        rightMiddlePID.setOutputRange(-.25, .25);
-
         // pid for velocity
         leftMiddlePID.setP(0.00012245, 2);
         leftMiddlePID.setI(0, 2);
@@ -197,17 +215,6 @@ public class Drivetrain extends SubsystemBase implements Testable {
         rightMiddlePID.setP(0.00012245, 2);
         rightMiddlePID.setI(0, 2);
         rightMiddlePID.setD(0.0, 2);
-        
-        // pid for position
-        leftBackPID.setP(14.301);
-        leftBackPID.setI(0);
-        leftBackPID.setD(581.73);
-        leftBackPID.setOutputRange(-.25, .25);
-
-        rightBackPID.setP(14.301);
-        rightBackPID.setI(0);
-        rightBackPID.setD(581.73);
-        rightBackPID.setOutputRange(-.25, .25);
 
         // pid for velocity
         leftBackPID.setP(0.00012245, 2);
@@ -426,7 +433,14 @@ public class Drivetrain extends SubsystemBase implements Testable {
         rightMiddlePID.setReference(position, ControlType.kPosition);
         rightBackPID.setReference(position, ControlType.kPosition);
     }
-
+    /** drives to distance.
+     *
+     * @param position position to go to in rotations
+     */
+    public synchronized void setBothMotorTarget(double position){
+        setLeftMotorTarget(position);
+        setRightMotorTarget(position);
+    }
     /**
      * Convert distance to encoder values.
      * TODO: STILL NEED TO TEST THIS
@@ -434,14 +448,22 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @param dist the distance in meters.
      * @return The converstion to encover values.
      */
-    public double distToEncoder(double dist) {
+       public double distToEncoder(double dist) {
         if (!getShift()) {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * HIGH_GEAR_RATIO;
         } else {
             return (dist / WHEEL_CIRCUMFRENCE_IN_METERS) * LOW_GEAR_RATIO;
         }
     }
-    
+    /**
+     * goes a distance.
+     *
+     * @param position distance to travel in meters
+     */
+
+    public void distanceToTravel(double position) {
+        setBothMotorTarget(distToEncoder(position));
+    }
     /**
      * The position you want the left side to register.
      * When it is in the position it is currently in
@@ -466,7 +488,6 @@ public class Drivetrain extends SubsystemBase implements Testable {
         rightBackEncoder.setPosition(position);
         
     }
-
     /**
      * Zeros the raw encoder values (PROBABLY NOT WHAT YOU WANT).
      *
@@ -730,17 +751,18 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public void initSendable(SendableBuilder builder) {
         //builder.setSmartDashboardType("Drivetrain");
 
-        builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
-        builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
+        //builder.addDoubleProperty("leftDistance", this::getLeftDistance, null);
+        //builder.addDoubleProperty("leftEncoder", this::getLeftEncoderPosition, null);
         //builder.addDoubleProperty("leftRPM", this::getLeftRPM, null);
-        builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
+        //builder.addDoubleProperty("leftSpeed", this::getLeftSpeed, null);
 
         //builder.addDoubleProperty("rightDistance", this::getRightDistance, null);
         //builder.addDoubleProperty("rightEncoder", this::getRightEncoderPosition, null);
         //builder.addDoubleProperty("rightRPM", this::getRightRPM, null);
         //builder.addDoubleProperty("rightSpeed", this::getRightSpeed, null);
         //builder.addDoubleProperty("rotation", this::getRotation, null);
-        f2d.initSendable(builder);
+        //f2d.initSendable(builder);
+        SmartDashboard.putData(f2d);
 
         // builder.addBooleanProperty("shifterStatus", this::getShift, null);
         //builder.addDoubleArrayProperty("pidValues", this::getPid, null);

@@ -45,7 +45,7 @@ public final class Ports {
             RIGHT_LIMIT_SWITCH = 1,
             // LEDs
             LED_PORT = 0,
-            LED_LENGTH = 50,
+            LED_LENGTH = 114,
 
             // pneumatics
             PRESSURE_SENSOR = 0,

@@ -7,6 +7,7 @@ import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.Functions;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
 
@@ -24,7 +25,8 @@ public class ShooterLow extends CommandBase {
     OIButton.PrioritizedButton prioritizedControlButton;
 
     SimpleButton prioritizedSimpleControlButton;
-    private final double LOW_GOAL_SPEED = 1100;
+    private final double LOW_GOAL_SPEED = 1000;
+    private final double error = 70;
     OIButton shootButton;
     OIButton.PrioritizedButton prioritizedShootButton;
 
@@ -57,7 +59,7 @@ public class ShooterLow extends CommandBase {
     public void execute() {
         // shooter.setMotorPower(controlAxis.get());
 
-        if (prioritizedShootButton.get()) {
+        if (prioritizedShootButton.get() && Functions.isWithin(shooter.getShooterRPM(), LOW_GOAL_SPEED, error)) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
         } 
         else{
@@ -70,6 +72,7 @@ public class ShooterLow extends CommandBase {
 
     @Override
     public void end(final boolean interrupted) {
+        shooter.retractHood();
         shooter.stop();
         prioritizedShootButton.destroy();
         shooter.setState(Shooter.States.NOT_SHOOTING);

@@ -23,8 +23,8 @@ public class EncoderDrive extends CommandBase {
      * The Constructor.
      *
      * @param drivetrain the robot's drivetrain
-     * @param left The number of motor rotations to move the left side
-     * @param right The number of motor rotations to move the right side
+     * @param left The distance to move the left side
+     * @param right The distance to move the right side
      */
     public EncoderDrive(double left, double right, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -46,7 +46,7 @@ public class EncoderDrive extends CommandBase {
 
     @Override
     public void execute() {
-        // System.out.println(drivetrain.getLeftEncoderPosition());
+        System.out.println(drivetrain.getLeftDistance());
     }
 
     // Called once the command ends or is interrupted.
@@ -58,8 +58,8 @@ public class EncoderDrive extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Math.abs(drivetrain.getLeftDistance() - left) < 5
-            && Math.abs(drivetrain.getRightDistance() - right) < 5;
+        return Math.abs(drivetrain.getLeftDistance() - left) < 0.01
+            && Math.abs(drivetrain.getRightDistance() - right) < 0.01;
 
     }
 }

@@ -7,7 +7,11 @@
 
 package frc.robot.commands.drivetrain;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.devices.LEDs.LEDCall;
+import frc.robot.devices.LEDs.LEDRange;
+import frc.robot.devices.LEDs.LEDs;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Drivetrain;
@@ -17,6 +21,8 @@ import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.SimpleButton;
 import frc.robot.utilities.lists.AxisPriorities;
+import frc.robot.utilities.lists.Colors;
+import frc.robot.utilities.lists.LEDPriorities;
 
 /**
  * Command for Arcade Drive.
@@ -50,6 +56,8 @@ public class ArcadeDrive extends CommandBase {
 
     private final boolean isSingleAxis;
 
+    private boolean ledsOn = false;
+
     /**
      * teleop driver control.
      *
@@ -80,6 +88,7 @@ public class ArcadeDrive extends CommandBase {
 
         addRequirements(drivetrain);
         isSingleAxis = false;
+        ledsOn = false;
     }
 
     /**
@@ -109,6 +118,7 @@ public class ArcadeDrive extends CommandBase {
 
         addRequirements(drivetrain);
         isSingleAxis = true;
+        ledsOn = false;
     }
 
     // Called when the command is initially scheduled.
@@ -161,6 +171,10 @@ public class ArcadeDrive extends CommandBase {
         }
 
         if (activateSwitchfoot) {
+            //dumb stuff is dumb
+            if(!ledsOn){
+                LEDs.getInstance().addCall("reversed", new LEDCall(LEDPriorities.DRIVE_REV, LEDRange.Aarms).ffh(Colors.YELLOW, Colors.OFF));   
+            }
             turn = -turn;
         }
 
@@ -171,7 +185,14 @@ public class ArcadeDrive extends CommandBase {
 
         if (switchfoot.get()) {
             activateSwitchfoot = !activateSwitchfoot;
+            if (activateSwitchfoot) {
+                LEDs.getInstance().addCall("reversed", new LEDCall(LEDPriorities.DRIVE_REV, LEDRange.Aarms).ffh(Colors.YELLOW, Colors.OFF));  
+            }
+            else{
+                LEDs.getInstance().removeCall("reversed");
+            }
         }
+
         if (!activateSwitchfoot) {
             drivetrain.setLeftMotorPower(leftPower);
             drivetrain.setRightMotorPower(rightPower);
@@ -185,6 +206,7 @@ public class ArcadeDrive extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         drivetrain.stop();
+        LEDs.getInstance().removeCall("reversed");
     }
 
     // Returns true when the command should end.

@@ -9,7 +9,7 @@ import frc.robot.subsystems.Drivetrain;
 public class TurnByEncoder extends ParallelCommandGroup {
 
     //TODO check accuracy
-    private static final double ROBOT_RADIUS = 15;
+    private static final double ROBOT_RADIUS = Drivetrain.DRIVE_WIDTH/2;
 
     /**
      * Constructor to turn the robot using encoders.
@@ -18,7 +18,7 @@ public class TurnByEncoder extends ParallelCommandGroup {
      * @param drive Drivetrain subsystem.
      */
     public TurnByEncoder(double angle, Drivetrain drive) {
-        double radians = Math.PI / 180;
+        double radians = (Math.PI / 180) * angle;
         double distance = ROBOT_RADIUS * radians;
         addCommands(new EncoderDrive(distance, -distance, drive));
     }

@@ -11,7 +11,10 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 public enum LEDRange {
     // TODO update led ranges
     Bar(Atomic.Bar),
-    All(Atomic.Bar);
+    ArmLeft(Atomic.ArmLeft),
+    ArmRight(Atomic.ArmRight),
+    Aarms(Atomic.ArmLeft, Atomic.ArmRight),
+    All(Atomic.ArmLeft, Atomic.Bar, Atomic.ArmRight);
 
     private final Atomic[] ranges;
 
@@ -29,7 +32,9 @@ public enum LEDRange {
      * and they manage their own internal state to update LED colors.
      */
     protected enum Atomic {
-        Bar(0, 49);
+        ArmLeft(0,37),
+        Bar(38, 74),
+        ArmRight(75,113);
 
         private final int start;
         private final int end;

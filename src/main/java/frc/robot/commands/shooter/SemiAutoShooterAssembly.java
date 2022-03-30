@@ -1,5 +1,6 @@
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.devices.Lemonlight;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
@@ -20,6 +21,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
     private OIAxis controlAxis;
     private OIAxis.PrioritizedAxis prioritizedControlAxis;
     private final int axisPriority = AxisPriorities.MANUAL_OVERRIDE;
+    private Command arcadeDrive;
 
     /**
      * Command for running the shooter in semi auto mode.
@@ -30,26 +32,27 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
      * @param limelight The limelight device.
      * @param shootButton The button to enable the shooter.
      * @param controlAxis The joystick used to manually align the robot to find a target.
+     * @param arcadeDrive The arcadeDrive command
      */
     public SemiAutoShooterAssembly(Shooter shooter,
         Conveyor conveyor,
         Drivetrain drivetrain,
         Lemonlight limelight,
         OIButton shootButton,
-        OIAxis controlAxis) {
+        OIAxis controlAxis, 
+        Command arcadeDrive) {
 
         super(shooter, conveyor, drivetrain, limelight);
         this.shootButton = shootButton;
         this.controlAxis = controlAxis;
+        this.arcadeDrive = arcadeDrive;
 
         addRequirements(shooter, drivetrain);
     }
 
     @Override
     public void findTarget(Drivetrain drivetrain) {
-        drivetrain.setLeftMotorPower(-prioritizedControlAxis.get());
-        drivetrain.setRightMotorPower(prioritizedControlAxis.get());
-
+        arcadeDrive.execute();
     }
 
     @Override

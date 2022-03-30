@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  * climb command to go automatically.
  */
 
-public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
+public class ClimbAutomationBetter2 extends StatefullSequentalCommandGroup {
     
     private Climb climb;
     private Drivetrain drivetrain;
@@ -37,7 +37,7 @@ public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
      * @param climb needs a climb subsystem to work
     */
 
-    public ClimbAutomationBetter(Drivetrain drivetrain, Climb climb) {
+    public ClimbAutomationBetter2(Drivetrain drivetrain, Climb climb) {
         this.climb = climb;
         this.drivetrain = drivetrain;
         AutoAlign autoAlign = new AutoAlign(climb, drivetrain);
@@ -50,7 +50,6 @@ public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
             new InstantCommand(() -> LEDs.getInstance().addCall("climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All).flashing(Colors.RED, Colors.OFF))),
             new InstantCommand(() -> climb.setDetachPos(true)),
             new MoveArms(climb, -140),
-            autoAlign,
             new MoveArms(climb, climb.FORWARD_LIMIT),
             new InstantCommand(() -> climb.setDetachPos(false)),
             new WaitCommand(.1),

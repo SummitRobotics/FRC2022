@@ -11,7 +11,7 @@ import frc.robot.utilities.RollingAverage;
 /**
  * Manual override for the shooter.
  */
-public class ShooterAtStart extends CommandBase {
+public class midrangeShooter extends CommandBase {
 
     Shooter shooter;
 
@@ -19,8 +19,8 @@ public class ShooterAtStart extends CommandBase {
 
     RollingAverage avg = new RollingAverage(5, false);
 
-    private double speed = 1000;
-    private double error = 60;
+    private double speed = 1200;
+    private double error = 25;
 
     /**
      * Manual override for the shooter.
@@ -28,16 +28,11 @@ public class ShooterAtStart extends CommandBase {
      * @param shooter the shooter subsystem
      * @param conveyor the conveyor subsystem
      */
-    public ShooterAtStart(Shooter shooter, Conveyor conveyor) {
+    public midrangeShooter(Shooter shooter, Conveyor conveyor) {
         addRequirements(shooter);
 
         this.shooter = shooter;
         this.conveyor = conveyor;
-    }
-
-    public ShooterAtStart(Shooter shooter, Conveyor conveyor, double rpm){
-        this(shooter, conveyor);
-        speed = rpm;
     }
 
     @Override
@@ -71,6 +66,7 @@ public class ShooterAtStart extends CommandBase {
 
     @Override
     public boolean isFinished() {
+        System.out.println("existssssss: " + conveyor.doesBallExist());
         return !conveyor.doesBallExist();
     }
 }

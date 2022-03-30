@@ -3,11 +3,13 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.devices.Lemonlight;
+import frc.robot.utilities.Functions;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 import java.util.HashMap;
@@ -16,6 +18,10 @@ import java.util.HashMap;
  * Subsystem to control the intake of the robot.
  */
 public class Intake extends SubsystemBase implements Testable {
+    public static final double 
+        P = 0.004,
+        I = 0.0,
+        D = 0.0;
 
     /**
      * Enum for Intake States.
@@ -29,7 +35,10 @@ public class Intake extends SubsystemBase implements Testable {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = 0.5;
+            INTAKE_MOTOR_SPEED = .5, 
+            MAX_RPM = 8000, 
+            ACTUAL_SPEED = MAX_RPM / 2,
+            MOVE_TO_CONVEYOR = ACTUAL_SPEED / 2;
 
     // motor
     private final CANSparkMax intakeMotor =
@@ -48,6 +57,8 @@ public class Intake extends SubsystemBase implements Testable {
     // ball limelight (tested in this subsystem)
     private Lemonlight ballLimelight;
 
+    private final SparkMaxPIDController intakePidController = intakeMotor.getPIDController();
+
     /**
      * Subsystem to control the intake of the robot.
      *
@@ -55,6 +66,10 @@ public class Intake extends SubsystemBase implements Testable {
      */
     public Intake(Lemonlight ballLimelight) {
         this.ballLimelight = ballLimelight;
+        intakePidController.setP(P);
+        intakePidController.setI(I);
+        intakePidController.setD(D);
+        intakePidController.setOutputRange(-1.0, 1.0);
         zeroEncoder();
         state = States.UP;
         intakeMotor.setOpenLoopRampRate(INTAKE_RATE);
@@ -87,12 +102,12 @@ public class Intake extends SubsystemBase implements Testable {
             setIntakeMotorPower(INTAKE_MOTOR_SPEED);
         }
     }
+
     /**
      * Gets the intake motor's speed (in RPM).
      *
      * @return speed
      */
-
     public double getIntakeRPM() {
         return intakeEncoder.getVelocity();
     }
@@ -116,8 +131,29 @@ public class Intake extends SubsystemBase implements Testable {
     }
 
     /**
+     * Makes the intake motor rotate to a postion.
+     *
+     * @param position the postion to be rotated to
+     */
+
+    public void setIntakePosition(double position) {
+        intakePidController.setReference(position, CANSparkMax.ControlType.kPosition);
+    }
+    
+    /**
+     * Set the speed of the intake.
+     *
+     * @param speed The desired intake speed
+     */
+    public void setIntakeSpeed(double speed) {
+        speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
+        intakePidController.setReference(speed, CANSparkMax.ControlType.kVelocity);
+
+    }
+    /**
      * Resets the intake motor's encoder position.
      */
+
     public void zeroEncoder() {
         setIntakeEncoder(0);
     }

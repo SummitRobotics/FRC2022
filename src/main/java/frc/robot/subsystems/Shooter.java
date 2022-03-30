@@ -78,6 +78,8 @@ public class Shooter extends SubsystemBase implements Testable {
 
     // targeting limelight (for testing)
     private Lemonlight targetingLimelight;
+    
+    private double setPoint = 0;
 
     /**
      * Creates a new shooter instance.
@@ -96,6 +98,7 @@ public class Shooter extends SubsystemBase implements Testable {
         
         zeroEncoders();
         shooterMotorFollow.follow(shooterMotorMain, true);
+        setPoint = 0;
     }
 
     /**
@@ -149,6 +152,7 @@ public class Shooter extends SubsystemBase implements Testable {
      */
     public void setMotorTargetSpeed(double speed) {
         speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
+        setPoint = speed;
         shooterMotorPIDController.setReference(speed, CANSparkMax.ControlType.kVelocity);
     }
 
@@ -274,7 +278,8 @@ public class Shooter extends SubsystemBase implements Testable {
         builder.setSmartDashboardType("Shooter");
         // //builder.addDoubleProperty("encoderValue", this::getEncoderValue, null);
         builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
-        // builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        builder.addDoubleProperty("shooterSetpoint", () -> setPoint, null);
+        builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
         // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

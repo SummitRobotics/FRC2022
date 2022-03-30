@@ -64,8 +64,8 @@ public class Conveyor extends SubsystemBase implements Testable {
     private boolean doesBallExist;
     private boolean lidarAboveThreshold;
 
-    private ConveyorState beltBall = ConveyorState.NONE;
-    private ConveyorState indexBall = ConveyorState.NONE;
+    private ConveyorState beltBall;
+    private ConveyorState indexBall;
 
 
     // Constants storing acceptable distance data
@@ -102,7 +102,7 @@ public class Conveyor extends SubsystemBase implements Testable {
 
         lidarAboveThreshold = false;
     
-        beltBall = ConveyorState.NONE;
+        beltBall = getColorSensorDetctedBall();
         indexBall = ConveyorState.NONE;
 
         index.setInverted(true);
@@ -303,7 +303,7 @@ public class Conveyor extends SubsystemBase implements Testable {
         if (lidarDistance > lidarReliceShooting) {
             if (lidarAboveThreshold) {
                 lidarAboveThreshold = false;
-                System.out.println("ball dec");
+                //System.out.println("ball dec");
                 return true;
             }
             lidarAboveThreshold = false;
