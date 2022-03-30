@@ -13,7 +13,7 @@ import frc.robot.subsystems.Intake;
 public class FullAutoIntake extends SequentialCommandGroup {
 
     public FullAutoIntake(Drivetrain drivetrain, Intake intake, Lemonlight limelight, Conveyor conveyor) {
-        addCommands(new LowerIntake(intake), new FullAutoIntakeDrive(drivetrain, limelight, conveyor));
+        addCommands(new LowerIntake(intake), new FullAutoIntakeDrive(drivetrain, limelight, conveyor, intake));
     }
     
 }

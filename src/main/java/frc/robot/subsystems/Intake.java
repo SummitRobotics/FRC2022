@@ -3,17 +3,24 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.Ports;
 
 /**
  * Subsystem to control the intake of the robot.
  */
 public class Intake extends SubsystemBase {
-
+    public static final double 
+        P = 0.004,
+        I = 0.0,
+        D = 0.0;
     /**
      * Enum for Intake States.
      */
@@ -26,7 +33,9 @@ public class Intake extends SubsystemBase {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = .5;
+            INTAKE_MOTOR_SPEED = .5, 
+            MAX_RPM = 1000, 
+            MOVE_TO_CONVEYOR = 500;
 
     // motor
     private final CANSparkMax intakeMotor =
@@ -42,11 +51,15 @@ public class Intake extends SubsystemBase {
     // variable to track the intake solenoid's position.
     private boolean intakeSolenoidPosition = false;
 
-
+    private final SparkMaxPIDController intakePidController = intakeMotor.getPIDController();
     /**
      * Subsystem to control the intake of the robot.
      */
     public Intake() {
+        intakePidController.setP(P);
+        intakePidController.setI(I);
+        intakePidController.setD(D);
+        intakePidController.setOutputRange(-1.0, 1.0);
         zeroEncoder();
         state = States.UP;
         intakeMotor.setOpenLoopRampRate(INTAKE_RATE);
@@ -108,8 +121,24 @@ public class Intake extends SubsystemBase {
     }
 
     /**
+     * Makes the intake motor rotate to a postion.
+     *
+     * @param position the postion to be rotated to
+     */
+
+    public void setIntakePosition(double position) {
+        intakePidController.setReference(position, CANSparkMax.ControlType.kPosition);
+    }
+    
+    public void setIntakeSpeed(double speed) {
+        speed = Functions.clampDouble(speed, MAX_RPM, -MAX_RPM);
+        intakePidController.setReference(speed, CANSparkMax.ControlType.kVelocity);
+
+    }
+    /**
      * Resets the intake motor's encoder position.
      */
+
     public void zeroEncoder() {
         setIntakeEncoder(0);
     }
@@ -178,7 +207,7 @@ public class Intake extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("intake");
-        //builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
+        builder.addDoubleProperty("intake_motor_position", this::getIntakeEncoderPosition, null);
         builder.addDoubleProperty("intake_motor_speed", this::getIntakeRPM, null);
         builder.addDoubleProperty("motor_current", this::getIntakePower, null);
         builder.addBooleanProperty("intake_solenoid_position", this::getIntakeSolenoid, null);

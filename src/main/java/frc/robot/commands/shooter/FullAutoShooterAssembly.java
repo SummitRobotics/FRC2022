@@ -80,7 +80,7 @@ public class FullAutoShooterAssembly extends CommandBase {
 
         // TODO - Set these, including the constants
         alignPID.setTolerance(TARGET_HORIZONTAL_ACCURACY, 9999999);
-        movePID.setTolerance(2,9999999);
+        movePID.setTolerance(2, 9999999);
         alignPID.setSetpoint(10);
         movePID.setSetpoint(IDEAL_SHOOTING_DISTANCE);
 
@@ -184,13 +184,10 @@ public class FullAutoShooterAssembly extends CommandBase {
             if (!hasRecordedLimelightDistance) {
                 movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
                 hasRecordedLimelightDistance = true;
-                System.out.println("new setpoing: " + movePID.getSetpoint());
+                
             }
 
-            System.out.println(limelightDistanceEstimate);
             double movePower = movePID.calculate(limelightDistanceEstimate);
-            System.out.println(movePID.getPositionError());
-            System.out.println("movePower: " + movePower);
             leftPower -= movePower;
             rightPower -= movePower;
 
@@ -347,6 +344,6 @@ public class FullAutoShooterAssembly extends CommandBase {
      */
     public boolean isFinished() {
         System.out.println(!conveyor.doesBallExist());
-        return false;
+        return !conveyor.doesBallExist();
     }
 }
