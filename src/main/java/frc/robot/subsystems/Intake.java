@@ -79,12 +79,12 @@ public class Intake extends SubsystemBase {
             setIntakeMotorPower(INTAKE_MOTOR_SPEED);
         }
     }
+
     /**
      * Gets the intake motor's speed (in RPM).
      *
      * @return speed
      */
-
     public double getIntakeRPM() {
         return intakeEncoder.getVelocity();
     }
@@ -113,13 +113,16 @@ public class Intake extends SubsystemBase {
     public void zeroEncoder() {
         setIntakeEncoder(0);
     }
+
     /**
-     * gets intake motor power
+     * gets intake motor power.
+     *
      * @return power draw
      */
-    public double getIntakePower(){
+    public double getIntakePower() {
         return intakeMotor.getOutputCurrent();
     }
+
     /**
      * Stops the intake motor.
      */

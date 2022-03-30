@@ -161,7 +161,7 @@ public class RobotContainer {
     private void setDefaultCommands() {
         // drive by controller
         drivetrain.setDefaultCommand(arcadeDrive);
-        intake.setDefaultCommand(new DefaultIntake(intake, conveyor));
+        intake.setDefaultCommand(new DefaultIntake(intake, conveyor, gyro));
         conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
     }
 
@@ -212,8 +212,8 @@ public class RobotContainer {
         launchpad.missileA.whileHeld(climbMO);
 
         ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2,
-        joystick.button8, joystick.button4, joystick.button5, joystick.button3,
-        joystick.button7);
+            joystick.button8, joystick.button4, joystick.button5, joystick.button3,
+            joystick.button7);
         // launchpad.missileB.toggleWhenPressed(climbSemiAuto);
         launchpad.missileB.whileHeld(autoClimbCommand);
         launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));

@@ -1,10 +1,12 @@
 package frc.robot.commands.intake;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Intake;
+import frc.robot.utilities.Functions;
 
 /**
  * Default command for Intake.
@@ -13,18 +15,20 @@ public class DefaultIntake extends CommandBase {
 
     private final Intake intake;
     private final Conveyor conveyor;
-
+    private final AHRS gyro;
 
     /**
      * Default command for Intake.
      *
      * @param intake The intake
      * @param conveyor The conveyor
+     * @param gyro The gyro
      */
-    public DefaultIntake(Intake intake, Conveyor conveyor) {
+    public DefaultIntake(Intake intake, Conveyor conveyor, AHRS gyro) {
         addRequirements(intake);
         this.intake = intake;
         this.conveyor = conveyor;
+        this.gyro = gyro;
     }
 
     @Override
@@ -38,12 +42,20 @@ public class DefaultIntake extends CommandBase {
                     intake.stop();
                     CommandScheduler.getInstance().schedule(new RaiseIntake(intake));
                 } else {
-                    intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
+                    double robotVelocity = Math.sqrt(gyro.getVelocityX() * gyro.getVelocityX()
+                        + gyro.getVelocityY() * gyro.getVelocityY());
+                    intake.setIntakeMotorPower(Functions.clampDouble(calculatePower(robotVelocity), 1, -1));
                 }
                 break;
             default:
                 break;
         }
+    }
+
+    // Linear Regression
+    // TODO - tune
+    private double calculatePower(double velocity) {
+        return 0 * velocity + 0;
     }
 
     @Override
