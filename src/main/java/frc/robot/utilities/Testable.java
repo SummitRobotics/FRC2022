@@ -34,7 +34,7 @@ public interface Testable {
     }
 
     public default double getMotorTestRotations() {
-        return 0.5;
+        return 10;
     }
 
     public default double getAllowedTimeSeconds() {

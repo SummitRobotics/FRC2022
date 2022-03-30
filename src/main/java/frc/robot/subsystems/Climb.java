@@ -30,15 +30,16 @@ public class Climb extends SubsystemBase implements Testable {
     RollingAverage climbPitchAverage = new RollingAverage(10, true);
     private double oldGyroAngle = 0;
     private RollingAverage climbDrivitiveAvrage = new RollingAverage(10, true);
+    private boolean wereSwitchesFalse = false;
 
-    //TODO set these
+    // TODO set these
     public static final double
             P = 1,
             I = 0,
             D = 0,
             FF = 0,
             IZ = 0,
-            //TODO tune these values
+            // TODO tune these values
             CLIMB_TILT_ANGLE = -2,
             CLIMB_ROLL_ANGLE = 5,
             CLIMB_DRIVITIVE = 1,
@@ -407,12 +408,20 @@ public class Climb extends SubsystemBase implements Testable {
     public HashMap<String, Boolean> runCustomTests() {
         HashMap<String, Boolean> result = new HashMap<String, Boolean>();
 
-        if (pivotPos) {
+        if (!pivotPos && !wereSwitchesFalse) {
+            setPivotPos(true);
+        } else if (pivotPos && !getLeftLimit() && !getRightLimit()) {
+            wereSwitchesFalse = true;
             setPivotPos(false);
         }
 
-        result.put("Left Limit Switch", getLeftLimit());
-        result.put("Right Limit Switch", getRightLimit());
+        if (wereSwitchesFalse) {
+            result.put("Left Limit Switch", getLeftDetachPos());
+            result.put("Right Limit Switch",  getRightDetachPos());
+        } else {
+            result.put("Left Limit Switch", false);
+            result.put("Right Limit Switch",  false);
+        }
 
         return result;
     }
@@ -549,4 +558,3 @@ public class Climb extends SubsystemBase implements Testable {
         };
     }
 }
-

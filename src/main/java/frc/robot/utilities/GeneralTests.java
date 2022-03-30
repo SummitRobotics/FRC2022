@@ -13,10 +13,9 @@ public class GeneralTests implements Testable {
     private Drivetrain drivetrain;
     private Timer timer;
 
-    // TODO - set these
     private static final double
-        FULL_PRESSURE = 0,
-        PARTIAL_PRESSURE = 0;
+        FULL_PRESSURE = 100,
+        PARTIAL_PRESSURE = 50;
 
     private boolean hasReachedFullPressure;
     private boolean hasReachedPartialPressure;
@@ -52,6 +51,7 @@ public class GeneralTests implements Testable {
         result.put("Compressor", false);
         result.put("Pressure", false);
 
+        timer.reset();
         timer.start();
 
         return result;
@@ -66,7 +66,7 @@ public class GeneralTests implements Testable {
             if (hasReachedPartialPressure) {
                 pressureStatus = true;
             } else {
-                if (timer.hasElapsed(0.5)) {
+                if (timer.hasElapsed(0.25)) {
                     drivetrain.toggleShift();
                     timer.reset();
                     if (pcm.getPressure() < PARTIAL_PRESSURE) {

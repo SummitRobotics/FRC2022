@@ -218,14 +218,13 @@ public class RobotContainer {
                                 StatusPriorities.ENABLED)),
             new InstantCommand(() -> pcm.enableCompressorDigital()),
             new ParallelCommandGroup(homeLeftArm, homeRightArm),
-            new InstantCommand(() -> new TestSubsystem(new GeneralTests(drivetrain, pcm))),
-            new ParallelCommandGroup(
-                new TestSubsystem(shooter),
-                new TestSubsystem(intake),
-                new TestSubsystem(drivetrain),
-                new TestSubsystem(conveyor),
-                new TestSubsystem(climb)
-        ));
+            new TestSubsystem(new GeneralTests(drivetrain, pcm)),
+            new TestSubsystem(shooter),
+            new TestSubsystem(intake),
+            new TestSubsystem(drivetrain),
+            new TestSubsystem(conveyor),
+            new TestSubsystem(climb)
+        );
 
         // Configure the button bindings
         setDefaultCommands();

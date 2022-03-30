@@ -80,6 +80,7 @@ public class TestSubsystem extends CommandBase {
             testStates.put(set.getKey(), false);
         }
 
+        timer.reset();
         timer.start();
     }
 
@@ -112,7 +113,6 @@ public class TestSubsystem extends CommandBase {
         }
 
         for (int i = 0; i < limelights.length; i++) {
-            // TODO - What else can we test on limelights?
             if (limelights[i] != null) {
                 testStates.replace("Limelight " + i, true);
             } else {
