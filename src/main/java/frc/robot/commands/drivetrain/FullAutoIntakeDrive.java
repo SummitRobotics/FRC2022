@@ -115,13 +115,13 @@ public class FullAutoIntakeDrive extends CommandBase {
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
             double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
-            drivetrain.setLeftMotorPower(movePower - alignPower);
-            drivetrain.setRightMotorPower(movePower + alignPower);
+            // drivetrain.setLeftMotorPower(movePower - alignPower);
+            // drivetrain.setRightMotorPower(movePower + alignPower);
             intake.setIntakeEncoder(0);
         } else if (oldDistance < 50 && intake.getIntakeEncoderPosition() > 20) {
             intake.setIntakeSpeed(intake.MOVE_TO_CONVEYOR);
         } else {
-            intake.setIntakeSpeed(intake.MAX_RPM);
+            intake.setIntakeSpeed(intake.ACTUAL_SPEED);
         }
         if (lastState != thisState) {
             lastState = thisState;
