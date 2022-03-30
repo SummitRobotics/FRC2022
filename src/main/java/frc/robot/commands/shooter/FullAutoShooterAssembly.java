@@ -335,6 +335,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         movePID.reset();
         alignPID.close();
         movePID.close();
+        drivetrain.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
         hasRecordedLimelightDistance = false;
     }
