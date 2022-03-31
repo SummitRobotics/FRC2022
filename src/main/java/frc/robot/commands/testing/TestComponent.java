@@ -13,6 +13,7 @@ import frc.robot.devices.Lidar;
 import frc.robot.oi.drivers.ShuffleboardDriver;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -20,12 +21,12 @@ import java.util.HashMap;
  */
 public class TestComponent extends CommandBase {
 
-    private CANSparkMax[] motors;
-    private ColorSensor[] colorSensors;
+    private ArrayList<CANSparkMax> motors;
+    private ArrayList<ColorSensor> colorSensors;
     private HashMap<String, Lemonlight> limelights;
-    private Lidar[] lidars;
-    private RelativeEncoder[] encoders;
-    private double[] startingPositions;
+    private ArrayList<Lidar> lidars;
+    private ArrayList<RelativeEncoder> encoders;
+    private ArrayList<Double> startingPositions;
     private HashMap<String, Boolean> testStates;
     private Testable toTest;
 
@@ -44,16 +45,16 @@ public class TestComponent extends CommandBase {
         limelights = toTest.getLimelights();
         lidars = toTest.getLidars();
 
-        for (int i = 0; i < motors.length; i++) {
-            testStates.put("Motor " + motors[i].getDeviceId(), false);
-            encoders[i] = motors[i].getEncoder();
+        for (int i = 0; i < motors.size(); i++) {
+            testStates.put("Motor " + motors.get(i).getDeviceId(), false);
+            encoders.set(i, motors.get(i).getEncoder());
         }
 
-        for (int i = 0; i < colorSensors.length; i++) {
+        for (int i = 0; i < colorSensors.size(); i++) {
             testStates.put("Color Sensor " + i, false);
         }
 
-        for (int i = 0; i < lidars.length; i++) {
+        for (int i = 0; i < lidars.size(); i++) {
             testStates.put("Lidar " + i, false);
         }
 
@@ -73,9 +74,9 @@ public class TestComponent extends CommandBase {
 
     @Override
     public void initialize() {
-        for (int i = 0; i < motors.length; i++) {
-            startingPositions[i] = encoders[i].getPosition();
-            motors[i].set(toTest.getMotorTestSpeed());
+        for (int i = 0; i < motors.size(); i++) {
+            startingPositions.set(i, encoders.get(i).getPosition());
+            motors.get(i).set(toTest.getMotorTestSpeed());
         }
 
         for (HashMap.Entry<String, Boolean> set : toTest.initCustomTests().entrySet()) {
@@ -88,26 +89,26 @@ public class TestComponent extends CommandBase {
 
     @Override
     public void execute() {
-        for (int i = 0; i < motors.length; i++) {
-            if (encoders[i].getPosition() > startingPositions[i] + toTest.getMotorTestRotations()) {
-                motors[i].set(0);
-                testStates.replace("Motor " + motors[i].getDeviceId(), true);
+        for (int i = 0; i < motors.size(); i++) {
+            if (encoders.get(i).getPosition() > startingPositions.get(i) + toTest.getMotorTestRotations()) {
+                motors.get(i).set(0);
+                testStates.replace("Motor " + motors.get(i).getDeviceId(), true);
             }
         }
 
-        for (int i = 0; i < colorSensors.length; i++) {
-            if (colorSensors[i].getLoopTimeMilliseconds() < toTest.getMaxSensorLoopMilliseconds()
-                && colorSensors[i].getProximity() > 0
-                && colorSensors[i].getColorString() != "Unknown") {
+        for (int i = 0; i < colorSensors.size(); i++) {
+            if (colorSensors.get(i).getLoopTimeMilliseconds() < toTest.getMaxSensorLoopMilliseconds()
+                && colorSensors.get(i).getProximity() > 0
+                && colorSensors.get(i).getColorString() != "Unknown") {
                 testStates.replace("Color Sensor " + i, true);
             } else {
                 testStates.replace("Color Sensor " + i, false);
             }
         }
 
-        for (int i = 0; i < lidars.length; i++) {
-            if (lidars[i].getLoopTimeMilliseconds() < toTest.getMaxSensorLoopMilliseconds()
-                && lidars[i].getDistance() > 0) {
+        for (int i = 0; i < lidars.size(); i++) {
+            if (lidars.get(i).getLoopTimeMilliseconds() < toTest.getMaxSensorLoopMilliseconds()
+                && lidars.get(i).getDistance() > 0) {
                 testStates.replace("Lidar " + i, true);
             } else {
                 testStates.replace("Lidar " + i, false);

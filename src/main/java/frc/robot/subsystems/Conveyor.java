@@ -10,6 +10,7 @@ import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lidar;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
+import java.util.ArrayList;
 
 /**
  * Subsystem to control the conveyor of the robot.
@@ -341,18 +342,25 @@ public class Conveyor extends SubsystemBase implements Testable {
     }
 
     @Override
-    public CANSparkMax[] getMotors() {
-        return new CANSparkMax[] {belt, index};
+    public ArrayList<CANSparkMax> getMotors() {
+        ArrayList<CANSparkMax> result = new ArrayList<CANSparkMax>();
+        result.add(belt);
+        result.add(index);
+        return result;
     }
 
     @Override
-    public ColorSensor[] getColorSensors() {
-        return new ColorSensor[] {colorSensor};
+    public ArrayList<ColorSensor> getColorSensors() {
+        ArrayList<ColorSensor> result = new ArrayList<ColorSensor>();
+        result.add(colorSensor);
+        return result;
     }
 
     @Override
-    public Lidar[] getLidars() {
-        return new Lidar[] {lidar};
+    public ArrayList<Lidar> getLidars() {
+        ArrayList<Lidar> result = new ArrayList<Lidar>();
+        result.add(lidar);
+        return result;
     }
 
     @Override

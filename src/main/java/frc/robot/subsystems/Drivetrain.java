@@ -28,6 +28,7 @@ import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
+import java.util.ArrayList;
 
 /**
  * Subsystem to control the drivetrain of the robot.
@@ -761,8 +762,11 @@ public class Drivetrain extends SubsystemBase implements Testable {
     }
 
     @Override
-    public CANSparkMax[] getMotors() {
-        return new CANSparkMax[] {left, right};
+    public ArrayList<CANSparkMax> getMotors() {
+        ArrayList<CANSparkMax> result = new ArrayList<CANSparkMax>();
+        result.add(left);
+        result.add(right);
+        return result;
     }
 
     @Override

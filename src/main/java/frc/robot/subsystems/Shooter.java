@@ -18,6 +18,8 @@ import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -262,8 +264,10 @@ public class Shooter extends SubsystemBase implements Testable {
     }
 
     @Override
-    public CANSparkMax[] getMotors() {
-        return new CANSparkMax[] {shooterMotorMain};
+    public ArrayList<CANSparkMax> getMotors() {
+        ArrayList<CANSparkMax> result = new ArrayList<CANSparkMax>();
+        result.add(shooterMotorMain);
+        return result;
     }
 
     @Override
@@ -271,6 +275,11 @@ public class Shooter extends SubsystemBase implements Testable {
         HashMap<String, Lemonlight> result = new HashMap<String, Lemonlight>();
         result.put("limelight-target", targetingLimelight);
         return result;
+    }
+
+    @Override
+    public double getMotorTestSpeed() {
+        return 0.05;
     }
 
     @Override

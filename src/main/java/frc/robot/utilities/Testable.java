@@ -4,6 +4,8 @@ import com.revrobotics.CANSparkMax;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.Lidar;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,12 +15,12 @@ public interface Testable {
 
     public String getTestName();
 
-    public default CANSparkMax[] getMotors() {
-        return new CANSparkMax[] {};
+    public default ArrayList<CANSparkMax> getMotors() {
+        return new ArrayList<CANSparkMax>();
     }
 
-    public default ColorSensor[] getColorSensors() {
-        return new ColorSensor[] {};
+    public default ArrayList<ColorSensor> getColorSensors() {
+        return new ArrayList<ColorSensor>();
     }
 
     // The HashMap includes network table names and limelight objects
@@ -26,8 +28,8 @@ public interface Testable {
         return new HashMap<String, Lemonlight>();
     }
 
-    public default Lidar[] getLidars() {
-        return new Lidar[] {};
+    public default ArrayList<Lidar> getLidars() {
+        return new ArrayList<Lidar>();
     }
 
     public default double getMotorTestSpeed() {

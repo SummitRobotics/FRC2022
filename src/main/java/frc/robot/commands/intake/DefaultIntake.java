@@ -52,7 +52,8 @@ public class DefaultIntake extends CommandBase {
                 //         + gyro.getVelocityY() * gyro.getVelocityY());
                 //     intake.setIntakeSpeed(calculatePower(robotVelocity));
                 // }
-                intake.setIntakeSpeed(dumb.getDouble(0));
+                //intake.setIntakeSpeed(dumb.getDouble(0));
+                intake.setIntakeMotorPower(Intake.INTAKE_MOTOR_SPEED);
                 break;
             default:
                 break;

@@ -12,6 +12,7 @@ import frc.robot.devices.Lemonlight;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -226,8 +227,10 @@ public class Intake extends SubsystemBase implements Testable {
     }
 
     @Override
-    public CANSparkMax[] getMotors() {
-        return new CANSparkMax[] {intakeMotor};
+    public ArrayList<CANSparkMax> getMotors() {
+        ArrayList<CANSparkMax> result = new ArrayList<CANSparkMax>();
+        result.add(intakeMotor);
+        return result;
     }
 
     @Override

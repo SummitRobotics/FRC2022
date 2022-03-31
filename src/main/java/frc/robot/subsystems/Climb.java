@@ -17,6 +17,7 @@ import frc.robot.utilities.Homeable;
 import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -391,8 +392,11 @@ public class Climb extends SubsystemBase implements Testable {
     }
 
     @Override
-    public CANSparkMax[] getMotors() {
-        return new CANSparkMax[] {leftMotor, rightMotor};
+    public ArrayList<CANSparkMax> getMotors() {
+        ArrayList<CANSparkMax> result = new ArrayList<CANSparkMax>();
+        result.add(leftMotor);
+        result.add(rightMotor);
+        return result;
     }
 
     @Override
