@@ -12,14 +12,14 @@ public class TurnByEncoder extends ParallelCommandGroup {
     private static final double ROBOT_RADIUS = Drivetrain.DRIVE_WIDTH / 2;
 
     /**
-     * Constructor to turn the robot using encoders.
+     * Constructor to turn the robot using encoders, rotating clockwise.
      *
      * @param angle Angle to turn the robot.
-     * @param drive Drivetrain subsystem.
+     * @param drivetrain Drivetrain subsystem.
      */
-    public TurnByEncoder(double angle, Drivetrain drive) {
+    public TurnByEncoder(double angle, Drivetrain drivetrain) {
         double radians = (Math.PI / 180) * angle;
         double distance = ROBOT_RADIUS * radians;
-        addCommands(new EncoderDrive(distance, -distance, drive));
+        addCommands(new EncoderDrive(distance, -distance, drivetrain));
     }
 }

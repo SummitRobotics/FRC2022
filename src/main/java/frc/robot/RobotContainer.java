@@ -337,7 +337,8 @@ public class RobotContainer {
         Command deafultAuto = new SequentialCommandGroup(
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor, 1250),
-            new DriveByTime(drivetrain, 1.2, -0.5),
+            new DriveByTime(drivetrain, .8, -0.5),
+            new DriveByTime(drivetrain, .4, -0.2),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.setDefaultOption("shoot and drive", deafultAuto);
@@ -346,7 +347,8 @@ public class RobotContainer {
             autoInit.get(),
             new ShooterAtStart(shooter, conveyor),
             new WaitCommand(8),
-            new DriveByTime(drivetrain, 1.2, -0.5),
+            new DriveByTime(drivetrain, .8, -0.5),
+            new DriveByTime(drivetrain, .4, -0.2),
             new PrintCommand("auto done")
         );
 
@@ -364,30 +366,48 @@ public class RobotContainer {
         Command driveOlnly = new SequentialCommandGroup(
                 autoInit.get(),
                 new WaitCommand(10),
-                new DriveByTime(drivetrain, 1.2, -0.5),
+                new DriveByTime(drivetrain, .8, -0.5),
+                new DriveByTime(drivetrain, .4, -0.2),
                 new PrintCommand("auto done")
         );
 
         ShuffleboardDriver.autoChooser.addOption("drive only", driveOlnly);
 
 
-        
-        Command twoBallAuto = new SequentialCommandGroup(
+        Command twoBallAutoLow = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
-            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
-            // new EncoderDrive(2.5, 2.5, drivetrain),
+            // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new EncoderDrive(2.5, 2.5, drivetrain),
             new WaitCommand(1),
             new TurnByEncoder(190, drivetrain),
             new RaiseIntake(intake),
             new WaitCommand(.5),
-            // new DriveToHub(drivetrain, targetingLimelight).withTimeout(3),
-            // new ShooterAtStart(shooter, conveyor, 1000),
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
-            new DriveByTime(drivetrain, 1.2, -0.5),
+            new EncoderDrive(5, 5, drivetrain),
+            new TurnByEncoder(15, drivetrain),
+            new WaitCommand(.5),
+            new ShooterAtStart(shooter, conveyor, 1000),
+            new DriveByTime(drivetrain, .8, -0.5),
+            new DriveByTime(drivetrain, .4, -0.2),
             new PrintCommand("auto done"));
 
-        ShuffleboardDriver.autoChooser.addOption("2 ball", twoBallAuto);
+        ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);
+
+        Command twoBallAutoHigh = new SequentialCommandGroup(
+            autoInit.get(),
+            new LowerIntake(intake),
+            // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new EncoderDrive(2.5, 2.5, drivetrain),
+            new WaitCommand(1),
+            new TurnByEncoder(190, drivetrain),
+            new RaiseIntake(intake),
+            new WaitCommand(.5),
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
+            new DriveByTime(drivetrain, .8, -0.5),
+            new DriveByTime(drivetrain, .4, -0.2),
+            new PrintCommand("auto done"));
+
+        ShuffleboardDriver.autoChooser.addOption("2 ball high", twoBallAutoHigh);
 
 
         Command twoBallAutoDLC = new SequentialCommandGroup(
