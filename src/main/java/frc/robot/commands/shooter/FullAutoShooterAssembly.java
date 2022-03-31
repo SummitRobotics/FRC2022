@@ -50,7 +50,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         TARGET_HORIZONTAL_ACCURACY = 5,
         TARGET_WRONG_COLOR_MISS = 30,
         TARGET_MOTOR_SPEED_ACCURACY = 75,
-        IDEAL_SHOOTING_DISTANCE = 80,
+        IDEAL_SHOOTING_DISTANCE = 60,
         SHOOTER_IDLE_SPEED = 1400;
 
     // devices

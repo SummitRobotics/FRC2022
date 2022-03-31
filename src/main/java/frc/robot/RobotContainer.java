@@ -373,38 +373,38 @@ public class RobotContainer {
 
         ShuffleboardDriver.autoChooser.addOption("drive only", driveOlnly);
 
-
+        //TODO add conveyor wait
         Command twoBallAutoLow = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
-            new EncoderDrive(2.5, 2.5, drivetrain),
+            new EncoderDrive(1.2, 1.2, drivetrain),
             new WaitCommand(1),
-            new TurnByEncoder(190, drivetrain),
             new RaiseIntake(intake),
+            new EncoderDrive(-3, -3, drivetrain),
             new WaitCommand(.5),
-            new EncoderDrive(5, 5, drivetrain),
-            new TurnByEncoder(15, drivetrain),
-            new WaitCommand(.5),
+            new TurnByEncoder(190, drivetrain),
+            new WaitCommand(.5),           
             new ShooterAtStart(shooter, conveyor, 1000),
-            new DriveByTime(drivetrain, .8, -0.5),
-            new DriveByTime(drivetrain, .4, -0.2),
+            new EncoderDrive(-1, -1, drivetrain),
+            new TurnByEncoder(190, drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);
-
+        //TODO change to just move left or right based on vision
         Command twoBallAutoHigh = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
-            new EncoderDrive(2.5, 2.5, drivetrain),
+            new EncoderDrive(1.2, 1.2, drivetrain),
             new WaitCommand(1),
-            new TurnByEncoder(190, drivetrain),
             new RaiseIntake(intake),
+            new EncoderDrive(-1, -1, drivetrain),
             new WaitCommand(.5),
+            new TurnByEncoder(190, drivetrain),
+            new WaitCommand(.5),     
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
-            new DriveByTime(drivetrain, .8, -0.5),
-            new DriveByTime(drivetrain, .4, -0.2),
+            new EncoderDrive(-1, -1, drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball high", twoBallAutoHigh);
