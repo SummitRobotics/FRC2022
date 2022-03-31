@@ -5,16 +5,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
+import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.utilities.Functions;
-import frc.robot.utilities.lists.PIDValues;
 import java.util.ArrayList;
-import frc.robot.subsystems.Conveyor.ConveyorState;
-/** TODO: 
- * continue moving if loses sight
- * end if conveyor gets new ball
- */ 
+
+// TODO: 
+// continue moving if loses sight
+// end if conveyor gets new ball
+
 /**
  * Full auto intake mode.
  */
@@ -22,7 +22,8 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     private static final double 
         DISTANCE_FROM_BALL = 0,
-        DISTANCE_TO_CONTINUE = 5;
+        DISTANCE_TO_CONTINUE = 5,
+        BACK_UP_DISTANCE = 0;
 
     private ConveyorState lastState;
     private ConveyorState thisState;
@@ -42,6 +43,7 @@ public class FullAutoIntakeDrive extends CommandBase {
     private double horizontalOffset;
     private Conveyor conveyor;
     private Intake intake;
+
     /**
      * Constructor.
      *
@@ -112,6 +114,14 @@ public class FullAutoIntakeDrive extends CommandBase {
         System.out.println("DIST: " + limelightDistanceEstimate + " offset: " + horizontalOffset + " COLOR: " + color);
 
         if (limelightDistanceEstimate < 999) {
+            if (limelightDistanceEstimate < BACK_UP_DISTANCE &&
+                !Functions.isWithin(horizontalOffset, 0, 5)) {
+
+                movePID.setSetpoint(BACK_UP_DISTANCE);
+            } else {
+                movePID.setSetpoint(0);
+            }
+
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
             double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
