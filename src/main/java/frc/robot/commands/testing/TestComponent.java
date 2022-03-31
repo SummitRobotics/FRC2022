@@ -40,6 +40,9 @@ public class TestComponent extends CommandBase {
     public TestComponent(Testable toTest) {
         this.toTest = toTest;
 
+        encoders = new ArrayList<RelativeEncoder>();
+        startingPositions = new ArrayList<Double>();
+        testStates = new HashMap<String, Boolean>();
         motors = toTest.getMotors();
         colorSensors = toTest.getColorSensors();
         limelights = toTest.getLimelights();
