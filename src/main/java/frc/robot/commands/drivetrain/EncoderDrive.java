@@ -16,8 +16,8 @@ import frc.robot.subsystems.Drivetrain;
 public class EncoderDrive extends CommandBase {
 
     private final Drivetrain drivetrain;
-    private final double left;
-    private final double right;
+    private double left;
+    private double right;
 
     /**
      * The Constructor.
@@ -39,15 +39,16 @@ public class EncoderDrive extends CommandBase {
     public void initialize() {
         drivetrain.stop();
         // TODO test if this is accurate
-        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left)
-            + drivetrain.getLeftEncoderPosition());
-        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right)
-            + drivetrain.getRightEncoderPosition());
+        left = left + drivetrain.getLeftDistance();
+        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
+        
+        right = right + drivetrain.getRightDistance();
+        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right));
     }
 
     @Override
     public void execute() {
-        System.out.println(drivetrain.getLeftDistance());
+        System.out.println(drivetrain.getLeftDistance() - left);
     }
 
     // Called once the command ends or is interrupted.
@@ -59,8 +60,8 @@ public class EncoderDrive extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Math.abs(drivetrain.getLeftDistance() - left) < 0.01
-            && Math.abs(drivetrain.getRightDistance() - right) < 0.01;
+        return Math.abs(drivetrain.getLeftDistance() - left) < 0.05
+            && Math.abs(drivetrain.getRightDistance() - right) < 0.05;
 
     }
 }

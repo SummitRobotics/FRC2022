@@ -170,60 +170,60 @@ public class Drivetrain extends SubsystemBase implements Testable {
         leftPID.setP(posP);
         leftPID.setI(posI);
         leftPID.setD(posD);
-        leftPID.setOutputRange(-.5, .5);
+        leftPID.setOutputRange(-.2, .2);
 
         rightPID.setP(posP);
         rightPID.setI(posI);
         rightPID.setD(posD);
-        rightPID.setOutputRange(-.5, .5);
+        rightPID.setOutputRange(-.2, .2);
 
         // pid for position
         leftMiddlePID.setP(posP);
         leftMiddlePID.setI(posI);
         leftMiddlePID.setD(posD);
-        leftMiddlePID.setOutputRange(-.5, .5);
+        leftMiddlePID.setOutputRange(-.2, .2);
 
         rightMiddlePID.setP(posP);
         rightMiddlePID.setI(posI);
         rightMiddlePID.setD(posD);
-        rightMiddlePID.setOutputRange(-.5, .5);
+        rightMiddlePID.setOutputRange(-.2, .2);
 
         // pid for position
         leftBackPID.setP(posP);
         leftBackPID.setI(posI);
         leftBackPID.setD(posD);
-        leftBackPID.setOutputRange(-.5, .5);
+        leftBackPID.setOutputRange(-.2, .2);
 
         rightBackPID.setP(posP);
         rightBackPID.setI(posI);
         rightBackPID.setD(posD);
-        rightBackPID.setOutputRange(-.5, .5);
-
+        rightBackPID.setOutputRange(-.2, .2);
+        
         // pid for velocity
         leftPID.setP(0.00012245, 2);
-        leftPID.setI(0, 2);
+        leftPID.setI(0, 4);
         leftPID.setD(0.0, 2);
 
         rightPID.setP(0.00012245, 2);
-        rightPID.setI(0, 2);
+        rightPID.setI(0, 4);
         rightPID.setD(0.0, 2);
         
         // pid for velocity
         leftMiddlePID.setP(0.00012245, 2);
-        leftMiddlePID.setI(0, 2);
+        leftMiddlePID.setI(0, 4);
         leftMiddlePID.setD(0.0, 2);
 
         rightMiddlePID.setP(0.00012245, 2);
-        rightMiddlePID.setI(0, 2);
+        rightMiddlePID.setI(0, 4);
         rightMiddlePID.setD(0.0, 2);
 
         // pid for velocity
         leftBackPID.setP(0.00012245, 2);
-        leftBackPID.setI(0, 2);
+        leftBackPID.setI(0, 4);
         leftBackPID.setD(0.0, 2);
 
         rightBackPID.setP(0.00012245, 2);
-        rightBackPID.setI(0, 2);
+        rightBackPID.setI(0, 4);
         rightBackPID.setD(0.0, 2);
 
         left.disableVoltageCompensation();
