@@ -22,7 +22,7 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     private static final double 
         DISTANCE_FROM_BALL = 0,
-        DISTANCE_TO_CONTINUE = 5,
+        BACK_UP_THRESHOLD = 0,
         BACK_UP_DISTANCE = 0;
 
     private ConveyorState lastState;
@@ -33,7 +33,6 @@ public class FullAutoIntakeDrive extends CommandBase {
     private String teamColor;
     // devices
     private Lemonlight limelight;
-    private int loopCount;
     // PID controllers
     private PIDController movePID;
     private PIDController alignPID;
@@ -43,6 +42,7 @@ public class FullAutoIntakeDrive extends CommandBase {
     private double horizontalOffset;
     private Conveyor conveyor;
     private Intake intake;
+    private boolean isBackingUp;
 
     /**
      * Constructor.
@@ -69,6 +69,7 @@ public class FullAutoIntakeDrive extends CommandBase {
 
         addRequirements(drivetrain, intake);
         teamColor = DriverStation.getAlliance().toString();
+        isBackingUp = false;
     }
 
     @Override
@@ -77,7 +78,6 @@ public class FullAutoIntakeDrive extends CommandBase {
         movePID.reset();
         alignPID.reset();
         oldDistance = 999;
-        loopCount = 0;
         changed = false;
         lastState = conveyor.getBeltState();
     }
@@ -114,26 +114,36 @@ public class FullAutoIntakeDrive extends CommandBase {
         System.out.println("DIST: " + limelightDistanceEstimate + " offset: " + horizontalOffset + " COLOR: " + color);
 
         if (limelightDistanceEstimate < 999) {
-            if (limelightDistanceEstimate < BACK_UP_DISTANCE &&
-                !Functions.isWithin(horizontalOffset, 0, 5)) {
 
+            if (limelightDistanceEstimate < BACK_UP_THRESHOLD
+                && !Functions.isWithin(horizontalOffset, 0, 5)) {
+                
+                isBackingUp = true;
                 movePID.setSetpoint(BACK_UP_DISTANCE);
                 alignPID.setSetpoint(horizontalOffset);
-            } else {
-                movePID.setSetpoint(0);
-                alignPID.setSetpoint(0);
+
+            }
+            
+            if (isBackingUp) {
+                if (movePID.atSetpoint()) {
+                    alignPID.setSetpoint(0);
+                    if (alignPID.atSetpoint()) {
+                        movePID.setSetpoint(0);
+                        isBackingUp = false;
+                    }
+                }
             }
 
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
             double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
-            // drivetrain.setLeftMotorPower(movePower - alignPower);
-            // drivetrain.setRightMotorPower(movePower + alignPower);
+            drivetrain.setLeftMotorPower(movePower - alignPower);
+            drivetrain.setRightMotorPower(movePower + alignPower);
             intake.setIntakeEncoder(0);
         } else if (oldDistance < 50 && intake.getIntakeEncoderPosition() > 20) {
-            intake.setIntakeSpeed(intake.MOVE_TO_CONVEYOR);
+            intake.setIntakeSpeed(Intake.MOVE_TO_CONVEYOR);
         } else {
-            intake.setIntakeSpeed(intake.ACTUAL_SPEED);
+            intake.setIntakeSpeed(Intake.ACTUAL_SPEED);
         }
         if (lastState != thisState) {
             lastState = thisState;
