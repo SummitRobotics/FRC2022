@@ -118,8 +118,10 @@ public class FullAutoIntakeDrive extends CommandBase {
                 !Functions.isWithin(horizontalOffset, 0, 5)) {
 
                 movePID.setSetpoint(BACK_UP_DISTANCE);
+                alignPID.setSetpoint(horizontalOffset);
             } else {
                 movePID.setSetpoint(0);
+                alignPID.setSetpoint(0);
             }
 
             double alignPower = alignPID.calculate(horizontalOffset);
