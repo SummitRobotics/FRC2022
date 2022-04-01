@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -299,6 +300,8 @@ public class RobotContainer {
     public void robotInit() {
         createAutoCommands();
         gyro.calibrate();
+        //sets drivetrain back to 0, reducing acumulated error and bad stuff
+        drivetrain.setPose(new Pose2d());
         ShuffleboardDriver.init();
     }
 

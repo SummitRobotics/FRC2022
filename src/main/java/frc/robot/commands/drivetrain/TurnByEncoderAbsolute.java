@@ -18,9 +18,10 @@ public class TurnByEncoderAbsolute extends ParallelCommandGroup {
      * @param drive Drivetrain subsystem.
      */
     public TurnByEncoderAbsolute(double angle, Drivetrain drive) {
+        angle = angle - (drive.getRotation() % 360);
         double radians = (Math.PI / 180) * angle;
         double distance = ROBOT_RADIUS * radians;
-        addCommands(new EncoderDrive(distance - drive.encoderToDist(drive.getLeftEncoderPosition()),
-            -distance + drive.encoderToDist(drive.getRightEncoderPosition()), drive));
+        addCommands(new EncoderDrive(distance, -distance, drive));
+
     }
 }

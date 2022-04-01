@@ -20,7 +20,9 @@ public class EncoderDrive extends CommandBase {
     private double right;
     private double maximumPower = 0.5;
     /**
-     * The Constructor.
+     * drives each whele the set dist using encoders, regardless of gear
+     * 
+     * max output is 0.5 unless specifyed
      *
      * @param drivetrain the robot's drivetrain
      * @param left The distance to move the left side
@@ -35,7 +37,7 @@ public class EncoderDrive extends CommandBase {
         addRequirements(drivetrain);
     }
     /**
-     * The Constructor.
+     * drives each whele the set dist using encoders, regardless of gear
      *
      * @param drivetrain the robot's drivetrain
      * @param left The distance to move the left side
@@ -56,6 +58,7 @@ public class EncoderDrive extends CommandBase {
     public void initialize() {
         drivetrain.stop();
         drivetrain.setPIDMaxPower(maximumPower);
+        
         // TODO test if this is accurate
         left = left + drivetrain.getLeftDistance();
         drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
