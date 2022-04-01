@@ -50,7 +50,7 @@ public class TestComponent extends CommandBase {
 
         for (int i = 0; i < motors.size(); i++) {
             testStates.put("Motor " + motors.get(i).getDeviceId(), false);
-            encoders.set(i, motors.get(i).getEncoder());
+            encoders.add(i, motors.get(i).getEncoder());
         }
 
         for (int i = 0; i < colorSensors.size(); i++) {
