@@ -50,7 +50,7 @@ public class TestComponent extends CommandBase {
 
         for (int i = 0; i < motors.size(); i++) {
             testStates.put("Motor " + motors.get(i).getDeviceId(), false);
-            encoders.set(i, motors.get(i).getEncoder());
+            encoders.add(i, motors.get(i).getEncoder());
         }
 
         for (int i = 0; i < colorSensors.size(); i++) {
@@ -78,7 +78,7 @@ public class TestComponent extends CommandBase {
     @Override
     public void initialize() {
         for (int i = 0; i < motors.size(); i++) {
-            startingPositions.set(i, encoders.get(i).getPosition());
+            startingPositions.add(i, encoders.get(i).getPosition());
             motors.get(i).set(toTest.getMotorTestSpeed());
         }
 
