@@ -78,7 +78,7 @@ public class TestComponent extends CommandBase {
     @Override
     public void initialize() {
         for (int i = 0; i < motors.size(); i++) {
-            startingPositions.set(i, encoders.get(i).getPosition());
+            startingPositions.add(i, encoders.get(i).getPosition());
             motors.get(i).set(toTest.getMotorTestSpeed());
         }
 
