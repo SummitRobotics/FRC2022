@@ -165,9 +165,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         // } else {
         //     //alignPID.setSetpoint(0);
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        // }
-        alignPID.setSetpoint(10);
-        
+        // }        
         double leftPower = 0;
         double rightPower = 0;
 

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.DriveToHub;
+import frc.robot.commands.WaitUntilConveyor;
 import frc.robot.commands.climb.*;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
@@ -379,7 +380,7 @@ public class RobotContainer {
             new LowerIntake(intake),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
             new EncoderDrive(1.2, 1.2, drivetrain),
-            new WaitCommand(1),
+            new WaitUntilConveyor(conveyor),
             new RaiseIntake(intake),
             new EncoderDrive(-3, -3, drivetrain),
             new WaitCommand(.5),
@@ -391,52 +392,71 @@ public class RobotContainer {
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);
-        //TODO change to just move left or right based on vision
         Command twoBallAutoHigh = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
             new EncoderDrive(1.2, 1.2, drivetrain),
-            new WaitCommand(1),
+            new WaitUntilConveyor(conveyor),
             new RaiseIntake(intake),
             new EncoderDrive(-1, -1, drivetrain),
             new WaitCommand(.5),
             new TurnByEncoder(190, drivetrain),
             new WaitCommand(.5),     
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
+            new midrangeShooter(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
             new EncoderDrive(-1, -1, drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball high", twoBallAutoHigh);
 
 
-        Command twoBallAutoDLC = new SequentialCommandGroup(
+        Command twoBallAutoLowDLC = new SequentialCommandGroup(
             //2 ball
             autoInit.get(),
             new LowerIntake(intake),
-            new EncoderDrive(2, 2, drivetrain),
-            new WaitCommand(1),
-                        new TurnByEncoder(180, drivetrain),
-            new WaitCommand(1),
-            new EncoderDrive(3, 3, drivetrain),
-            new WaitCommand(1),
-            new TurnByEncoder(110, drivetrain),
-            new WaitCommand(1),
-            new ShooterAtStart(shooter, conveyor, 1200),
-            //new stuff
-            new TurnByEncoder(60, drivetrain),
-            new EncoderDrive(10, 10, drivetrain),
-            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
-            new TurnByEncoder(35, drivetrain),
-            new EncoderDrive(.2, .2, drivetrain),
-            new WaitCommand(3),
+            // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new EncoderDrive(1, 1, drivetrain),
+            new WaitUntilConveyor(conveyor),
             new RaiseIntake(intake),
+            new EncoderDrive(-3, -3, drivetrain),
+            new TurnByEncoder(-170, drivetrain),      
+            new ShooterAtStart(shooter, conveyor, 1000),
+            new EncoderDrive(-.5, -.5, drivetrain),
+            new TurnByEncoder(-110, drivetrain),
+            new EncoderDrive(1, 1, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new EncoderDrive(2, 2, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new RaiseIntake(intake),
+            new EncoderDrive(-4, -4, drivetrain),
             new TurnByEncoder(180, drivetrain),
-            new EncoderDrive(10, 10, drivetrain),
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
             new PrintCommand("auto done"));
 
-        ShuffleboardDriver.autoChooser.addOption("4 ball", twoBallAutoDLC);
+        ShuffleboardDriver.autoChooser.addOption("2low 2high", twoBallAutoLowDLC);
+        Command twoBallAutoHighDLC = new SequentialCommandGroup(
+            //2 ball
+            autoInit.get(),
+            new LowerIntake(intake),
+            // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new EncoderDrive(1, 1, drivetrain),
+            new WaitUntilConveyor(conveyor),
+            new RaiseIntake(intake),
+            new EncoderDrive(-1, -1, drivetrain),
+            new TurnByEncoder(-170, drivetrain),      
+            new midrangeShooter(shooter, conveyor, drivetrain, targetingLimelight),
+            new TurnByEncoder(-90, drivetrain),
+            new EncoderDrive(1, 1, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new TurnByEncoder(-15, drivetrain),
+            new EncoderDrive(2, 2, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new RaiseIntake(intake),
+            new EncoderDrive(-4, -4, drivetrain),
+            new TurnByEncoder(110, drivetrain),
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new PrintCommand("auto done"));
+        ShuffleboardDriver.autoChooser.addOption("4 high", twoBallAutoHighDLC);
 
     }
     
