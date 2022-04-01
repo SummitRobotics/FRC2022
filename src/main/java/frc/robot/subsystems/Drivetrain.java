@@ -170,34 +170,34 @@ public class Drivetrain extends SubsystemBase implements Testable {
         leftPID.setP(posP);
         leftPID.setI(posI);
         leftPID.setD(posD);
-        leftPID.setOutputRange(-.2, .2);
+        leftPID.setOutputRange(-.5, .5);
 
         rightPID.setP(posP);
         rightPID.setI(posI);
         rightPID.setD(posD);
-        rightPID.setOutputRange(-.2, .2);
+        rightPID.setOutputRange(-.5, .5);
 
         // pid for position
         leftMiddlePID.setP(posP);
         leftMiddlePID.setI(posI);
         leftMiddlePID.setD(posD);
-        leftMiddlePID.setOutputRange(-.2, .2);
+        leftMiddlePID.setOutputRange(-.5, .5);
 
         rightMiddlePID.setP(posP);
         rightMiddlePID.setI(posI);
         rightMiddlePID.setD(posD);
-        rightMiddlePID.setOutputRange(-.2, .2);
+        rightMiddlePID.setOutputRange(-.5, .5);
 
         // pid for position
         leftBackPID.setP(posP);
         leftBackPID.setI(posI);
         leftBackPID.setD(posD);
-        leftBackPID.setOutputRange(-.2, .2);
+        leftBackPID.setOutputRange(-.5, .5);
 
         rightBackPID.setP(posP);
         rightBackPID.setI(posI);
         rightBackPID.setD(posD);
-        rightBackPID.setOutputRange(-.2, .2);
+        rightBackPID.setOutputRange(-.5, .5);
         
         // pid for velocity
         leftPID.setP(0.00012245, 2);
@@ -301,7 +301,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
     /**
      * Gets the shift state.
      *
-     * @return the shift state where true is high and false is low
+     * @return the shift state where true is low and false is high
      */
     public boolean getShift() {
         return oldShift;
@@ -397,13 +397,30 @@ public class Drivetrain extends SubsystemBase implements Testable {
         rightBackPID.setReference(convertMPStoRPM(rightMS), ControlType.kVelocity, 2);
         
     }
+    /**
+     * maximum power PID can have. 
+     *
+     * @param power
+     *
+     */
 
+    public void setPIDMaxPower(double power) {
+        leftPID.setOutputRange(-power, power);
+        leftMiddlePID.setOutputRange(-power, power);
+        leftBackPID.setOutputRange(-power, power);
+        rightPID.setOutputRange(-power, power);
+        rightMiddlePID.setOutputRange(-power, power);
+        rightBackPID.setOutputRange(-power, power);
+
+
+    }
     /**
      * Converts robot meters per second into motor rotations per minute.
      *
      * @param input the MPS to convert
      * @return the corresponding RPM
      */
+
     public double convertMPStoRPM(double input) {
         double out = input / WHEEL_RADIUS_IN_METERS;
         out *= 60;
@@ -688,7 +705,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return double array of p,i,d
      */
     public double[] getPid() {
-        if (getShift()) {
+        if (!getShift()) {
             double[] out = { HIGH_P, HIGH_I, HIGH_D };
             return out;
 
@@ -704,7 +721,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return The motors feed forward.
      */
     public SimpleMotorFeedforward getFeedForward() {
-        if (getShift()) {
+        if (!getShift()) {
             return HighFeedFoward;
         } else {
             return LowFeedFoward;
@@ -717,7 +734,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return the current voltage constraint.
      */
     public DifferentialDriveVoltageConstraint getVoltageConstraint() {
-        if (getShift()) {
+        if (!getShift()) {
             return HighVoltageConstraint;
         } else {
             return LowVoltageConstraint;

@@ -18,7 +18,7 @@ public class EncoderDrive extends CommandBase {
     private final Drivetrain drivetrain;
     private double left;
     private double right;
-
+    private double maximumPower = 0.5;
     /**
      * The Constructor.
      *
@@ -26,6 +26,7 @@ public class EncoderDrive extends CommandBase {
      * @param left The distance to move the left side
      * @param right The distance to move the right side
      */
+
     public EncoderDrive(double left, double right, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
         this.left = left;
@@ -33,11 +34,28 @@ public class EncoderDrive extends CommandBase {
 
         addRequirements(drivetrain);
     }
+    /**
+     * The Constructor.
+     *
+     * @param drivetrain the robot's drivetrain
+     * @param left The distance to move the left side
+     * @param right The distance to move the right side
+     * @param maximumPower The maximum power the PID can set
+     */
 
+    public EncoderDrive(double left, double right, Drivetrain drivetrain, double maximumPower) {
+        this.drivetrain = drivetrain;
+        this.left = left;
+        this.right = right;
+        this.maximumPower = maximumPower;
+        addRequirements(drivetrain);
+    }
     // Called when the command is initially scheduled.
+
     @Override
     public void initialize() {
         drivetrain.stop();
+        drivetrain.setPIDMaxPower(maximumPower);
         // TODO test if this is accurate
         left = left + drivetrain.getLeftDistance();
         drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
