@@ -9,9 +9,11 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -50,7 +52,9 @@ public class Drivetrain extends SubsystemBase {
         WHEEL_RADIUS_IN_METERS = 0.0508,
         WHEEL_CIRCUMFRENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
-        DRIVE_WIDTH = 0.6858;
+        DRIVE_WIDTH = 0.6858,
+        MAX_SPEED_HIGH_GEAR_MPS = 2,
+        MAX_ACCEL_HIGH_GEAR_MPS2 = 2;
 
 
     // left motors
@@ -602,6 +606,17 @@ public class Drivetrain extends SubsystemBase {
         } else {
             return LowVoltageConstraint;
         }
+    }
+
+    /**
+     * Returns the trajectory config with a voltage constraint and drive kinematics. Voltage constrain is based of current shift status.
+     *
+     * @return A trajectory config.
+     */
+    public TrajectoryConfig getTrajectoryConfigHighGear() {
+        return new TrajectoryConfig(MAX_SPEED_HIGH_GEAR_MPS, MAX_ACCEL_HIGH_GEAR_MPS2)
+            .setKinematics(DriveKinimatics)
+            .addConstraint(HighVoltageConstraint);
     }
 
     //TODO run a check so we dont update at a unnessaryly fast rate
