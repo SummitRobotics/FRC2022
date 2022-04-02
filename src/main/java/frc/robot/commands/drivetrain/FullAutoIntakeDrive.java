@@ -22,8 +22,8 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     private static final double 
         DISTANCE_FROM_BALL = 0,
-        BACK_UP_THRESHOLD = 0,
-        BACK_UP_DISTANCE = 0;
+        BACK_UP_THRESHOLD = 14,
+        BACK_UP_DISTANCE = 24;
 
     private ConveyorState lastState;
     private ConveyorState thisState;
@@ -161,6 +161,6 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return movePID.atSetpoint() || (conveyor.getIndexState() != ConveyorState.NONE && conveyor.getBeltState() != ConveyorState.NONE) || changed;
+        return (conveyor.getIndexState() != ConveyorState.NONE && conveyor.getBeltState() != ConveyorState.NONE) || changed;
     }
 }
