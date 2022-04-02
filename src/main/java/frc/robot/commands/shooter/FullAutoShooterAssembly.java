@@ -42,16 +42,16 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected boolean isDrivenAndAligned;
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 70,
-        MIN_SHOOTER_RANGE = 50,
+        MAX_SHOOTER_RANGE = 180,
+        MIN_SHOOTER_RANGE = 45,
         OK_TO_MOVE_OFSET = 5,
-        HOOD_UP_RANGE = 120,
-        RANGE_OVERLAP = 10,
+        HOOD_UP_RANGE = 125,
+        RANGE_OVERLAP = 4,
         TARGET_HORIZONTAL_ACCURACY = 5,
         TARGET_WRONG_COLOR_MISS = 30,
         TARGET_MOTOR_SPEED_ACCURACY = 75,
         IDEAL_SHOOTING_DISTANCE = 60,
-        SHOOTER_IDLE_SPEED = 1400;
+        SHOOTER_IDLE_SPEED = 1700;
 
     // devices
     protected Lemonlight limelight;
@@ -113,16 +113,19 @@ public class FullAutoShooterAssembly extends CommandBase {
         // TODO - Test the shooter and do a regression to find the right formula.
         // Add higher order terms if necessary.
         if (hoodPos) {
-            return 0 * distance * distance * distance
-                + 0 * distance * distance
-                + 0 * distance
-                + 0;
+            return
+                (-0.00330099 * distance * distance * distance) +
+                (1.44904 * distance * distance) +
+                (-205.058 * distance) +
+                11204.6;
         } else {
             return 
-                + (-0.013333 * distance * distance * distance)
-                + (2.22857 * distance * distance)
-                + -117.095 * distance
-                + 3539.43;
+                (-0.00000243868 * distance * distance * distance * distance * distance) +
+                (0.000923236 * distance * distance * distance * distance) +
+                (-0.131588 * distance * distance * distance) +
+                (8.76388 * distance * distance) +
+                (-266.098 * distance) +
+                4428.38;
         }
     }
 
@@ -252,15 +255,14 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return Whether or not the hood position was correct
      */
     public boolean setHood(Shooter shooter, double limelightDistanceEstimate, boolean hoodPos) {
-        // if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
+        if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
 
-        //     shooter.toggleHoodPos();
-        //     return false;
+            shooter.toggleHoodPos();
+            return false;
 
-        // } else {
-        //     return true;
-        // }
-        return true;
+        } else {
+            return true;
+        }
     }
 
     @Override

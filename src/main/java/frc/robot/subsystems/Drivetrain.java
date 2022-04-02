@@ -563,11 +563,11 @@ public class Drivetrain extends SubsystemBase implements Testable {
      */
     public double getRightEncoderPosition() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getPosition(), rightMiddleEncoder.getPosition(), rightBackEncoder.getPosition()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getStickyFaults() != NO_FAULT_CODE) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
         return Functions.medianWithoutExtraneous(x);
     }
 
@@ -578,31 +578,31 @@ public class Drivetrain extends SubsystemBase implements Testable {
      */
     public double getLeftEncoderPosition() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getPosition(), leftMiddleEncoder.getPosition(), leftBackEncoder.getPosition()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getFaults() != NO_FAULT_CODE) {
+                
+        //     }
+        // }
         return Functions.medianWithoutExtraneous(x);
     }
 
     public double getLeftRPM() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getVelocity(), leftMiddleEncoder.getVelocity(), leftBackEncoder.getVelocity()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getStickyFaults() != NO_FAULT_CODE) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
         return Functions.medianWithoutExtraneous(x);
     }
 
     public double getRightRPM() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getVelocity(), rightMiddleEncoder.getVelocity(), rightBackEncoder.getVelocity()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getStickyFaults() != NO_FAULT_CODE) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
         return Functions.medianWithoutExtraneous(x);
     }
 
