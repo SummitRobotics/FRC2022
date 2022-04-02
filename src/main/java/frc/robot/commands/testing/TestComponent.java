@@ -156,14 +156,14 @@ public class TestComponent extends CommandBase {
         if (isSuccessful) {
             ShuffleboardDriver.statusDisplay.addStatus(
                 "Test Status",
-                "Test was successful",
+                toTest.getTestName() + " test was successful",
                 Colors.GREEN,
                 5
             );
             return true;
 
         } else if (timer.hasElapsed(toTest.getAllowedTimeSeconds())) {
-            String toPrint = toTest.getTestName() + ":";
+            String toPrint = toTest.getTestName() + "|";
 
             for (HashMap.Entry<String, Boolean> set : testStates.entrySet()) {
                 if (!set.getValue()) {

@@ -564,7 +564,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public double getRightEncoderPosition() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getPosition(), rightMiddleEncoder.getPosition(), rightBackEncoder.getPosition()));
         for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
                 System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
@@ -579,7 +581,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public double getLeftEncoderPosition() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getPosition(), leftMiddleEncoder.getPosition(), leftBackEncoder.getPosition()));
         for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
                 System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
@@ -589,7 +593,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public double getLeftRPM() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getVelocity(), leftMiddleEncoder.getVelocity(), leftBackEncoder.getVelocity()));
         for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
                 System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
@@ -599,7 +605,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public double getRightRPM() {
         ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getVelocity(), rightMiddleEncoder.getVelocity(), rightBackEncoder.getVelocity()));
         for (CANSparkMax motor : allMotors) {
-            if (motor.getStickyFaults() != NO_FAULT_CODE) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
                 System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }

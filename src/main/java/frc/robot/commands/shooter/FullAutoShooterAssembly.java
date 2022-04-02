@@ -81,7 +81,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         // TODO - Set these, including the constants
         alignPID.setTolerance(TARGET_HORIZONTAL_ACCURACY, 9999999);
         movePID.setTolerance(2, 9999999);
-        alignPID.setSetpoint(10);
+        alignPID.setSetpoint(0);
         movePID.setSetpoint(IDEAL_SHOOTING_DISTANCE);
 
         addRequirements(shooter, drivetrain);
@@ -165,7 +165,14 @@ public class FullAutoShooterAssembly extends CommandBase {
         // } else {
         //     //alignPID.setSetpoint(0);
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        // }        
+        // }
+
+        if (movePID.atSetpoint()) {
+            alignPID.setSetpoint(Math.atan(Math.toRadians(12/limelightDistanceEstimate)));
+        } else {
+            alignPID.setSetpoint(0);
+        }
+
         double leftPower = 0;
         double rightPower = 0;
 

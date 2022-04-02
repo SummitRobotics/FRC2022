@@ -152,7 +152,8 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }),
-                new RaiseIntake(intake));
+                new RaiseIntake(intake)
+        );
 
         testInit = new SequentialCommandGroup(
             new InstantCommand(
@@ -162,13 +163,13 @@ public class RobotContainer {
                                 Colors.TEAM,
                                 StatusPriorities.ENABLED)),
             new InstantCommand(() -> pcm.enableCompressorDigital()),
-            homeArms.get()
-            // new TestComponent(pcm),
-            // new TestComponent(shooter),
-            // new TestComponent(intake),
-            // new TestComponent(drivetrain),
-            // new TestComponent(conveyor)
-            // new TestComponent(climb)
+            homeArms.get(),
+            new TestComponent(pcm),
+            new TestComponent(intake),
+            new TestComponent(drivetrain),
+            new TestComponent(conveyor),
+            new TestComponent(climb),
+            new TestComponent(shooter)
         );
 
         // Configure the button bindings
@@ -183,7 +184,7 @@ public class RobotContainer {
         // drive by controller
         drivetrain.setDefaultCommand(arcadeDrive);
         intake.setDefaultCommand(new DefaultIntake(intake, conveyor, gyro));
-        conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
+        conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, shooter));
     }
 
     /**
@@ -203,7 +204,7 @@ public class RobotContainer {
 
         controller1.buttonA.whenPressed(new LowerIntake(intake));
         controller1.buttonB.whenPressed(
-                new RaiseIntake(intake));
+            new RaiseIntake(intake));
 
         controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor).withTimeout(5));
         // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
@@ -369,12 +370,11 @@ public class RobotContainer {
 
 
         Command driveOlnly = new SequentialCommandGroup(
-                // autoInit.get(),
-                // new WaitCommand(10),
-                // new DriveByTime(drivetrain, .8, -0.5),
-                // new DriveByTime(drivetrain, .4, -0.2),
-                // new PrintCommand("auto done")
-                new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor)
+                autoInit.get(),
+                new WaitCommand(10),
+                new DriveByTime(drivetrain, .8, -0.5),
+                new DriveByTime(drivetrain, .4, -0.2),
+                new PrintCommand("auto done")
         );
 
         ShuffleboardDriver.autoChooser.addOption("drive only", driveOlnly);
