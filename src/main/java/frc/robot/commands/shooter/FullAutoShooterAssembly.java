@@ -40,18 +40,20 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected double currentMotorSpeed;
     protected double currentIndexSpeed;
     protected boolean isDrivenAndAligned;
+    boolean properlyAligned;
+
     //constants
     protected static final double
-        MAX_SHOOTER_RANGE = 70,
-        MIN_SHOOTER_RANGE = 50,
+        MAX_SHOOTER_RANGE = 180,
+        MIN_SHOOTER_RANGE = 45,
         OK_TO_MOVE_OFSET = 5,
-        HOOD_UP_RANGE = 120,
-        RANGE_OVERLAP = 10,
+        HOOD_UP_RANGE = 125,
+        RANGE_OVERLAP = 4,
         TARGET_HORIZONTAL_ACCURACY = 5,
         TARGET_WRONG_COLOR_MISS = 30,
         TARGET_MOTOR_SPEED_ACCURACY = 75,
         IDEAL_SHOOTING_DISTANCE = 60,
-        SHOOTER_IDLE_SPEED = 1400;
+        SHOOTER_IDLE_SPEED = 1700;
 
     // devices
     protected Lemonlight limelight;
@@ -81,7 +83,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         // TODO - Set these, including the constants
         alignPID.setTolerance(TARGET_HORIZONTAL_ACCURACY, 9999999);
         movePID.setTolerance(2, 9999999);
-        alignPID.setSetpoint(10);
+        alignPID.setSetpoint(0);
         movePID.setSetpoint(IDEAL_SHOOTING_DISTANCE);
 
         addRequirements(shooter, drivetrain);
@@ -113,16 +115,21 @@ public class FullAutoShooterAssembly extends CommandBase {
         // TODO - Test the shooter and do a regression to find the right formula.
         // Add higher order terms if necessary.
         if (hoodPos) {
-            return 0 * distance * distance * distance
-                + 0 * distance * distance
-                + 0 * distance
-                + 0;
+            System.out.println("reg far");
+            return
+                (-0.00330099 * distance * distance * distance) +
+                (1.44904 * distance * distance) +
+                (-205.058 * distance) +
+                11204.6;
         } else {
+            System.out.println("reg close");
             return 
-                + (-0.013333 * distance * distance * distance)
-                + (2.22857 * distance * distance)
-                + -117.095 * distance
-                + 3539.43;
+                (-0.00000243868 * distance * distance * distance * distance * distance) +
+                (0.000923236 * distance * distance * distance * distance) +
+                (-0.131588 * distance * distance * distance) +
+                (8.76388 * distance * distance) +
+                (-266.098 * distance) +
+                4428.38;
         }
     }
 
@@ -134,6 +141,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     public void fire(Shooter shooter) {
         //System.out.println("FFFFFFFFFFFIIIIIIIIIRRRRRRRRRRREEEEEEEEEEEEEEEE");
         shooter.setState(Shooter.States.READY_TO_FIRE);
+        properlyAligned = false;
+
     }
 
     /**
@@ -158,14 +167,21 @@ public class FullAutoShooterAssembly extends CommandBase {
         double horizontalOffset,
         boolean isAccurate,
         double limelightDistanceEstimate) {
-        
         //sets if align target based on ball color
         // if (isAccurate) {
         //     alignPID.setSetpoint(0);
         // } else {
         //     //alignPID.setSetpoint(0);
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        // }        
+        // }
+
+        if (movePID.atSetpoint()) {
+            alignPID.setSetpoint(Math.toDegrees(Math.atan((12/limelightDistanceEstimate))));
+            properlyAligned = true;
+        } else if (!properlyAligned) {
+            alignPID.setSetpoint(0);
+        }
+
         double leftPower = 0;
         double rightPower = 0;
 
@@ -177,7 +193,7 @@ public class FullAutoShooterAssembly extends CommandBase {
 
 
         //move towards target
-        if (Functions.isWithin(horizontalOffset, 10, OK_TO_MOVE_OFSET)) {
+        if (Functions.isWithin(horizontalOffset, alignPID.getSetpoint(), OK_TO_MOVE_OFSET)) {
             //records current distance to be heald with pid, clamped to the max and min range of the shooter
             if (!hasRecordedLimelightDistance) {
                 movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
@@ -196,8 +212,8 @@ public class FullAutoShooterAssembly extends CommandBase {
         //sets drivetrain powers
         drivetrain.setLeftMotorPower(leftPower);
         drivetrain.setRightMotorPower(rightPower);
-        System.out.println("Is aligned " + alignPID.atSetpoint() + " is arrived " + movePID.atSetpoint());
-        return alignPID.atSetpoint() && movePID.atSetpoint();
+        System.out.println("Is aligned " + alignPID.atSetpoint() + " is arrived " + movePID.atSetpoint() );
+        return alignPID.atSetpoint() && movePID.atSetpoint() && properlyAligned;
     }
 
     /**
@@ -252,15 +268,14 @@ public class FullAutoShooterAssembly extends CommandBase {
      * @return Whether or not the hood position was correct
      */
     public boolean setHood(Shooter shooter, double limelightDistanceEstimate, boolean hoodPos) {
-        // if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos == false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos == true)) {
+        if ((limelightDistanceEstimate < HOOD_UP_RANGE - RANGE_OVERLAP && hoodPos != false) || (limelightDistanceEstimate > HOOD_UP_RANGE + RANGE_OVERLAP && hoodPos != true)) {
 
-        //     shooter.toggleHoodPos();
-        //     return false;
+            shooter.toggleHoodPos();
+            return false;
 
-        // } else {
-        //     return true;
-        // }
-        return true;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -283,6 +298,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         indexState = conveyor.getIndexState();
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterRPM();
+        isSpooled = false;
         if (limelightHasTarget) {
             //TODO change this back
             isHoodSet = setHood(shooter, limelightDistanceEstimate, hoodPos);
@@ -290,13 +306,9 @@ public class FullAutoShooterAssembly extends CommandBase {
                 smoothedHorizontalOffset,
                 true,
                 limelightDistanceEstimate);
-            isSpooled = spool(shooter, limelightDistanceEstimate,
+            if (isHoodSet) {
+                isSpooled = spool(shooter, limelightDistanceEstimate,
                 currentMotorSpeed, hoodPos, isDrivenAndAligned);
-
-            //System.out.println("hood: " + isHoodSet + "  spool: " + isSpooled + "  ball: " + isBallReady() + " drive: " + isDrivenAndAligned);
-            if (isHoodSet && isSpooled && isBallReady() && isDrivenAndAligned) {
-                //System.out.println("fire");
-                fire(shooter);
             }
 
             if (!isDrivenAndAligned) {
@@ -312,6 +324,7 @@ public class FullAutoShooterAssembly extends CommandBase {
             }
 
         } else {
+            properlyAligned = false;            
             shooter.setMotorTargetSpeed(SHOOTER_IDLE_SPEED);
             alignPID.reset();
             movePID.reset();

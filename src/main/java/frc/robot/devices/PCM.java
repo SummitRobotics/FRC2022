@@ -19,7 +19,7 @@ public class PCM implements Sendable, Testable {
 
     private static final double
         FULL_PRESSURE = 100,
-        PARTIAL_PRESSURE = 50;
+        PARTIAL_PRESSURE = 75;
 
     private boolean hasReachedFullPressure;
     private boolean hasReachedPartialPressure;
@@ -153,7 +153,7 @@ public class PCM implements Sendable, Testable {
             if (hasReachedPartialPressure) {
                 pressureStatus = true;
             } else {
-                if (timer.hasElapsed(0.25)) {
+                if (timer.hasElapsed(0.1)) {
                     drivetrain.toggleShift();
                     timer.reset();
                     if (getPressure() < PARTIAL_PRESSURE) {

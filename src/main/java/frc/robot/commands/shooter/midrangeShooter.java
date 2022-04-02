@@ -1,7 +1,5 @@
 package frc.robot.commands.shooter;
 
-import java.sql.RowId;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
@@ -24,7 +22,7 @@ public class midrangeShooter extends CommandBase {
     Drivetrain drivetrain;
     RollingAverage avg = new RollingAverage(5, false);
     protected PIDController alignPID;
-    private double speed = 1600;
+    private double speed = 1610;
     private double error = 25;
 
     /**
@@ -66,7 +64,7 @@ public class midrangeShooter extends CommandBase {
      * @return is aligned
      */
 
-    public boolean driveAndAlign(Drivetrain drivetrain, double horizontalOffset) {
+    public boolean driveAndAlign(Drivetrain drivetrain, double horizontalOffset, double limelightDistanceEstimate) {
     
         //sets if align target based on ball color
         // if (isAccurate) {
@@ -75,6 +73,8 @@ public class midrangeShooter extends CommandBase {
         //     //alignPID.setSetpoint(0);
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
         // }
+
+        alignPID.setSetpoint(Math.atan(Math.toRadians(12 / limelightDistanceEstimate)));
         
         double leftPower = 0;
         double rightPower = 0;
@@ -91,15 +91,20 @@ public class midrangeShooter extends CommandBase {
         drivetrain.setRightMotorPower(rightPower);
         System.out.println("Is aligned " + alignPID.atSetpoint());
         return alignPID.atSetpoint();
-}
+    }
 
     @Override
     public void execute() {
         // shooter.setMotorPower(controlAxis.get());
         shooter.setHoodPos(false);
         avg.update(shooter.getShooterRPM());
+        double limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
+            Lemonlight.MAIN_MOUNT_HEIGHT,
+            Lemonlight.MAIN_MOUNT_ANGLE,
+            Lemonlight.MAIN_TARGET_HEIGHT,
+            limelight.getVerticalOffset());
         double horizontalOffset = limelight.getHorizontalOffset();
-        boolean aligned = driveAndAlign(drivetrain, horizontalOffset);
+        boolean aligned = driveAndAlign(drivetrain, horizontalOffset, limelightDistanceEstimate);
 
         if (Functions.isWithin(avg.getAverage(), speed, error) && aligned) {
             shooter.setState(Shooter.States.READY_TO_FIRE);

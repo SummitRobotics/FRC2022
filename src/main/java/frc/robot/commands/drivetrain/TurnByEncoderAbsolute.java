@@ -31,7 +31,6 @@ public class TurnByEncoderAbsolute extends CommandBase {
      * @param drivetrain the robot's drivetrain
      * @param direction the direction to point the robot
      */
-
     public TurnByEncoderAbsolute(Rotation2d direction, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
         this.direction = direction;

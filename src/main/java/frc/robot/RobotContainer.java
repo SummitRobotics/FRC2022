@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -20,7 +21,7 @@ import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.*;
 import frc.robot.commands.shooter.*;
-// import frc.robot.commands.testing.TestComponent;
+import frc.robot.commands.testing.TestComponent;
 import frc.robot.devices.*;
 import frc.robot.devices.LEDs.*;
 import frc.robot.oi.drivers.*;
@@ -154,7 +155,8 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }),
-                new RaiseIntake(intake));
+                new RaiseIntake(intake)
+        );
 
         testInit = new SequentialCommandGroup(
             new InstantCommand(
@@ -164,13 +166,13 @@ public class RobotContainer {
                                 Colors.TEAM,
                                 StatusPriorities.ENABLED)),
             new InstantCommand(() -> pcm.enableCompressorDigital()),
-            homeArms.get()
-            // new TestComponent(pcm),
-            // new TestComponent(shooter),
-            // new TestComponent(intake),
-            // new TestComponent(drivetrain),
-            // new TestComponent(conveyor),
-            // new TestComponent(climb)
+            homeArms.get(),
+            new TestComponent(pcm),
+            new TestComponent(intake),
+            new TestComponent(drivetrain),
+            new TestComponent(conveyor),
+            new TestComponent(climb),
+            new TestComponent(shooter)
         );
 
         // Configure the button bindings
@@ -185,7 +187,7 @@ public class RobotContainer {
         // drive by controller
         drivetrain.setDefaultCommand(arcadeDrive);
         intake.setDefaultCommand(new DefaultIntake(intake, conveyor, gyro));
-        conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, intake, shooter));
+        conveyor.setDefaultCommand(new ConveyorAutomation(conveyor, shooter));
     }
 
     /**
@@ -205,7 +207,7 @@ public class RobotContainer {
 
         controller1.buttonA.whenPressed(new LowerIntake(intake));
         controller1.buttonB.whenPressed(
-                new RaiseIntake(intake));
+            new RaiseIntake(intake));
 
         controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor).withTimeout(5));
         // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
@@ -241,9 +243,9 @@ public class RobotContainer {
         launchpad.missileB.whileHeld(autoClimbCommand);
         launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));
 
-        // ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
-        //         joystick.button5, joystick.button2, joystick.button7,
-        //         joystick.button6, joystick.button8);
+        ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
+                joystick.button5, joystick.button2, joystick.button7,
+                joystick.button6, joystick.button8);
 
         launchpad.buttonA.whenHeld(climbSemiAuto);
         launchpad.buttonA.commandBind(climbSemiAuto);
@@ -302,6 +304,8 @@ public class RobotContainer {
     public void robotInit() {
         createAutoCommands();
         gyro.calibrate();
+        //sets drivetrain back to 0, reducing acumulated error and bad stuff
+        drivetrain.setPose(new Pose2d());
         ShuffleboardDriver.init();
     }
 
@@ -332,6 +336,7 @@ public class RobotContainer {
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
             new InstantCommand(drivetrain::highGear),
+            new InstantCommand(drivetrain::zeroDistance),
             homeArms.get(),
             new InstantCommand(() -> {
                 launchpad.bigLEDRed.set(false);
@@ -377,21 +382,21 @@ public class RobotContainer {
 
         ShuffleboardDriver.autoChooser.addOption("drive only", driveOlnly);
 
-        //TODO add conveyor wait
         Command twoBallAutoLow = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
-            new EncoderDrive(1.4, 1.4, drivetrain, .2),
-            new WaitCommand(.2),
+            new EncoderDrive(1, 1, drivetrain, .2),
+            new WaitCommand(1),
             new RaiseIntake(intake),
-            new EncoderDrive(-2.2, -2.2, drivetrain),
+            new EncoderDrive(-2, -2, drivetrain),
             new WaitCommand(.5),
             new TurnByEncoder(170, drivetrain),
-            new DriveByTime(drivetrain, .5, .3),         
+            new WaitCommand(.5),
+            new DriveByTime(drivetrain, .8, .3),         
             new ShooterAtStart(shooter, conveyor, 1100),
             new EncoderDrive(-2.4, -2.4, drivetrain),            
-            new TurnByEncoder(180, drivetrain),
+            new TurnByEncoderAbsolute(0, drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);
@@ -400,20 +405,20 @@ public class RobotContainer {
             autoInit.get(),
             new LowerIntake(intake),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
-            new EncoderDrive(1.4, 1.4, drivetrain, .2),
-            new WaitUntilConveyor(conveyor),
+            new EncoderDrive(1, 1, drivetrain, .2),
+            new WaitCommand(1),
             new RaiseIntake(intake),
             new EncoderDrive(-1, -1, drivetrain),
             new WaitCommand(.5),
-            new TurnByEncoder(190, drivetrain),
+            new TurnByEncoder(180, drivetrain),
             new WaitCommand(.5),     
             new midrangeShooter(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
-            new EncoderDrive(-1, -1, drivetrain),
+            new EncoderDrive(-1.4, -1.4, drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball high", twoBallAutoHigh);
 
-
+        //TODO replace with low ball changes
         Command twoBallAutoLowDLC = new SequentialCommandGroup(
             //2 ball
             autoInit.get(),

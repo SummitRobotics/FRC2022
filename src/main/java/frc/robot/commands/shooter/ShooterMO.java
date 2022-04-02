@@ -45,7 +45,7 @@ public class ShooterMO extends CommandBase {
         this.controlAxis = controlAxis;
         this.HoodButton = controlButton;
         this.shootButton = shootButton;
-        dumb.forceSetDouble(1800);
+        dumb.forceSetDouble(60);
     }
 
     @Override

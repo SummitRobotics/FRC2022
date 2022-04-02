@@ -15,7 +15,6 @@ public class ConveyorAutomation extends CommandBase {
 
     // subsystems
     private Conveyor conveyor;
-    private Intake intake;
     private Shooter shooter;
 
     private static final int indexLidarStop = Conveyor.MAX_INDEXED_LIDAR_DISTANCE - 3;
@@ -33,9 +32,8 @@ public class ConveyorAutomation extends CommandBase {
      * @param intake The intake subsystem
      * @param shooter The shooter subsystem
      */
-    public ConveyorAutomation(Conveyor conveyor, Intake intake, Shooter shooter) {
+    public ConveyorAutomation(Conveyor conveyor, Shooter shooter) {
         this.conveyor = conveyor;
-        this.intake = intake;
         this.shooter = shooter;
         addRequirements(conveyor);
     }

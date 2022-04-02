@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -30,6 +31,7 @@ import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Subsystem to control the drivetrain of the robot.
@@ -57,7 +59,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858,
         SPLINE_MAX_VEL_MPS_HIGH = 3,
-        SPLINE_MAX_ACC_MPSSQ_HIGH = 3;
+        SPLINE_MAX_ACC_MPSSQ_HIGH = 3,
+        NO_FAULT_CODE = 0;
 
 
     // left motors
@@ -81,7 +84,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
     private final CANSparkMax rightBack =
         new CANSparkMax(Ports.RIGHT_DRIVE_1, MotorType.kBrushless);
 
-
+    private final ArrayList <CANSparkMax> allMotors = new ArrayList<>(List.of(left, leftMiddle, leftBack, right, rightMiddle, rightBack));
     // pid controllers
     private final SparkMaxPIDController leftPID = left.getPIDController();
     private final SparkMaxPIDController leftMiddlePID = leftMiddle.getPIDController();
@@ -238,6 +241,13 @@ public class Drivetrain extends SubsystemBase implements Testable {
         leftBack.disableVoltageCompensation();
         rightBack.disableVoltageCompensation();
 
+        left.clearFaults();
+        leftMiddle.clearFaults();
+        leftBack.clearFaults();
+
+        right.clearFaults();
+        rightMiddle.clearFaults();
+        rightBack.clearFaults();
         setClosedRampRate(0);
         setOpenRampRate(0);
 
@@ -533,7 +543,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @apiNote This zeros the raw encoder values. This is provavly not what you want to do.
      *     Instead use zeroEncoders().
      */
-    private synchronized void zeroEncoders() {
+    public synchronized void zeroEncoders() {
         setRightEncoder(0);
         setLeftEncoder(0);
     }
@@ -555,7 +565,15 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return position of motor in rotations
      */
     public double getRightEncoderPosition() {
-        return (rightEncoder.getPosition() + rightMiddleEncoder.getPosition() + rightBackEncoder.getPosition()) / 3;
+        ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getPosition(), rightMiddleEncoder.getPosition(), rightBackEncoder.getPosition()));
+        for (CANSparkMax motor : allMotors) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+            }
+        }
+        return Functions.medianWithoutExtraneous(x);
     }
 
     /**
@@ -564,15 +582,39 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return position of motor in rotations
      */
     public double getLeftEncoderPosition() {
-        return (leftEncoder.getPosition() + leftMiddleEncoder.getPosition() + leftBackEncoder.getPosition()) / 3;
+        ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getPosition(), leftMiddleEncoder.getPosition(), leftBackEncoder.getPosition()));
+        for (CANSparkMax motor : allMotors) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+            }
+        }
+        return Functions.medianWithoutExtraneous(x);
     }
 
     public double getLeftRPM() {
-        return (leftEncoder.getVelocity() + leftMiddleEncoder.getVelocity() + leftBackEncoder.getVelocity()) / 3;
+        ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getVelocity(), leftMiddleEncoder.getVelocity(), leftBackEncoder.getVelocity()));
+        for (CANSparkMax motor : allMotors) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+            }
+        }
+        return Functions.medianWithoutExtraneous(x);
     }
 
     public double getRightRPM() {
-        return (leftEncoder.getVelocity() + leftMiddleEncoder.getVelocity() + leftBackEncoder.getVelocity()) / 3;
+        ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getVelocity(), rightMiddleEncoder.getVelocity(), rightBackEncoder.getVelocity()));
+        for (CANSparkMax motor : allMotors) {
+            if (motor.getFault(CANSparkMax.FaultID.kSensorFault) || 
+            motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+            || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+            }
+        }
+        return Functions.medianWithoutExtraneous(x);
     }
 
     /**

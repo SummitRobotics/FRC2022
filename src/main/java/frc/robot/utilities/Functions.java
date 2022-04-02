@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Contains various static utility functions for use throughout the program.
@@ -126,5 +129,25 @@ public class Functions {
         Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(path);
 
         return new FollowTrajectoryThreaded(drivetrain, trajectory);
+    }
+    /**
+     * takes a list of numbers and gets the median value of them. 
+     *
+     * @param toBeAveraged Arraylist of numbers to get the median of
+     * @return the median value
+     */
+
+    public static double medianWithoutExtraneous (ArrayList<Double> toBeAveraged){
+        Collections.sort(toBeAveraged);
+        double mean = 0;
+        for (double i : toBeAveraged) {
+            mean += i;
+        }
+        mean /= 3;
+        final double asfasd = mean;
+
+        toBeAveraged.removeIf(e -> (e != 0 && Math.abs((asfasd - e) / e) > .2));
+        if (toBeAveraged.size() == 0) return 0;
+        return toBeAveraged.get((int) (toBeAveraged.size() / 2));
     }
 }

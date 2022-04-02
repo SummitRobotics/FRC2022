@@ -36,10 +36,9 @@ public class Intake extends SubsystemBase implements Testable {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = .5, 
+            INTAKE_MOTOR_SPEED = 0.5, 
             MAX_RPM = 8000, 
-            ACTUAL_SPEED = MAX_RPM / 2,
-            MOVE_TO_CONVEYOR = ACTUAL_SPEED / 2;
+            ACTUAL_SPEED = MAX_RPM / 2;
 
     // motor
     private final CANSparkMax intakeMotor =

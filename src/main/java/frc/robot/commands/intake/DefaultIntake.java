@@ -18,8 +18,8 @@ public class DefaultIntake extends CommandBase {
     private final Intake intake;
     private final Conveyor conveyor;
     private final AHRS gyro;
-    static NetworkTableEntry dumb =
-        NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
+    // static NetworkTableEntry dumb =
+    //     NetworkTableInstance.getDefault().getTable("chronic").getEntry("realy_dumb");
 
     /**
      * Default command for Intake.
@@ -37,7 +37,7 @@ public class DefaultIntake extends CommandBase {
 
     @Override
     public void initialize() {
-        dumb.forceSetDouble(1800);
+       // dumb.forceSetDouble(1800);
     }
 
     @Override
