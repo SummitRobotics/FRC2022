@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.DriveToHub;
 import frc.robot.commands.WaitUntilConveyor;
+import frc.robot.commands.autonomous.AutoTest;
+import frc.robot.commands.autonomous.FourBallAuto;
+import frc.robot.commands.autonomous.TwoBallAuto;
 import frc.robot.commands.climb.*;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
@@ -459,6 +462,9 @@ public class RobotContainer {
             new PrintCommand("auto done"));
         ShuffleboardDriver.autoChooser.addOption("4 high", twoBallAutoHighDLC);
 
+        ShuffleboardDriver.autoChooser.addOption("Spline Test", new AutoTest(drivetrain, intake, shooter, conveyor, targetingLimelight));
+        ShuffleboardDriver.autoChooser.addOption("Spline 2 Ball", new TwoBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
+        ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball", new FourBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
     }
     
     /**

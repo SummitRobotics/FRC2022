@@ -8,6 +8,8 @@ import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -26,15 +28,18 @@ import java.util.function.Supplier;
  * This command is threaded using Command Threader
  * This means the trajectory calculations runs every ~5ms
  */
-public class FollowTrajectoryThreaded extends CommandBase {
+public class FollowDynamicTrajectoryThreaded extends CommandBase {
 
-    private final Trajectory trajectory;
     private final Drivetrain drivetrain;
-    private final int period;
+    private final Supplier<Pose2d> startingPosSupplier;
+    private final Supplier<List<Translation2d>> midpointsSupplier;
+    private final Supplier<Pose2d> endPosSupplier;
+    private final TrajectoryConfig config;
     private CommandThreader commandThreader;
+    private final int period;
 
     private final LEDCall splineLEDs = new LEDCall(LEDPriorities.SPLINES, LEDRange.All)
-            .sine(Colors.PURPLE);
+        .sine(Colors.PURPLE);
 
     /**
      * command to follow a trajectory object.
@@ -42,13 +47,21 @@ public class FollowTrajectoryThreaded extends CommandBase {
      * it more precise
      *
      * @param drivetrain drivetrain to control
-     * @param trajectory path to the saved SerializableMultiGearTrajectory object
      */
-    public FollowTrajectoryThreaded(Drivetrain drivetrain, Trajectory trajectory) {
+    public FollowDynamicTrajectoryThreaded(
+        Supplier<Pose2d> startingPos,
+        Supplier<Pose2d> endingPos,
+        Supplier<List<Translation2d>> midpoints,
+        TrajectoryConfig config,
+        Drivetrain drivetrain
+    ) {
         super();
 
         this.drivetrain = drivetrain;
-        this.trajectory = trajectory;
+        this.midpointsSupplier = midpoints;
+        this.startingPosSupplier = startingPos;
+        this.endPosSupplier = endingPos;
+        this.config = config;
 
         this.period = 5;
 
@@ -58,34 +71,35 @@ public class FollowTrajectoryThreaded extends CommandBase {
     @Override
     public void initialize() {
         splineLEDs.activate();
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(startingPosSupplier.get(), midpointsSupplier.get(), endPosSupplier.get(), config);
 
         RamseteCommand ramseteCommand =
-                new RamseteCommand(
-                        trajectory,
-                        drivetrain::getPose,
-                        // TODO tune controller values
-                        new RamseteController(1.5, 0.8),
-                        Drivetrain.DriveKinimatics,
-                        drivetrain::setMotorTargetSpeed,
-                        drivetrain);
+            new RamseteCommand(
+                trajectory,
+                drivetrain::getPose,
+                // TODO tune controller values
+                new RamseteController(1.5, 0.8),
+                Drivetrain.DriveKinimatics,
+                drivetrain::setMotorTargetSpeed,
+                drivetrain);
 
         drivetrain.setPose(trajectory.getInitialPose());
 
         // Wraps the command, so we can update odometry every cycle.
         Runnable onExecute =
-                () -> {
-                    drivetrain.updateOdometry();
-                    ramseteCommand.execute();
-                };
+            () -> {
+                drivetrain.updateOdometry();
+                ramseteCommand.execute();
+            };
 
         // Wraps the ramseteCommand in a functional command,
         // so we can update drivetrain odometry still.
         FunctionalCommand command = new FunctionalCommand(
-                ramseteCommand::initialize,
-                onExecute,
-                ramseteCommand::end,
-                ramseteCommand::isFinished,
-                drivetrain);
+            ramseteCommand::initialize,
+            onExecute,
+            ramseteCommand::end,
+            ramseteCommand::isFinished,
+            drivetrain);
 
         // Creates the command threader
         commandThreader = new CommandThreader(command, period, 10);

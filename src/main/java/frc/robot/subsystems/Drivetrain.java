@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -54,7 +55,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
         WHEEL_RADIUS_IN_METERS = 0.05207,
         WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
-        DRIVE_WIDTH = 0.6858;
+        DRIVE_WIDTH = 0.6858,
+        SPLINE_MAX_VEL_MPS_HIGH = 3,
+        SPLINE_MAX_ACC_MPSSQ_HIGH = 3;
 
 
     // left motors
@@ -201,29 +204,29 @@ public class Drivetrain extends SubsystemBase implements Testable {
         
         // pid for velocity
         leftPID.setP(0.00012245, 2);
-        leftPID.setI(0, 4);
+        leftPID.setI(0, 2);
         leftPID.setD(0.0, 2);
 
         rightPID.setP(0.00012245, 2);
-        rightPID.setI(0, 4);
+        rightPID.setI(0, 2);
         rightPID.setD(0.0, 2);
         
         // pid for velocity
         leftMiddlePID.setP(0.00012245, 2);
-        leftMiddlePID.setI(0, 4);
+        leftMiddlePID.setI(0, 2);
         leftMiddlePID.setD(0.0, 2);
 
         rightMiddlePID.setP(0.00012245, 2);
-        rightMiddlePID.setI(0, 4);
+        rightMiddlePID.setI(0, 2);
         rightMiddlePID.setD(0.0, 2);
 
         // pid for velocity
         leftBackPID.setP(0.00012245, 2);
-        leftBackPID.setI(0, 4);
+        leftBackPID.setI(0, 2);
         leftBackPID.setD(0.0, 2);
 
         rightBackPID.setP(0.00012245, 2);
-        rightBackPID.setI(0, 4);
+        rightBackPID.setI(0, 2);
         rightBackPID.setD(0.0, 2);
 
         left.disableVoltageCompensation();
@@ -739,6 +742,12 @@ public class Drivetrain extends SubsystemBase implements Testable {
         } else {
             return LowVoltageConstraint;
         }
+    }
+
+    public TrajectoryConfig getTrajectoryConfigHighGear() {
+        return new TrajectoryConfig(SPLINE_MAX_VEL_MPS_HIGH, SPLINE_MAX_ACC_MPSSQ_HIGH).
+            setKinematics(DriveKinimatics).
+            addConstraint(HighVoltageConstraint);
     }
 
     //TODO run a check so we dont update at a unnessaryly fast rate
