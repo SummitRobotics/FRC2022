@@ -238,6 +238,13 @@ public class Drivetrain extends SubsystemBase implements Testable {
         leftBack.disableVoltageCompensation();
         rightBack.disableVoltageCompensation();
 
+        left.clearFaults();
+        leftMiddle.clearFaults();
+        leftBack.clearFaults();
+
+        right.clearFaults();
+        rightMiddle.clearFaults();
+        rightBack.clearFaults();
         setClosedRampRate(0);
         setOpenRampRate(0);
 
@@ -558,7 +565,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
         ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getPosition(), rightMiddleEncoder.getPosition(), rightBackEncoder.getPosition()));
         for (CANSparkMax motor : allMotors) {
             if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                x.remove(allMotors.indexOf(motor));
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
         return Functions.medianWithoutExtraneous(x);
@@ -573,7 +580,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
         ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getPosition(), leftMiddleEncoder.getPosition(), leftBackEncoder.getPosition()));
         for (CANSparkMax motor : allMotors) {
             if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                x.remove(allMotors.indexOf(motor));
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
         return Functions.medianWithoutExtraneous(x);
@@ -583,7 +590,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
         ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getVelocity(), leftMiddleEncoder.getVelocity(), leftBackEncoder.getVelocity()));
         for (CANSparkMax motor : allMotors) {
             if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                x.remove(allMotors.indexOf(motor));
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
         return Functions.medianWithoutExtraneous(x);
@@ -593,7 +600,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
         ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getVelocity(), rightMiddleEncoder.getVelocity(), rightBackEncoder.getVelocity()));
         for (CANSparkMax motor : allMotors) {
             if (motor.getStickyFaults() != NO_FAULT_CODE) {
-                x.remove(allMotors.indexOf(motor));
+                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
             }
         }
         return Functions.medianWithoutExtraneous(x);

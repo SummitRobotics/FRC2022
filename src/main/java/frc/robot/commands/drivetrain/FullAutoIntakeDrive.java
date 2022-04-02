@@ -115,24 +115,24 @@ public class FullAutoIntakeDrive extends CommandBase {
 
         if (limelightDistanceEstimate < 999) {
 
-            if (limelightDistanceEstimate < BACK_UP_THRESHOLD
-                && !Functions.isWithin(horizontalOffset, 0, 5)) {
+            // if (limelightDistanceEstimate < BACK_UP_THRESHOLD
+            //     && !Functions.isWithin(horizontalOffset, 0, 5)) {
                 
-                isBackingUp = true;
-                movePID.setSetpoint(BACK_UP_DISTANCE);
-                alignPID.setSetpoint(horizontalOffset);
+            //     isBackingUp = true;
+            //     movePID.setSetpoint(BACK_UP_DISTANCE);
+            //     alignPID.setSetpoint(horizontalOffset);
 
-            }
+            // }
             
-            if (isBackingUp) {
-                if (movePID.atSetpoint()) {
-                    alignPID.setSetpoint(0);
-                    if (alignPID.atSetpoint()) {
-                        movePID.setSetpoint(0);
-                        isBackingUp = false;
-                    }
-                }
-            }
+            // if (isBackingUp) {
+            //     if (movePID.atSetpoint()) {
+            //         alignPID.setSetpoint(0);
+            //         if (alignPID.atSetpoint()) {
+            //             movePID.setSetpoint(0);
+            //             isBackingUp = false;
+            //         }
+            //     }
+            // }
 
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
@@ -140,10 +140,6 @@ public class FullAutoIntakeDrive extends CommandBase {
             drivetrain.setLeftMotorPower(movePower - alignPower);
             drivetrain.setRightMotorPower(movePower + alignPower);
             intake.setIntakeEncoder(0);
-        } else if (oldDistance < 50 && intake.getIntakeEncoderPosition() > 20) {
-            intake.setIntakeSpeed(Intake.MOVE_TO_CONVEYOR);
-        } else {
-            intake.setIntakeSpeed(Intake.ACTUAL_SPEED);
         }
         if (lastState != thisState) {
             lastState = thisState;
@@ -152,7 +148,7 @@ public class FullAutoIntakeDrive extends CommandBase {
             }
             //drivetrain.stop();
         }
-    }
+        }   
 
     @Override
     public void end(boolean interrupted) {

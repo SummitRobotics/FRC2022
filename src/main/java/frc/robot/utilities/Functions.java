@@ -137,18 +137,17 @@ public class Functions {
      * @return the median value
      */
 
-    public static double medianWithoutExtraneous (List<Double> toBeAveraged){
+    public static double medianWithoutExtraneous (ArrayList<Double> toBeAveraged){
         Collections.sort(toBeAveraged);
         double mean = 0;
         for (double i : toBeAveraged) {
             mean += i;
         }
         mean /= 3;
-        for (double i : toBeAveraged) {
-            if (Math.abs((mean - i) / i) > .2) {
-                toBeAveraged.remove(i);
-            }
-        }
+        final double asfasd = mean;
+
+        toBeAveraged.removeIf(e -> (e != 0 && Math.abs((asfasd - e) / e) > .2));
+        if (toBeAveraged.size() == 0) return 0;
         return toBeAveraged.get((int) (toBeAveraged.size() / 2));
     }
 }

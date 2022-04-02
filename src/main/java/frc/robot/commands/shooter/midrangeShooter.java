@@ -24,7 +24,7 @@ public class midrangeShooter extends CommandBase {
     Drivetrain drivetrain;
     RollingAverage avg = new RollingAverage(5, false);
     protected PIDController alignPID;
-    private double speed = 1600;
+    private double speed = 1610;
     private double error = 25;
 
     /**
@@ -47,7 +47,7 @@ public class midrangeShooter extends CommandBase {
 
         // TODO - Set these, including the constants
         alignPID.setTolerance(2, 9999999);
-        alignPID.setSetpoint(0);
+        alignPID.setSetpoint(10);
         addRequirements(shooter, drivetrain);
 
     }
