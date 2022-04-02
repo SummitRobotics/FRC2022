@@ -2,7 +2,6 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.intake.LowerIntake;
 import frc.robot.commands.intake.RaiseIntake;
@@ -13,8 +12,8 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
-public class TwoBallAuto extends AutoCommand {
-    public TwoBallAuto(Drivetrain drivetrain, Intake intake, Shooter shooter, Conveyor conveyor, Lemonlight limelight) {
+public class AutoTest extends AutoCommand {
+    public AutoTest(Drivetrain drivetrain, Intake intake, Shooter shooter, Conveyor conveyor, Lemonlight limelight) {
         super(drivetrain, new Pose2d(6.1, 5.26, new Rotation2d(-1.147, 0.945)));
 
         addCommands(
@@ -29,10 +28,7 @@ public class TwoBallAuto extends AutoCommand {
                 new RaiseIntake(intake),
                 // Rotate toward Hub
                 rotateTo(new Rotation2d(3.081, -1.946))
-            ),
-
-            // Shoot the balls.
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight)
+            )
         );
     }
 }

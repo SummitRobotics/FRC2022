@@ -16,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.autonomous.AutoTest;
+import frc.robot.commands.autonomous.FourBallAuto;
+import frc.robot.commands.autonomous.TwoBallAuto;
 import frc.robot.commands.climb.ClimbAutomation;
 import frc.robot.commands.climb.ClimbMO;
 import frc.robot.commands.climb.ClimbManual;
@@ -94,7 +97,6 @@ public class RobotContainer {
     private Supplier<Command> fullAutoIntake;
     private final Command teleInit;
     private final Command autoInit;
-    private Command auto;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -305,7 +307,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An ExampleCommand will run in autonomous
-        return auto;
+        return new AutoTest(drivetrain, intake, shooter, conveyor, targetingLimelight);
+        // return new FourBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight);
+        // return new TwoBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight);
     }
 }
