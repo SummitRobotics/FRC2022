@@ -19,18 +19,14 @@ public class TwoBallAuto extends AutoCommand {
         super(drivetrain, new Pose2d(6.1, 5.26, new Rotation2d(-1.147, 0.945)));
 
         addCommands(
-            // Pick up ball.
-            new ParallelCommandGroup(
-                new LowerIntake(intake),
-                moveTo(new Pose2d(5.2, 6, new Rotation2d(-0.776, 0.529)))
-            ),
+            new LowerIntake(intake),
 
-            new ParallelCommandGroup(
-                // Raise the Intake
-                new RaiseIntake(intake),
-                // Rotate toward Hub
-                new TurnByEncoderAbsolute(new Rotation2d(3.081, -1.946), drivetrain)
-            ),
+            // Move to ball 2
+            moveTo(new Pose2d(5.2, 6, new Rotation2d(-0.776, 0.529))),
+            new RaiseIntake(intake),
+
+            // Rotate toward hub
+            rotateTo(new Rotation2d(3.081, -1.946)),
 
             // Shoot the balls.
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight)

@@ -22,28 +22,24 @@ public class FourBallAuto extends AutoCommand {
         super(drivetrain, new Pose2d(7.583, 1.741, new Rotation2d(0.045, -1.417)));
 
         addCommands(
-            // Pick up ball one.
-            new ParallelCommandGroup(
-                new LowerIntake(intake),
-                moveTo(new Pose2d(7.617, 0.414, new Rotation2d(0, -0.405)))),
+            // Move to ball 2
+            new LowerIntake(intake),
+            moveTo(new Pose2d(7.617, 0.414, new Rotation2d(0, -0.405))),
 
-            new ParallelCommandGroup(
-                new RaiseIntake(intake),
-                new TurnByEncoderAbsolute(new Rotation2d(0.664, 3.801), drivetrain)),
+            // Rotate toward hub
+            new RaiseIntake(intake),
+            rotateTo(new Rotation2d(0.664, 3.801)),
 
             // Shoot the balls.
             new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight),
 
             // Drive to the 4th ball taking a path going through the third bal
-            new ParallelCommandGroup(
-                new LowerIntake(intake),
-                moveTo(new Pose2d(1.342, 1.213, new Rotation2d(-0.843, -0.259)), List.of(new Translation2d(5.075, 1.854)))
-            ),
+            new LowerIntake(intake),
+            moveTo(new Pose2d(1.342, 1.213, new Rotation2d(-0.843, -0.259)), List.of(new Translation2d(5.075, 1.854))),
 
             // Raise intake and rotate for final move
-            new ParallelCommandGroup(
-                new RaiseIntake(intake),
-                new TurnByEncoderAbsolute(new Rotation2d(0.956, -0.124), drivetrain)),
+            new RaiseIntake(intake),
+            rotateTo(new Rotation2d(0.956, -0.124)),
 
             // Drive to shooting position
             moveTo(new Pose2d(5.919, 1.662, new Rotation2d(2.564, 2.598))),

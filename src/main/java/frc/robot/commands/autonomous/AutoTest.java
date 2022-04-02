@@ -18,17 +18,14 @@ public class AutoTest extends AutoCommand {
 
         addCommands(
             // Pick up ball.
-            new ParallelCommandGroup(
-                new LowerIntake(intake),
-                moveTo(new Pose2d(7.1, 5.26, Rotation2d.fromDegrees(0)))
-            ),
+            new LowerIntake(intake),
+            moveTo(new Pose2d(7.1, 5.26, Rotation2d.fromDegrees(0))),
 
-            new ParallelCommandGroup(
-                // Raise the Intake
-                new RaiseIntake(intake),
-                // Rotate toward Hub
-                new TurnByEncoderAbsolute(new Rotation2d(3.081, -1.946), drivetrain)
-            )
+            // Raise the Intake
+            new RaiseIntake(intake),
+            
+            // Rotate toward Hub
+            rotateTo(new Rotation2d(3.081, -1.946))
         );
     }
 }

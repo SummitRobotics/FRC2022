@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drivetrain.FollowDynamicTrajectoryThreaded;
 import frc.robot.commands.drivetrain.FollowTrajectoryThreaded;
 import frc.robot.commands.drivetrain.TurnByEncoder;
+import frc.robot.commands.drivetrain.TurnByEncoderAbsolute;
 import frc.robot.subsystems.Drivetrain;
 import java.util.List;
 import java.util.function.Supplier;
@@ -52,5 +53,9 @@ public abstract class AutoCommand extends SequentialCommandGroup {
 
     private Command moveTo(Supplier<Pose2d> start, Supplier<Pose2d> end, Supplier<List<Translation2d>> midpoints) {
         return new FollowDynamicTrajectoryThreaded(start, end, midpoints, config, drivetrain);
+    }
+
+    protected Command rotateTo(Rotation2d direction) {
+        return new TurnByEncoderAbsolute(direction, drivetrain);
     }
 }
