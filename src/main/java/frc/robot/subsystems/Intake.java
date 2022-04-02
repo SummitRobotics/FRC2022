@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase implements Testable {
 
     public static final double
             INTAKE_RATE = 0.5,
-            INTAKE_MOTOR_SPEED = 0.25, 
+            INTAKE_MOTOR_SPEED = 0.5, 
             MAX_RPM = 8000, 
             ACTUAL_SPEED = MAX_RPM / 2;
 
