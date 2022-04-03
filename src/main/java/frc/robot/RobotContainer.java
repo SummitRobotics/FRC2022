@@ -246,11 +246,17 @@ public class RobotContainer {
 
         launchpad.buttonA.whenHeld(climbSemiAuto);
         launchpad.buttonA.commandBind(climbSemiAuto);
-        launchpad.buttonE.whileHeld(homeArms.get());
-        Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
-                joystick.axisY, arcadeDrive);
+
+        launchpad.buttonE.commandBind(homeArms.get(), launchpad.buttonE::whenHeld);
+
+
+        // Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
+        //         joystick.axisY, arcadeDrive);
+
+        Command sas = new FullAutoShooterNew(drivetrain, shooter, conveyor, targetingLimelight);
         launchpad.buttonH.whileHeld(sas);
         launchpad.buttonH.commandBind(sas);
+
         ClimbAutomationBetter2 climbAutomationBetter2 = new ClimbAutomationBetter2(drivetrain, climb);
 
         
