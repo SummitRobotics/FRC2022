@@ -176,7 +176,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         // }
 
         if (movePID.atSetpoint()) {
-            alignPID.setSetpoint(Math.toDegrees(Math.atan((12/limelightDistanceEstimate))));
+            alignPID.setSetpoint(Math.toDegrees(Math.atan((12 / limelightDistanceEstimate))));
             properlyAligned = true;
         } else if (!properlyAligned) {
             alignPID.setSetpoint(0);
@@ -196,7 +196,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         if (Functions.isWithin(horizontalOffset, alignPID.getSetpoint(), OK_TO_MOVE_OFSET)) {
             //records current distance to be heald with pid, clamped to the max and min range of the shooter
             if (!hasRecordedLimelightDistance) {
-                movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
+                movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE - 5, MIN_SHOOTER_RANGE));
                 hasRecordedLimelightDistance = true;
                 
             }
@@ -212,7 +212,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         //sets drivetrain powers
         drivetrain.setLeftMotorPower(leftPower);
         drivetrain.setRightMotorPower(rightPower);
-        System.out.println("Is aligned " + alignPID.atSetpoint() + " is arrived " + movePID.atSetpoint() );
+        System.out.println("Is aligned " + alignPID.atSetpoint() + " is arrived " + movePID.atSetpoint());
         return alignPID.atSetpoint() && movePID.atSetpoint() && properlyAligned;
     }
 
