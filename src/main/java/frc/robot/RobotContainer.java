@@ -332,6 +332,10 @@ public class RobotContainer {
                             "robot in auto",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
+            new InstantCommand(() -> {
+                gyro.calibrate();
+                drivetrain.setPose(new Pose2d());
+            }),
             new InstantCommand(drivetrain::highGear),
             new InstantCommand(drivetrain::zeroDistance),
             homeArms.get(),
