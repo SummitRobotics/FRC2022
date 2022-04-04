@@ -75,7 +75,6 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         } else if (prioritizedAlignButton.get()) {
             x = super.driveAndAlign(drivetrain, limelight.getHorizontalOffset(), true, super.IDEAL_SHOOTING_DISTANCE);
         } else {
-            drivetrain.stop();
             x = true;
         }
         return x;

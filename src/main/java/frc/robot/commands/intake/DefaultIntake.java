@@ -44,10 +44,11 @@ public class DefaultIntake extends CommandBase {
     public void execute() {
         switch (intake.getState()) {
             case DOWN:
-                // if (conveyor.getBeltState() != ConveyorState.NONE && conveyor.getIndexState() != ConveyorState.NONE) {
-                //     intake.stop();
-                //     CommandScheduler.getInstance().schedule(new RaiseIntake(intake));
-                // } else {
+                if (conveyor.getBeltState() != ConveyorState.NONE && conveyor.getIndexState() != ConveyorState.NONE) {
+                    intake.stop();
+                    CommandScheduler.getInstance().schedule(new RaiseIntake(intake));
+                } 
+                //else {
                 //     double robotVelocity = Math.sqrt(gyro.getVelocityX() * gyro.getVelocityX()
                 //         + gyro.getVelocityY() * gyro.getVelocityY());
                 //     intake.setIntakeSpeed(calculatePower(robotVelocity));
