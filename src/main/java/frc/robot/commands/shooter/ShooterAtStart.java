@@ -1,7 +1,5 @@
 package frc.robot.commands.shooter;
 
-import java.sql.RowId;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Shooter;

@@ -7,6 +7,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
+import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
@@ -58,6 +59,7 @@ public class FullAutoShooterNew extends CommandBase {
     public void initialize() {
         alignPid.reset();
         movePid.reset();
+        lemonlight.setLEDMode(LEDModes.FORCE_ON);
     }
 
     @Override
@@ -172,6 +174,7 @@ public class FullAutoShooterNew extends CommandBase {
         drivetrain.stop();
         shooter.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
+        lemonlight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override

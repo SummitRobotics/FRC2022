@@ -106,7 +106,7 @@ public class Lemonlight implements Sendable {
      * @param mode the LED mode to switch to
      */
     public void setLEDMode(LEDModes mode) {
-        //ledMode.setDouble(mode.value);
+        ledMode.setDouble(mode.value);
     }
 
     /**

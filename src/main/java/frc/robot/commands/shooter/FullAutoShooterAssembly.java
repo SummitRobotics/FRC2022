@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
+import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
@@ -279,6 +280,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         alignPID.reset();
         movePID.reset();
         hasRecordedLimelightDistance = false;
+        limelight.setLEDMode(LEDModes.FORCE_ON);
     }
     
     @Override
@@ -342,6 +344,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         drivetrain.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
         hasRecordedLimelightDistance = false;
+        limelight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     /**

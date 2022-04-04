@@ -2,6 +2,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.devices.Lemonlight;
+import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Conveyor;
@@ -101,6 +102,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         prioritizedControlAxis = controlAxis.prioritize(axisPriority);
         prioritizedFarButton = farButton.prioritize(axisPriority);
         prioritizedCloseButton = closeButton.prioritize(axisPriority);
+        limelight.setLEDMode(LEDModes.FORCE_ON);
     }
 
     @Override
@@ -116,6 +118,7 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
         prioritizedShootButton.destroy();
         prioritizedControlAxis.destroy();
+        limelight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override
