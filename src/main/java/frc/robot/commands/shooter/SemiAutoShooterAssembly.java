@@ -1,5 +1,6 @@
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.devices.Lemonlight;
 import frc.robot.oi.inputs.OIAxis;
@@ -17,7 +18,11 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
 
     // OI
     private OIButton shootButton;
+    private OIButton driveButton;
+    private OIButton alignButton;
     private OIButton.PrioritizedButton prioritizedShootButton;
+    private OIButton.PrioritizedButton prioritizedDriveButton;
+    private OIButton.PrioritizedButton prioritizedAlignButton;
     private OIAxis controlAxis;
     private OIAxis.PrioritizedAxis prioritizedControlAxis;
     private final int axisPriority = AxisPriorities.MANUAL_OVERRIDE;
@@ -39,13 +44,17 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         Drivetrain drivetrain,
         Lemonlight limelight,
         OIButton shootButton,
-        OIAxis controlAxis, 
+        OIAxis controlAxis,
+        OIButton alignButton,
+        OIButton driveButton, 
         Command arcadeDrive) {
 
         super(shooter, conveyor, drivetrain, limelight);
         this.shootButton = shootButton;
         this.controlAxis = controlAxis;
         this.arcadeDrive = arcadeDrive;
+        this.alignButton = alignButton;
+        this.driveButton = driveButton;
 
         addRequirements(shooter, drivetrain);
     }
@@ -55,6 +64,23 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         arcadeDrive.execute();
     }
 
+    @Override
+    public boolean driveAndAlign(Drivetrain drivetrain,
+        double horizontalOffset,
+        boolean isAccurate,
+        double limelightDistanceEstimate) {
+        boolean x;
+        if (prioritizedDriveButton.get()) {
+            x = super.driveAndAlign(drivetrain, limelight.getHorizontalOffset(), true, limelight.getLimelightDistanceEstimateIN(limelight.MAIN_MOUNT_HEIGHT, limelight.MAIN_MOUNT_ANGLE, limelight.MAIN_TARGET_HEIGHT, limelight.getVerticalOffset()));
+        } else if (prioritizedAlignButton.get()) {
+            x = super.driveAndAlign(drivetrain, limelight.getHorizontalOffset(), true, super.IDEAL_SHOOTING_DISTANCE);
+        } else {
+            drivetrain.stop();
+            x = true;
+        }
+        return x;
+    }
+    
     @Override
     public void fire(Shooter shooter) {
         //System.out.println(prioritizedShootButton.get());
@@ -72,11 +98,14 @@ public class SemiAutoShooterAssembly extends FullAutoShooterAssembly {
         
         prioritizedShootButton = shootButton.prioritize(axisPriority);
         prioritizedControlAxis = controlAxis.prioritize(axisPriority);
+        prioritizedAlignButton = alignButton.prioritize(axisPriority);
+        prioritizedDriveButton = alignButton.prioritize(axisPriority);
     }
 
     @Override
     public void execute() {
         super.execute();
+        driveAndAlign(drivetrain, 0, true, 0);
         fire(shooter);
     }
 

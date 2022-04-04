@@ -250,8 +250,9 @@ public class RobotContainer {
         launchpad.buttonE.commandBind(homeArms.get(), launchpad.buttonE::whenHeld);
 
 
-        // Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
-        //         joystick.axisY, arcadeDrive);
+        Command semiAutoShooter = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY, joystick.button3, 
+            joystick.button4, arcadeDrive);
+        launchpad.buttonG.commandBind(semiAutoShooter, launchpad.buttonG::whileHeld);
 
         Command sas = new FullAutoShooterNew(drivetrain, shooter, conveyor, targetingLimelight);
         launchpad.buttonH.whileHeld(sas);
