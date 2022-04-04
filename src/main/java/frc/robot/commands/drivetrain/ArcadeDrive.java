@@ -7,7 +7,6 @@
 
 package frc.robot.commands.drivetrain;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
@@ -166,13 +165,13 @@ public class ArcadeDrive extends CommandBase {
 
         double limiterTurn = turnLimiter.getRateLimitedValue(turn);
 
-        if (intake.getState() == Intake.States.DOWN){
+        if (intake.getState() == Intake.States.DOWN) {
             turn = limiterTurn;
         }
 
         if (activateSwitchfoot) {
             //dumb stuff is dumb
-            if(!ledsOn){
+            if (!ledsOn) {
                 LEDs.getInstance().addCall("reversed", new LEDCall(LEDPriorities.DRIVE_REV, LEDRange.Aarms).ffh(Colors.YELLOW, Colors.OFF));   
             }
             turn = -turn;
@@ -187,8 +186,7 @@ public class ArcadeDrive extends CommandBase {
             activateSwitchfoot = !activateSwitchfoot;
             if (activateSwitchfoot) {
                 LEDs.getInstance().addCall("reversed", new LEDCall(LEDPriorities.DRIVE_REV, LEDRange.Aarms).ffh(Colors.YELLOW, Colors.OFF));  
-            }
-            else{
+            } else {
                 LEDs.getInstance().removeCall("reversed");
             }
         }

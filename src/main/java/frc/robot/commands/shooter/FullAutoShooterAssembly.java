@@ -1,16 +1,12 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
@@ -117,19 +113,19 @@ public class FullAutoShooterAssembly extends CommandBase {
         if (hoodPos) {
             System.out.println("reg far");
             return
-                (-0.00330099 * distance * distance * distance) +
-                (1.44904 * distance * distance) +
-                (-205.058 * distance) +
-                11204.6;
+                (-0.00330099 * distance * distance * distance)
+                + (1.44904 * distance * distance)
+                + (-205.058 * distance)
+                + 11204.6;
         } else {
             System.out.println("reg close");
             return 
-                (-0.00000243868 * distance * distance * distance * distance * distance) +
-                (0.000923236 * distance * distance * distance * distance) +
-                (-0.131588 * distance * distance * distance) +
-                (8.76388 * distance * distance) +
-                (-266.098 * distance) +
-                4428.38;
+                (-0.00000243868 * distance * distance * distance * distance * distance)
+                + (0.000923236 * distance * distance * distance * distance)
+                + (-0.131588 * distance * distance * distance)
+                + (8.76388 * distance * distance)
+                + (-266.098 * distance)
+                + 4428.38;
         }
     }
 

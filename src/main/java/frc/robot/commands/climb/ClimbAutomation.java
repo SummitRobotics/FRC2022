@@ -5,7 +5,6 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -16,7 +15,6 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
-import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.PIDValues;
 import frc.robot.utilities.lists.Ports;

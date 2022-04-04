@@ -6,7 +6,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.utilities.CustomVisionData;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,14 +187,16 @@ public class Lemonlight implements Sendable {
     ) {
         return targetDistance * Math.tan((targetAngle + mountAngle) * (Math.PI / 180)) * 0.393701;
     }
+
     /**
-     * Gets angles and ball colors supplied in an arraylist of double arrays
+     * Gets angles and ball colors supplied in an arraylist of double arrays.
+     *
      * @return array list with double arrays, each element is for each ball
      *      element 1 of double array is for ball color; red = 0 & blue = 1
      *      element 2 of double array is horizontal offset
      *      element 3 of double array is vertical offset
      */
-    public ArrayList<double[]> getCustomVisionDataReadable(){
+    public ArrayList<double[]> getCustomVisionDataReadable() {
         ArrayList<double[]> mainList = new ArrayList<double[]>();
         for (Number numbers : getCustomVisionDataNumbers()) {
             double data = numbers.doubleValue();
@@ -247,8 +248,10 @@ public class Lemonlight implements Sendable {
         }
         return angle;
     }
+
     /**
-     * checks to see if ball number given by data is legitimate
+     * checks to see if ball number given by data is legitimate.
+     *
      * @param number number given by custom vision code
      * @return whether or not ball exists, used to check before doing processing
      */
@@ -263,9 +266,10 @@ public class Lemonlight implements Sendable {
      * @return if ball is blue
      */
 
-    public boolean isBlue(double number){
+    public boolean isBlue(double number) {
         return String.valueOf(number).startsWith("2");
     }
+
     /**
      * Returns the custom vision data output by the limelight when in python mode.
      * In the limelight you output to the array labeled llpython.
@@ -354,8 +358,7 @@ public class Lemonlight implements Sendable {
         if (forBall) {
             builder.addDoubleArrayProperty(
                     "customDataArray", this::getCustomVisionDataForTelemetry, null);
-        }
-        else{
+        } else {
             builder.addDoubleProperty("distance Estimate", () -> {
                 return Lemonlight.getLimelightDistanceEstimateIN(MAIN_MOUNT_HEIGHT, MAIN_MOUNT_ANGLE, MAIN_TARGET_HEIGHT, this.getVerticalOffset());
             }, null);

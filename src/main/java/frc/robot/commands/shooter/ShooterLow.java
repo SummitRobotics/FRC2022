@@ -1,7 +1,5 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.oi.inputs.LEDButton;
 import frc.robot.oi.inputs.OIAxis;
@@ -25,7 +23,7 @@ public class ShooterLow extends CommandBase {
     OIButton.PrioritizedButton prioritizedControlButton;
 
     SimpleButton prioritizedSimpleControlButton;
-    private final double LOW_GOAL_SPEED = 1000;
+    private static final double LOW_GOAL_SPEED = 1000;
     private final double error = 70;
     OIButton shootButton;
     OIButton.PrioritizedButton prioritizedShootButton;
@@ -61,8 +59,7 @@ public class ShooterLow extends CommandBase {
 
         if (prioritizedShootButton.get() && Functions.isWithin(shooter.getShooterRPM(), LOW_GOAL_SPEED, error)) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
-        } 
-        else{
+        } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
         shooter.setMotorTargetSpeed(LOW_GOAL_SPEED);

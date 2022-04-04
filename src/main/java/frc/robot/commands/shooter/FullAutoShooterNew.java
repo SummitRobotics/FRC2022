@@ -5,7 +5,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
@@ -67,10 +66,10 @@ public class FullAutoShooterNew extends CommandBase {
             noTarget();
         } else {
             double lld  = Lemonlight.getLimelightDistanceEstimateIN(
-            Lemonlight.MAIN_MOUNT_HEIGHT,
-            Lemonlight.MAIN_MOUNT_ANGLE,
-            Lemonlight.MAIN_TARGET_HEIGHT,
-            lemonlight.getVerticalOffset());
+                Lemonlight.MAIN_MOUNT_HEIGHT,
+                Lemonlight.MAIN_MOUNT_ANGLE,
+                Lemonlight.MAIN_TARGET_HEIGHT,
+                lemonlight.getVerticalOffset());
 
             shooter.setHoodPos(lld > hoodDistCutoff);
 
@@ -118,23 +117,23 @@ public class FullAutoShooterNew extends CommandBase {
         if (hoodPos) {
             //System.out.println("reg down");
             return
-                (-0.00330099 * distance * distance * distance) +
-                (1.44904 * distance * distance) +
-                (-205.058 * distance) +
-                11204.6;
+                (-0.00330099 * distance * distance * distance)
+                + (1.44904 * distance * distance)
+                + (-205.058 * distance)
+                + 11204.6;
         } else {
             //System.out.println("reg up");
             return 
-                (-0.00000243868 * distance * distance * distance * distance * distance) +
-                (0.000923236 * distance * distance * distance * distance) +
-                (-0.131588 * distance * distance * distance) +
-                (8.76388 * distance * distance) +
-                (-266.098 * distance) +
-                4428.38;
+                (-0.00000243868 * distance * distance * distance * distance * distance)
+                + (0.000923236 * distance * distance * distance * distance)
+                + (-0.131588 * distance * distance * distance)
+                + (8.76388 * distance * distance)
+                + (-266.098 * distance)
+                + 4428.38;
         }
     }
 
-    private boolean alignAndDrive(double lld){
+    private boolean alignAndDrive(double lld) {
         double ofset = lemonlight.getHorizontalOffset();
 
         double leftPower = 0;
@@ -142,14 +141,14 @@ public class FullAutoShooterNew extends CommandBase {
 
         movePid.setSetpoint(Functions.findClosestPoint(lld, waypoints));
 
-        if(movePid.atSetpoint()){
+        if (movePid.atSetpoint()) {
             //math to keep offset from target center constant ad dist changes
             alignPid.setSetpoint(Math.toDegrees(Math.atan(alignOffset / lld)));
         } else {
             alignPid.setSetpoint(0);
         }
 
-        if(Functions.isWithin(ofset, 0, okToMoveError)){
+        if (Functions.isWithin(ofset, 0, okToMoveError)) {
             double power = movePid.calculate(lld);
             leftPower -= power;
             rightPower -= power;

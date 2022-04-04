@@ -1,7 +1,5 @@
 package frc.robot.devices;
 
-import java.time.Period;
-
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PowerDistribution;

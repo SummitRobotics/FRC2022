@@ -18,7 +18,6 @@ import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Subsystem for the Climb Subsystem.
