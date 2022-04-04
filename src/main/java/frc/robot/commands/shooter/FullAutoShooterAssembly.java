@@ -166,15 +166,9 @@ public class FullAutoShooterAssembly extends CommandBase {
     public boolean driveAndAlign(Drivetrain drivetrain,
         double horizontalOffset,
         boolean isAccurate,
-        double limelightDistanceEstimate) {
+        double limelightDistanceEstimate,
+        double setpoint) {
         //sets if align target based on ball color
-        // if (isAccurate) {
-        //     alignPID.setSetpoint(0);
-        // } else {
-        //     //alignPID.setSetpoint(0);
-        //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        // }
-
         if (movePID.atSetpoint()) {
             alignPID.setSetpoint(Math.toDegrees(Math.atan((12 / limelightDistanceEstimate))));
             properlyAligned = true;
@@ -200,7 +194,12 @@ public class FullAutoShooterAssembly extends CommandBase {
                 hasRecordedLimelightDistance = true;
                 
             }
-
+            if (!isAccurate) {
+                movePID.setSetpoint(0);
+            } else {
+                //alignPID.setSetpoint(0);
+                movePID.setSetpoint(setpoint);
+            }    
             double movePower = movePID.calculate(limelightDistanceEstimate);
             leftPower -= movePower;
             rightPower -= movePower;
@@ -305,7 +304,8 @@ public class FullAutoShooterAssembly extends CommandBase {
             isDrivenAndAligned = driveAndAlign(drivetrain,
                 smoothedHorizontalOffset,
                 true,
-                limelightDistanceEstimate);
+                limelightDistanceEstimate,
+                0);
             if (isHoodSet) {
                 isSpooled = spool(shooter, limelightDistanceEstimate,
                 currentMotorSpeed, hoodPos, isDrivenAndAligned);
