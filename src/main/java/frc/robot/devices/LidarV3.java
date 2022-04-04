@@ -25,7 +25,7 @@ public class LidarV3 implements Lidar, Sendable {
     private Object valueLock = new Object();
     private Object loopLock = new Object();
     private Timer loopTimer = new Timer();
-    private double measuredLoopTime = 0;
+    private double measuredLoopTime = 100;
     private short value;
     private Notifier thread;
 
