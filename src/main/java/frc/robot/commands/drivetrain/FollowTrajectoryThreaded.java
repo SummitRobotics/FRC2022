@@ -59,6 +59,8 @@ public class FollowTrajectoryThreaded extends CommandBase {
     public void initialize() {
         splineLEDs.activate();
 
+        drivetrain.getFieldWidget().getObject("trajectory").setTrajectory(trajectory);
+
         RamseteCommand ramseteCommand =
                 new RamseteCommand(
                         trajectory,

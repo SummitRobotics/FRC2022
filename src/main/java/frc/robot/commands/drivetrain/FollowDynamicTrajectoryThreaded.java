@@ -19,7 +19,6 @@ import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -31,22 +30,24 @@ import java.util.function.Supplier;
 public class FollowDynamicTrajectoryThreaded extends CommandBase {
 
     private final Drivetrain drivetrain;
-    private final Supplier<Pose2d> startingPosSupplier;
-    private final Supplier<List<Translation2d>> midpointsSupplier;
-    private final Supplier<Pose2d> endPosSupplier;
-    private final TrajectoryConfig config;
     private CommandThreader commandThreader;
     private final int period;
+
+    private final Supplier<Trajectory> generateTrajectory;
 
     private final LEDCall splineLEDs = new LEDCall(LEDPriorities.SPLINES, LEDRange.All)
         .sine(Colors.PURPLE);
 
     /**
-     * command to follow a trajectory object.
+     * Command to follow a trajectory object with a dynamic starting, midpoint and end pos.
      * The trajectory has been saved to the roborio with threading to make
      * it more precise
      *
      * @param drivetrain drivetrain to control
+     * @param startingPos A supplier for the starting pos of the robot
+     * @param midpoints A supplier for the midpoints for the trajectory
+     * @param endingPos A supplier for the ending pos of the robot
+     * @param config The trajectory config
      */
     public FollowDynamicTrajectoryThreaded(
         Supplier<Pose2d> startingPos,
@@ -58,12 +59,35 @@ public class FollowDynamicTrajectoryThreaded extends CommandBase {
         super();
 
         this.drivetrain = drivetrain;
-        this.midpointsSupplier = midpoints;
-        this.startingPosSupplier = startingPos;
-        this.endPosSupplier = endingPos;
-        this.config = config;
-
         this.period = 5;
+
+        generateTrajectory = () ->
+            TrajectoryGenerator.generateTrajectory(startingPos.get(), midpoints.get(), endingPos.get(), config);
+
+        addRequirements(drivetrain);
+    }
+
+    /**
+     * Command to follow a trajectory object with dynamic waypoints.
+     * The trajectory has been saved to the roborio with threading to make
+     * it more precise.
+     *
+     * @param waypoints A supplier of the waypoints for the trajectory
+     * @param config The trajectory config
+     * @param drivetrain The drivetrain subsystem
+     */
+
+    public FollowDynamicTrajectoryThreaded(
+        Supplier<List<Pose2d>> waypoints,
+        TrajectoryConfig config,
+        Drivetrain drivetrain
+    ) {
+        super();
+
+        this.drivetrain = drivetrain;
+        this.period = 5;
+
+        generateTrajectory = () -> TrajectoryGenerator.generateTrajectory(waypoints.get(), config);
 
         addRequirements(drivetrain);
     }
@@ -71,7 +95,9 @@ public class FollowDynamicTrajectoryThreaded extends CommandBase {
     @Override
     public void initialize() {
         splineLEDs.activate();
-        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(startingPosSupplier.get(), midpointsSupplier.get(), endPosSupplier.get(), config);
+        Trajectory trajectory = generateTrajectory.get();
+
+        drivetrain.getFieldWidget().getObject("trajectory").setTrajectory(trajectory);
 
         RamseteCommand ramseteCommand =
             new RamseteCommand(
@@ -83,7 +109,7 @@ public class FollowDynamicTrajectoryThreaded extends CommandBase {
                 drivetrain::setMotorTargetSpeed,
                 drivetrain);
 
-        drivetrain.setPose(trajectory.getInitialPose());
+        //drivetrain.setPose(trajectory.getInitialPose());
 
         // Wraps the command, so we can update odometry every cycle.
         Runnable onExecute =

@@ -3,17 +3,14 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.commands.DriveToHub;
 import frc.robot.commands.WaitUntilConveyor;
-import frc.robot.commands.autonomous.AutoTest;
 import frc.robot.commands.autonomous.FourBallAuto;
-import frc.robot.commands.autonomous.TwoBallAuto;
+import frc.robot.commands.autonomous.FourBallAutoForward;
 import frc.robot.commands.climb.*;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
@@ -396,7 +393,7 @@ public class RobotContainer {
             new DriveByTime(drivetrain, .8, .3),         
             new ShooterAtStart(shooter, conveyor, 1100),
             new EncoderDrive(-2.4, -2.4, drivetrain),            
-            new TurnByEncoderAbsolute(0, drivetrain),
+            new TurnByEncoderAbsolute(Rotation2d.fromDegrees(0), drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);
@@ -467,8 +464,7 @@ public class RobotContainer {
             new PrintCommand("auto done"));
         ShuffleboardDriver.autoChooser.addOption("4 high", twoBallAutoHighDLC);
 
-        ShuffleboardDriver.autoChooser.addOption("Spline Test", new AutoTest(drivetrain, intake, shooter, conveyor, targetingLimelight));
-        ShuffleboardDriver.autoChooser.addOption("Spline 2 Ball", new TwoBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
+        ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball - Forward Only", new FourBallAutoForward(drivetrain, intake, shooter, conveyor, targetingLimelight));
         ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball", new FourBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
     }
     

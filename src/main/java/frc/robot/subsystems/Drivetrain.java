@@ -58,8 +58,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
         WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858,
-        SPLINE_MAX_VEL_MPS_HIGH = 3,
-        SPLINE_MAX_ACC_MPSSQ_HIGH = 3,
+        SPLINE_MAX_VEL_MPS_HIGH = 3, // MAX:
+        SPLINE_MAX_ACC_MPSSQ_HIGH = 3, // MAX :
         NO_FAULT_CODE = 0;
 
 
@@ -786,10 +786,16 @@ public class Drivetrain extends SubsystemBase implements Testable {
         }
     }
 
-    public TrajectoryConfig getTrajectoryConfigHighGear() {
-        return new TrajectoryConfig(SPLINE_MAX_VEL_MPS_HIGH, SPLINE_MAX_ACC_MPSSQ_HIGH).
-            setKinematics(DriveKinimatics).
-            addConstraint(HighVoltageConstraint);
+    /**
+     * Returns the trajectory config for High Gear.
+     */
+    public TrajectoryConfig generateTrajectoryConfigHighGear() {
+        return new TrajectoryConfig(SPLINE_MAX_VEL_MPS_HIGH, SPLINE_MAX_ACC_MPSSQ_HIGH)
+            .setKinematics(DriveKinimatics).addConstraint(HighVoltageConstraint);
+    }
+
+    public Field2d getFieldWidget() {
+        return f2d;
     }
 
     //TODO run a check so we dont update at a unnessaryly fast rate
