@@ -74,7 +74,7 @@ public class ColorSensor implements Sendable {
 
         measuredProximity = 0;
         measuredColor = new Color(0, 0, 0);
-        measuredLoopTime = 0;
+        measuredLoopTime = 100;
         loopTimer = new Timer();
         thread.startPeriodic(0.02);
     }

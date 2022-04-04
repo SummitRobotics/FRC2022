@@ -34,7 +34,7 @@ public class LidarV4 implements Lidar, Sendable {
     public LidarV4(int id) {
         portI2C = new I2C(Port.kMXP, id);
         value = 0;
-        measuredLoopTime = 0;
+        measuredLoopTime = 100;
 
         rollingAverage = new RollingAverage(5, true);
 
