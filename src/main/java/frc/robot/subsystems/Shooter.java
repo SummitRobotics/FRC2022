@@ -279,7 +279,7 @@ public class Shooter extends SubsystemBase implements Testable {
 
     @Override
     public double getMotorTestSpeed() {
-        return 0.05;
+        return 0.15;
     }
 
     @Override

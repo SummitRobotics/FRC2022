@@ -1,15 +1,11 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.commands.DriveToHub;
 import frc.robot.commands.WaitUntilConveyor;
 import frc.robot.commands.climb.*;
 import frc.robot.commands.conveyor.ConveyorAutomation;
@@ -246,11 +242,18 @@ public class RobotContainer {
 
         launchpad.buttonA.whenHeld(climbSemiAuto);
         launchpad.buttonA.commandBind(climbSemiAuto);
-        launchpad.buttonE.whileHeld(homeArms.get());
-        Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
-                joystick.axisY, arcadeDrive);
+
+        launchpad.buttonE.commandBind(homeArms.get(), launchpad.buttonE::whenHeld);
+
+
+        Command semiAutoShooter = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY, joystick.button3, 
+            joystick.button4, arcadeDrive);
+        launchpad.buttonG.commandBind(semiAutoShooter, launchpad.buttonG::whileHeld);
+
+        Command sas = new FullAutoShooterNew(drivetrain, shooter, conveyor, targetingLimelight);
         launchpad.buttonH.whileHeld(sas);
         launchpad.buttonH.commandBind(sas);
+
         ClimbAutomationBetter2 climbAutomationBetter2 = new ClimbAutomationBetter2(drivetrain, climb);
 
         
@@ -332,6 +335,10 @@ public class RobotContainer {
                             "robot in auto",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
+            new InstantCommand(() -> {
+                gyro.calibrate();
+                drivetrain.setPose(new Pose2d());
+            }),
             new InstantCommand(drivetrain::highGear),
             new InstantCommand(drivetrain::zeroDistance),
             homeArms.get(),
