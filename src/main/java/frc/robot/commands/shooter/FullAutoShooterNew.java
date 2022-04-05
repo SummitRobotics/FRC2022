@@ -30,7 +30,7 @@ public class FullAutoShooterNew extends CommandBase {
     private final double moveError = 3;
     private final double okToMoveError = 15;
     private final double alignError = 2;
-    private final double speedError = 40;
+    private final double speedError = 25;
     private final double okToSpoolError = 25;
 
     private final double alignOffset = 14;
@@ -59,7 +59,7 @@ public class FullAutoShooterNew extends CommandBase {
     public void initialize() {
         alignPid.reset();
         movePid.reset();
-        lemonlight.setLEDMode(LEDModes.FORCE_ON);
+        //lemonlight.setLEDMode(LEDModes.FORCE_ON);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class FullAutoShooterNew extends CommandBase {
                 (-0.00330099 * distance * distance * distance)
                 + (1.44904 * distance * distance)
                 + (-205.058 * distance)
-                + 11204.6;
+                + (11204.6 - 15);
         } else {
             //System.out.println("reg up");
             return 
@@ -145,7 +145,15 @@ public class FullAutoShooterNew extends CommandBase {
 
         if (movePid.atSetpoint()) {
             //math to keep offset from target center constant ad dist changes
-            alignPid.setSetpoint(Math.toDegrees(Math.atan(alignOffset / lld)));
+            if(shooter.getHoodPos()){
+                // Far
+                alignPid.setSetpoint(6);
+            }
+            else{
+                // Close
+                alignPid.setSetpoint(8);
+            }
+            
         } else {
             alignPid.setSetpoint(0);
         }
@@ -161,6 +169,9 @@ public class FullAutoShooterNew extends CommandBase {
         leftPower -= alignPower;
         rightPower += alignPower;
 
+        drivetrain.setRightMotorPower(rightPower);
+        drivetrain.setLeftMotorPower(leftPower);
+
         return movePid.atSetpoint() && alignPid.atSetpoint();      
     }
 
@@ -174,7 +185,7 @@ public class FullAutoShooterNew extends CommandBase {
         drivetrain.stop();
         shooter.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
-        lemonlight.setLEDMode(LEDModes.FORCE_OFF);
+        //lemonlight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override

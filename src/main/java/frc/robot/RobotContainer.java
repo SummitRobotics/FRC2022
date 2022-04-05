@@ -82,7 +82,7 @@ public class RobotContainer {
 
         gyro = new AHRS();
 
-        targetingLimelight = new Lemonlight("limelight-target", false, false);
+        targetingLimelight = new Lemonlight("gloworm", false, true);
         // TODO: need to ensure that this name is set on the limelight as well.
         ballDetectionLimelight = new Lemonlight("limelight-balls", true, false);
 

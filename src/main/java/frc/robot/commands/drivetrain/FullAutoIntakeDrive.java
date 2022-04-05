@@ -136,7 +136,7 @@ public class FullAutoIntakeDrive extends CommandBase {
 
             double alignPower = alignPID.calculate(horizontalOffset);
             oldDistance = limelightDistanceEstimate;
-            double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.5, -0.5);
+            double movePower = -Functions.clampDouble(movePID.calculate(limelightDistanceEstimate), 0.6, -0.6);
             drivetrain.setLeftMotorPower(movePower - alignPower);
             drivetrain.setRightMotorPower(movePower + alignPower);
             intake.setIntakeEncoder(0);
