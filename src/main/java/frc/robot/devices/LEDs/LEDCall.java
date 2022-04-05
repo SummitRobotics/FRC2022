@@ -200,6 +200,7 @@ public class LEDCall implements LEDHandler {
      * Creates a new LEDCall that displays pneumatics pressure levels.
      *
      * @param pcm The PCM device
+     * @param ascending Whether or not the LED number are in ascending order
      * @return the modified LEDCall
      */
     public LEDCall pressure(PCM pcm, boolean ascending) {
@@ -222,12 +223,12 @@ public class LEDCall implements LEDHandler {
 
                 if (ascending) {
                     return (minLED + (pressure * (maxLED - minLED)) >= led)
-                    ? new Color8Bit(Color.kGreen)
-                    : new Color8Bit(Color.kOrange);
+                        ? new Color8Bit(Color.kGreen)
+                        : new Color8Bit(Color.kOrange);
                 } else {
                     return (minLED + (pressure * (maxLED - minLED)) <= led)
-                    ? new Color8Bit(Color.kGreen)
-                    : new Color8Bit(Color.kOrange);
+                        ? new Color8Bit(Color.kGreen)
+                        : new Color8Bit(Color.kOrange);
                 }
             }
         };
