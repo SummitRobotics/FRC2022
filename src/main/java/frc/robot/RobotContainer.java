@@ -149,8 +149,10 @@ public class RobotContainer {
                     launchpad.bigLEDGreen.set(false);
                 }),
                 new InstantCommand(() -> {
-                    LEDs.getInstance().addCall("pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.Aarms).pressure(pcm));
+                    LEDs.getInstance().addCall("left pressure",
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm));
+                    LEDs.getInstance().addCall("right pressure",
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm));
                 }),
                 new RaiseIntake(intake)
         );
