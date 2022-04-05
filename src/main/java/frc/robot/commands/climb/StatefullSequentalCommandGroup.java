@@ -4,16 +4,12 @@
 
 package frc.robot.commands.climb;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 
 public class StatefullSequentalCommandGroup extends CommandGroupBase {
     private enum CommandState {
@@ -37,9 +33,9 @@ public class StatefullSequentalCommandGroup extends CommandGroupBase {
 
         //registerGroupedCommands(commands);
 
-        for (Command x : commands){
+        for (Command x : commands) {
             m_requirements.addAll(x.getRequirements());
-            cmds.add(new AbstractMap.SimpleEntry<Command,CommandState>(x, CommandState.NotRun));
+            cmds.add(new AbstractMap.SimpleEntry<Command, CommandState>(x, CommandState.NotRun));
         }
     }
 
@@ -51,7 +47,7 @@ public class StatefullSequentalCommandGroup extends CommandGroupBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (cmdIndex >= cmds.size()){
+        if (cmdIndex >= cmds.size()) {
             return;
         }
 
@@ -77,7 +73,7 @@ public class StatefullSequentalCommandGroup extends CommandGroupBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        if (cmdIndex >= cmds.size()){
+        if (cmdIndex >= cmds.size()) {
             return;
         }
 
@@ -87,9 +83,9 @@ public class StatefullSequentalCommandGroup extends CommandGroupBase {
         }
     }
 
-    public void resetCommandState(){
+    public void resetCommandState() {
         cmdIndex = 0;
-        for (Entry x : cmds){
+        for (Entry x : cmds) {
             x.setValue(CommandState.NotRun);
         }
     }

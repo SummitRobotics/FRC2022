@@ -14,7 +14,6 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Contains various static utility functions for use throughout the program.
@@ -137,7 +136,7 @@ public class Functions {
      * @return the median value
      */
 
-    public static double medianWithoutExtraneous (ArrayList<Double> toBeAveraged){
+    public static double medianWithoutExtraneous(ArrayList<Double> toBeAveraged) {
         Collections.sort(toBeAveraged);
         double mean = 0;
         for (double i : toBeAveraged) {
@@ -149,5 +148,26 @@ public class Functions {
         toBeAveraged.removeIf(e -> (e != 0 && Math.abs((asfasd - e) / e) > .2));
         if (toBeAveraged.size() == 0) return 0;
         return toBeAveraged.get((int) (toBeAveraged.size() / 2));
+    }
+
+    /**
+     * finds the point closest to the input value. if 2 points are the same dist it returns the first in the points array.
+     *
+     * @param value the value to find the point closest to
+     * @param points the points that the value should be quantised to
+     * @return the point closest to the input value
+     */
+    public static double findClosestPoint(double value, double[] points) {
+        double out = Double.NaN;
+        double minError = Double.POSITIVE_INFINITY;
+        for (double x : points) {
+            double error = Math.abs(x - value);
+            if (error < minError) {
+                minError = error;
+                out = x;
+            }
+        }
+
+        return out;
     }
 }

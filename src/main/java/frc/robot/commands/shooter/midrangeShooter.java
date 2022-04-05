@@ -3,6 +3,7 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
+import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
@@ -55,6 +56,7 @@ public class midrangeShooter extends CommandBase {
         shooter.stop();
 
         shooter.extendHood();
+        limelight.setLEDMode(LEDModes.FORCE_ON);
     }
     /**
      * aligns to target.
@@ -121,7 +123,7 @@ public class midrangeShooter extends CommandBase {
         shooter.stop();
         drivetrain.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
-
+        limelight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override

@@ -18,7 +18,6 @@ import frc.robot.utilities.RollingAverage;
 import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Ports;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Subsystem for the Climb Subsystem.
@@ -399,36 +398,36 @@ public class Climb extends SubsystemBase implements Testable {
         return result;
     }
 
-    @Override
-    public HashMap<String, Boolean> initCustomTests() {
-        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
-        result.put("Left Limit Switch", false);
-        result.put("Right Limit Swtich", false);
+    // @Override
+    // public HashMap<String, Boolean> initCustomTests() {
+    //     HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+    //     result.put("Left Limit Switch", false);
+    //     result.put("Right Limit Swtich", false);
 
-        return result;
-    }
+    //     return result;
+    // }
 
-    @Override
-    public HashMap<String, Boolean> runCustomTests() {
-        HashMap<String, Boolean> result = new HashMap<String, Boolean>();
+    // @Override
+    // public HashMap<String, Boolean> runCustomTests() {
+    //     HashMap<String, Boolean> result = new HashMap<String, Boolean>();
 
-        if (!pivotPos && !wereSwitchesFalse) {
-            setPivotPos(true);
-        } else if (pivotPos && !getLeftLimit() && !getRightLimit()) {
-            wereSwitchesFalse = true;
-            setPivotPos(false);
-        }
+    //     if (!pivotPos && !wereSwitchesFalse) {
+    //         setPivotPos(true);
+    //     } else if (pivotPos && !getLeftLimit() && !getRightLimit()) {
+    //         wereSwitchesFalse = true;
+    //         setPivotPos(false);
+    //     }
 
-        if (wereSwitchesFalse) {
-            result.put("Left Limit Switch", getLeftDetachPos());
-            result.put("Right Limit Switch",  getRightDetachPos());
-        } else {
-            result.put("Left Limit Switch", false);
-            result.put("Right Limit Switch",  false);
-        }
+    //     if (wereSwitchesFalse) {
+    //         result.put("Left Limit Switch", getLeftDetachPos());
+    //         result.put("Right Limit Switch",  getRightDetachPos());
+    //     } else {
+    //         result.put("Left Limit Switch", false);
+    //         result.put("Right Limit Switch",  false);
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
 
     /**
      * Function to init telemetry for the climb subsystem.

@@ -60,11 +60,9 @@ public class EncoderDrive extends CommandBase {
         drivetrain.setPIDMaxPower(maximumPower);
         
         // TODO test if this is accurate
-        left = left + drivetrain.getLeftDistance();
-        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
+        drivetrain.setLeftMotorTarget(drivetrain.getLeftEncoderPosition() + drivetrain.distToEncoder(left));
         
-        right = right + drivetrain.getRightDistance();
-        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right));
+        drivetrain.setRightMotorTarget(drivetrain.getRightEncoderPosition() + drivetrain.distToEncoder(right));
     }
 
     @Override

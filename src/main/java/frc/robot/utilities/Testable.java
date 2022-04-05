@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkMax;
 import frc.robot.devices.ColorSensor;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.Lidar;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

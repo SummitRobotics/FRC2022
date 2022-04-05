@@ -1,11 +1,8 @@
 package frc.robot.commands.conveyor;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 /**

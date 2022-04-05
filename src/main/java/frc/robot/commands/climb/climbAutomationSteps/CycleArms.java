@@ -8,12 +8,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climb;
 import frc.robot.utilities.Functions;
 
+/**
+ * Command to cycle the arms.
+ */
 public class CycleArms extends CommandBase {
     private Climb climb;
     private double target;
     static boolean isBroken = false;
     static boolean canBeBroken = true;
     private final double error = 0.4;
+
     /** Creates a new CycleArms. */
     public CycleArms(Climb climb, double target) {
         this.target = target;
@@ -31,10 +35,10 @@ public class CycleArms extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && climb.isHooked()) {
+        if (climb.getLeftEncoderValue() >= Climb.GRAB_POINT && climb.getRightEncoderValue() >= Climb.GRAB_POINT && climb.isHooked()) {
             climb.setDetachPos(true);
             canBeBroken = false;
-        } else if (climb.getLeftEncoderValue() >= climb.GRAB_POINT && climb.getRightEncoderValue() >= climb.GRAB_POINT && !climb.isHooked() && canBeBroken) {
+        } else if (climb.getLeftEncoderValue() >= Climb.GRAB_POINT && climb.getRightEncoderValue() >= Climb.GRAB_POINT && !climb.isHooked() && canBeBroken) {
             climb.stop();
             isBroken = true;
         }   

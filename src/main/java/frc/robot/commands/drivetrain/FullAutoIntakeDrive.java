@@ -63,7 +63,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         this.intake = intake;
         // TODO - set these
         movePID.setTolerance(1, 1);
-        movePID.setSetpoint(DISTANCE_FROM_BALL);
+        movePID.setSetpoint(10);
         alignPID.setTolerance(1, 1);
         alignPID.setSetpoint(0);
 

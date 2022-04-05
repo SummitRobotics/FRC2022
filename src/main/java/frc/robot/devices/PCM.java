@@ -153,7 +153,7 @@ public class PCM implements Sendable, Testable {
             if (hasReachedPartialPressure) {
                 pressureStatus = true;
             } else {
-                if (timer.hasElapsed(0.1)) {
+                if (timer.hasElapsed(0.05)) {
                     drivetrain.toggleShift();
                     timer.reset();
                     if (getPressure() < PARTIAL_PRESSURE) {

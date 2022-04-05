@@ -1,16 +1,13 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
+import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
@@ -117,19 +114,19 @@ public class FullAutoShooterAssembly extends CommandBase {
         if (hoodPos) {
             System.out.println("reg far");
             return
-                (-0.00330099 * distance * distance * distance) +
-                (1.44904 * distance * distance) +
-                (-205.058 * distance) +
-                11204.6;
+                (-0.00330099 * distance * distance * distance)
+                + (1.44904 * distance * distance)
+                + (-205.058 * distance)
+                + 11204.6;
         } else {
             System.out.println("reg close");
             return 
-                (-0.00000243868 * distance * distance * distance * distance * distance) +
-                (0.000923236 * distance * distance * distance * distance) +
-                (-0.131588 * distance * distance * distance) +
-                (8.76388 * distance * distance) +
-                (-266.098 * distance) +
-                4428.38;
+                (-0.00000243868 * distance * distance * distance * distance * distance)
+                + (0.000923236 * distance * distance * distance * distance)
+                + (-0.131588 * distance * distance * distance)
+                + (8.76388 * distance * distance)
+                + (-266.098 * distance)
+                + 4428.38;
         }
     }
 
@@ -166,17 +163,11 @@ public class FullAutoShooterAssembly extends CommandBase {
     public boolean driveAndAlign(Drivetrain drivetrain,
         double horizontalOffset,
         boolean isAccurate,
-        double limelightDistanceEstimate) {
+        double limelightDistanceEstimate,
+        double setpoint) {
         //sets if align target based on ball color
-        // if (isAccurate) {
-        //     alignPID.setSetpoint(0);
-        // } else {
-        //     //alignPID.setSetpoint(0);
-        //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
-        // }
-
         if (movePID.atSetpoint()) {
-            alignPID.setSetpoint(Math.toDegrees(Math.atan((12/limelightDistanceEstimate))));
+            alignPID.setSetpoint(Math.toDegrees(Math.atan((12 / limelightDistanceEstimate))));
             properlyAligned = true;
         } else if (!properlyAligned) {
             alignPID.setSetpoint(0);
@@ -196,11 +187,16 @@ public class FullAutoShooterAssembly extends CommandBase {
         if (Functions.isWithin(horizontalOffset, alignPID.getSetpoint(), OK_TO_MOVE_OFSET)) {
             //records current distance to be heald with pid, clamped to the max and min range of the shooter
             if (!hasRecordedLimelightDistance) {
-                movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE, MIN_SHOOTER_RANGE));
+                movePID.setSetpoint(Functions.clampDouble(limelightDistanceEstimate, MAX_SHOOTER_RANGE - 5, MIN_SHOOTER_RANGE));
                 hasRecordedLimelightDistance = true;
                 
             }
-
+            if (!isAccurate) {
+                movePID.setSetpoint(0);
+            } else {
+                //alignPID.setSetpoint(0);
+                movePID.setSetpoint(setpoint);
+            }    
             double movePower = movePID.calculate(limelightDistanceEstimate);
             leftPower -= movePower;
             rightPower -= movePower;
@@ -212,7 +208,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         //sets drivetrain powers
         drivetrain.setLeftMotorPower(leftPower);
         drivetrain.setRightMotorPower(rightPower);
-        System.out.println("Is aligned " + alignPID.atSetpoint() + " is arrived " + movePID.atSetpoint() );
+        System.out.println("Is aligned " + alignPID.atSetpoint() + " is arrived " + movePID.atSetpoint());
         return alignPID.atSetpoint() && movePID.atSetpoint() && properlyAligned;
     }
 
@@ -284,6 +280,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         alignPID.reset();
         movePID.reset();
         hasRecordedLimelightDistance = false;
+        limelight.setLEDMode(LEDModes.FORCE_ON);
     }
     
     @Override
@@ -305,7 +302,8 @@ public class FullAutoShooterAssembly extends CommandBase {
             isDrivenAndAligned = driveAndAlign(drivetrain,
                 smoothedHorizontalOffset,
                 true,
-                limelightDistanceEstimate);
+                limelightDistanceEstimate,
+                0);
             if (isHoodSet) {
                 isSpooled = spool(shooter, limelightDistanceEstimate,
                 currentMotorSpeed, hoodPos, isDrivenAndAligned);
@@ -346,6 +344,7 @@ public class FullAutoShooterAssembly extends CommandBase {
         drivetrain.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
         hasRecordedLimelightDistance = false;
+        limelight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     /**

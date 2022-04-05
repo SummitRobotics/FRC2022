@@ -1,7 +1,6 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.*;
@@ -246,11 +245,18 @@ public class RobotContainer {
 
         launchpad.buttonA.whenHeld(climbSemiAuto);
         launchpad.buttonA.commandBind(climbSemiAuto);
-        launchpad.buttonE.whileHeld(homeArms.get());
-        Command sas = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger,
-                joystick.axisY, arcadeDrive);
+
+        launchpad.buttonE.commandBind(homeArms.get(), launchpad.buttonE::whenHeld);
+
+
+        Command semiAutoShooter = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY, joystick.button4, 
+            joystick.button5, arcadeDrive);
+        launchpad.buttonG.commandBind(semiAutoShooter, launchpad.buttonG::whileHeld);
+
+        Command sas = new FullAutoShooterNew(drivetrain, shooter, conveyor, targetingLimelight);
         launchpad.buttonH.whileHeld(sas);
         launchpad.buttonH.commandBind(sas);
+
         ClimbAutomationBetter2 climbAutomationBetter2 = new ClimbAutomationBetter2(drivetrain, climb);
 
         
@@ -332,6 +338,10 @@ public class RobotContainer {
                             "robot in auto",
                             Colors.TEAM,
                             StatusPriorities.ENABLED)),
+            new InstantCommand(() -> {
+                gyro.calibrate();
+                drivetrain.setPose(new Pose2d());
+            }),
             new InstantCommand(drivetrain::highGear),
             new InstantCommand(drivetrain::zeroDistance),
             homeArms.get(),
