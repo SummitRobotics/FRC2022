@@ -170,4 +170,18 @@ public class Functions {
 
         return out;
     }
+
+    public static double findClosestPoint(double value, Double[] points) {
+        double out = Double.NaN;
+        double minError = Double.POSITIVE_INFINITY;
+        for (double x : points) {
+            double error = Math.abs(x - value);
+            if (error < minError) {
+                minError = error;
+                out = x;
+            }
+        }
+
+        return out;
+    }
 }

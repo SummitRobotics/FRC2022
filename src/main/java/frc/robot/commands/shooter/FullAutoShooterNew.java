@@ -14,6 +14,9 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FullAutoShooterNew extends CommandBase {
 
     private Conveyor conveyor;
@@ -21,7 +24,12 @@ public class FullAutoShooterNew extends CommandBase {
     private Drivetrain drivetrain;
     private Lemonlight lemonlight;
 
-    private final double[] waypoints = {65, 155};
+    // Map of waypoints with desired offsets.
+    // First value is distance in inches and second value is offset.
+    private final Map<Double, Double> waypoints = Map.ofEntries(
+        Map.entry(65.0, 8.0),
+        Map.entry(155.0, 6.0)
+    );
 
     private final double maxDist = 160;
     private final double hoodDistCutoff = 125; 
@@ -136,35 +144,28 @@ public class FullAutoShooterNew extends CommandBase {
     }
 
     private boolean alignAndDrive(double lld) {
-        double ofset = lemonlight.getHorizontalOffset();
+        double offset = lemonlight.getHorizontalOffset();
 
         double leftPower = 0;
         double rightPower = 0;
 
-        movePid.setSetpoint(Functions.findClosestPoint(lld, waypoints));
+        double setpoint = Functions.findClosestPoint(lld, waypoints.keySet().toArray(new Double[0]));
+
+        movePid.setSetpoint(setpoint);
 
         if (movePid.atSetpoint()) {
-            //math to keep offset from target center constant ad dist changes
-            if(shooter.getHoodPos()){
-                // Far
-                alignPid.setSetpoint(6);
-            }
-            else{
-                // Close
-                alignPid.setSetpoint(8);
-            }
-            
+            alignPid.setSetpoint(waypoints.get(setpoint));
         } else {
             alignPid.setSetpoint(0);
         }
 
-        if (Functions.isWithin(ofset, 0, okToMoveError)) {
+        if (Functions.isWithin(offset, 0, okToMoveError)) {
             double power = movePid.calculate(lld);
             leftPower -= power;
             rightPower -= power;
         }
 
-        double alignPower = alignPid.calculate(ofset);
+        double alignPower = alignPid.calculate(offset);
 
         leftPower -= alignPower;
         rightPower += alignPower;
