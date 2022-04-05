@@ -50,6 +50,7 @@ public class midrangeShooter extends CommandBase {
         addRequirements(shooter, drivetrain);
 
     }
+    
 
     @Override
     public void initialize() {
