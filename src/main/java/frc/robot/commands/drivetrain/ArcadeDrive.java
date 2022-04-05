@@ -165,9 +165,9 @@ public class ArcadeDrive extends CommandBase {
 
         double limiterTurn = turnLimiter.getRateLimitedValue(turn);
 
-        if (intake.getState() == Intake.States.DOWN) {
-            turn = limiterTurn;
-        }
+        // if (intake.getState() == Intake.States.DOWN) {
+        //     turn = limiterTurn;
+        // }
 
         if (activateSwitchfoot) {
             //dumb stuff is dumb

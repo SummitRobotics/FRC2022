@@ -13,10 +13,11 @@ package frc.robot.utilities.lists;
 public class LEDPriorities {
     public static final int 
             ON = 0,
-            LOW_GEAR = 1,
-            INTAKE_DOWN = 2,
-            DRIVE_REV = 3,
-            SHOOTING = 4,
-            CLIMBING = 5,
-            SPLINES = 6;
+            PRESSURE = 1,
+            LOW_GEAR = 2,
+            INTAKE_DOWN = 3,
+            DRIVE_REV = 4,
+            SHOOTING = 5,
+            CLIMBING = 6,
+            SPLINES = 7;
 }

@@ -85,7 +85,7 @@ public class RobotContainer {
 
         gyro = new AHRS();
 
-        targetingLimelight = new Lemonlight("limelight-target", false, false);
+        targetingLimelight = new Lemonlight("gloworm", false, true);
         // TODO: need to ensure that this name is set on the limelight as well.
         ballDetectionLimelight = new Lemonlight("limelight-balls", true, false);
 
@@ -150,6 +150,10 @@ public class RobotContainer {
                 new InstantCommand(() -> {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
+                }),
+                new InstantCommand(() -> {
+                    LEDs.getInstance().addCall("pressure",
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.Aarms).pressure(pcm));
                 }),
                 new RaiseIntake(intake)
         );
