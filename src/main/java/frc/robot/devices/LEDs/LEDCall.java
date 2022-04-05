@@ -199,16 +199,30 @@ public class LEDCall implements LEDHandler {
     /**
      * Creates a new LEDCall that displays pneumatics pressure levels.
      *
+     * @param pcm The PCM device
      * @return the modified LEDCall
      */
     public LEDCall pressure(PCM pcm) {
         return new LEDCall(priority, range) {
+            int maxLED = 0;
+            int minLED = 1000;
+
             @Override
             public Color8Bit getColor(int loop, int led) {
-                int pressure = (int) pcm.getPressure() * 37 / 100;
-                return (pressure >= led)
+
+                if (led > maxLED) {
+                    maxLED = led;
+                }
+
+                if (led < minLED) {
+                    minLED = led;
+                }
+
+                int pressure = minLED + (int) pcm.getPressure() * maxLED / 100;
+
+                return (led >= pressure)
                     ? new Color8Bit(Color.kGreen)
-                    : new Color8Bit(Color.kBlue);
+                    : new Color8Bit(Color.kOrange);
             }
         };
     }
