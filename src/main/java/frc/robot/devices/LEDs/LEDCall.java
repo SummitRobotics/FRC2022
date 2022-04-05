@@ -220,7 +220,7 @@ public class LEDCall implements LEDHandler {
 
                 int pressure = minLED + (int) pcm.getPressure() * maxLED / 100;
 
-                return (led >= pressure)
+                return (led <= pressure)
                     ? new Color8Bit(Color.kGreen)
                     : new Color8Bit(Color.kOrange);
             }
