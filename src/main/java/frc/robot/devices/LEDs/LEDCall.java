@@ -2,6 +2,7 @@ package frc.robot.devices.LEDs;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.devices.PCM;
 
 /**
  * Class to make an LED Call. This is so we can change the LED's on the robot.
@@ -191,6 +192,23 @@ public class LEDCall implements LEDHandler {
             @Override
             public Color8Bit getColor(int loop, int led) {
                 return new Color8Bit(Color.fromHSV((loop + led) * 2 % 180, 255, 255));
+            }
+        };
+    }
+
+    /**
+     * Creates a new LEDCall that displays pneumatics pressure levels.
+     *
+     * @return the modified LEDCall
+     */
+    public LEDCall pressure(PCM pcm) {
+        return new LEDCall(priority, range) {
+            @Override
+            public Color8Bit getColor(int loop, int led) {
+                int pressure = (int) pcm.getPressure() * 37 / 100;
+                return (pressure >= led)
+                    ? new Color8Bit(Color.kGreen)
+                    : new Color8Bit(Color.kBlue);
             }
         };
     }
