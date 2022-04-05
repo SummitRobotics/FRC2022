@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.LowerIntake;
 import frc.robot.commands.intake.RaiseIntake;
-import frc.robot.commands.shooter.FullAutoShooterAssembly;
+import frc.robot.commands.shooter.FullAutoShooterNew;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
@@ -23,28 +23,29 @@ public class FourBallAuto extends AutoCommand {
             // Move to ball 2
             new LowerIntake(intake),
             moveTo(new Pose2d(7.6, 0.7, new Rotation2d(0, -1)), Direction.Forward),
+            new WaitCommand(0.2),
 
             // Rotate toward hub
             new RaiseIntake(intake),
             rotateTo(new Rotation2d(0.664, 3.801)),
 
             // Shoot the balls.
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight),
+            new FullAutoShooterNew(drivetrain, shooter, conveyor, limelight),
 
             // Drive to the 4th ball taking a path going through the third bal
             new LowerIntake(intake),
-            moveToDirectional(new Pose2d(1.324, 1.336, new Rotation2d(-0.196, -0.179)), List.of(new Pose2d(5.411, 1.835, new Rotation2d(-2.063, 0.521))), Direction.Forward),
-            //moveToNondirectional(new Pose2d(1.324, 1.336, new Rotation2d(-0.196, -0.179)), List.of(new Translation2d(5.411, 1.835)), Direction.Forward),
+            //moveToDirectional(new Pose2d(1.324, 1.336, new Rotation2d(-0.196, -0.073)), List.of(new Pose2d(5.411, 1.835, new Rotation2d(-2.063, 0.521))), Direction.Forward),
+            moveToNondirectional(new Pose2d(1.324, 1.336, new Rotation2d(-0.196, -0.073)), List.of(new Translation2d(5.411, 1.835)), Direction.Forward),
             new WaitCommand(0.4),
 
             // Raise intake and rotate for final move
             new RaiseIntake(intake),
 
             // Drive to shooting position
-            moveTo(new Pose2d(7.272, 1.577, new Rotation2d(0.409, 3.1)), Direction.Reverse),
+            moveTo(new Pose2d(3.785, 1.645, new Rotation2d(0.989, 1.196)), Direction.Reverse),
 
             // Shoot the last 2 balls
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight)
+            new FullAutoShooterNew(drivetrain, shooter, conveyor, limelight)
         );
     }
 }

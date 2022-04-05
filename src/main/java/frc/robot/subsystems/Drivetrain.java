@@ -56,8 +56,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
         WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858,
-        SPLINE_MAX_VEL_MPS_HIGH = 3, // MAX:
-        SPLINE_MAX_ACC_MPSSQ_HIGH = 3, // MAX :
+        SPLINE_MAX_VEL_MPS_HIGH = 4, // MAX:
+        SPLINE_MAX_ACC_MPSSQ_HIGH = 3.5, // MAX :
         NO_FAULT_CODE = 0;
 
 
@@ -206,29 +206,35 @@ public class Drivetrain extends SubsystemBase implements Testable {
         // pid for velocity
         leftPID.setP(0.00012245, 2);
         leftPID.setI(0, 2);
-        leftPID.setD(0.0, 2);
+        leftPID.setD(0.0001, 2);
+        leftPID.setFF(convertRpmToMetersPerSecond(0.734)/12, 2);
 
         rightPID.setP(0.00012245, 2);
         rightPID.setI(0, 2);
-        rightPID.setD(0.0, 2);
+        rightPID.setD(0.0001, 2);
+        rightPID.setFF(convertRpmToMetersPerSecond(0.734)/12, 2);
         
         // pid for velocity
         leftMiddlePID.setP(0.00012245, 2);
         leftMiddlePID.setI(0, 2);
-        leftMiddlePID.setD(0.0, 2);
+        leftMiddlePID.setD(0.0001, 2);
+        leftMiddlePID.setFF(convertRpmToMetersPerSecond(0.734)/12, 2);
 
         rightMiddlePID.setP(0.00012245, 2);
         rightMiddlePID.setI(0, 2);
-        rightMiddlePID.setD(0.0, 2);
+        rightMiddlePID.setD(0.0001, 2);
+        rightMiddlePID.setFF(convertRpmToMetersPerSecond(0.734)/12, 2);
 
         // pid for velocity
         leftBackPID.setP(0.00012245, 2);
         leftBackPID.setI(0, 2);
-        leftBackPID.setD(0.0, 2);
+        leftBackPID.setD(0.0001, 2);
+        leftBackPID.setFF(convertRpmToMetersPerSecond(0.734)/12, 2);
 
         rightBackPID.setP(0.00012245, 2);
         rightBackPID.setI(0, 2);
-        rightBackPID.setD(0.0, 2);
+        rightBackPID.setD(0.0001, 2);
+        rightBackPID.setFF(convertRpmToMetersPerSecond(0.734)/12, 2);
 
         left.disableVoltageCompensation();
         right.disableVoltageCompensation();

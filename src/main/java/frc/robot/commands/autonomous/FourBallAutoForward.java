@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.LowerIntake;
 import frc.robot.commands.intake.RaiseIntake;
 import frc.robot.commands.shooter.FullAutoShooterAssembly;
+import frc.robot.commands.shooter.FullAutoShooterNew;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
@@ -29,7 +30,7 @@ public class FourBallAutoForward extends AutoCommand {
             rotateTo(new Rotation2d(0.664, 3.801)),
 
             // Shoot the balls.
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight),
+            new FullAutoShooterNew(drivetrain, shooter, conveyor, limelight),
 
             // Drive to the 4th ball taking a path going through the third bal
             new LowerIntake(intake),
@@ -44,7 +45,7 @@ public class FourBallAutoForward extends AutoCommand {
             moveTo(new Pose2d(5.919, 1.662, new Rotation2d(2.564, 2.598)), Direction.Forward),
 
             // Shoot the last 2 balls
-            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, limelight)
+            new FullAutoShooterNew(drivetrain, shooter, conveyor, limelight)
         );
     }
 }
