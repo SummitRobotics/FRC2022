@@ -17,6 +17,7 @@ public class Lemonlight implements Sendable {
     private final NetworkTableEntry tv, tx, ty, ta, llpython;
     private NetworkTableEntry camMode, pipeline, ledMode;
     private final boolean forBall;
+    private final boolean photonVision;
 
     // VALUES SHOULD BE IN CM and DEGREES
     // TODO - CALIBRATE FOR COMP
@@ -45,6 +46,7 @@ public class Lemonlight implements Sendable {
         }
 
         this.forBall = forBall;
+        this.photonVision = photonVision;
 
         if (!photonVision) {
             tv = limelight.getEntry("tv");
@@ -106,7 +108,7 @@ public class Lemonlight implements Sendable {
      * @param mode the LED mode to switch to
      */
     public void setLEDMode(LEDModes mode) {
-        ledMode.setDouble(mode.value);
+        //ledMode.setDouble(mode.value);
     }
 
     /**
@@ -133,7 +135,10 @@ public class Lemonlight implements Sendable {
      * @return if limelight has a target
      */
     public boolean hasTarget() {
-        return tv.getDouble(0) == 1;
+        if (!photonVision) {
+            return tv.getDouble(0) == 1;
+        }
+        return tv.getBoolean(false);
     }
 
     /**
@@ -364,6 +369,8 @@ public class Lemonlight implements Sendable {
             }, null);
             
             builder.addBooleanProperty("hasTarget", this::hasTarget, null);
+
+            builder.addDoubleProperty("offset", this::getHorizontalOffset, null);
         }
     }
 }
