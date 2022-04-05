@@ -155,7 +155,12 @@ public class RobotContainer {
                     LEDs.getInstance().addCall("pressure",
                         new LEDCall(LEDPriorities.PRESSURE, LEDRange.Aarms).pressure(pcm));
                 }),
-                new RaiseIntake(intake)
+                new RaiseIntake(intake),
+
+                // TODO: MAKE SURE TO REMOVE THIS. DO NOT LEAVE THIS IN PLEASE!!! FOR TESTING ONLY
+                new InstantCommand(() -> {
+                    drivetrain.setPose(new Pose2d(7.637, 1.867, new Rotation2d(0, -1)));
+                })
         );
 
         testInit = new SequentialCommandGroup(
