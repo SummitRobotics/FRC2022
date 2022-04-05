@@ -58,10 +58,10 @@ public class Drivetrain extends SubsystemBase implements Testable {
         DRIVE_WIDTH = 0.6858,
         SPLINE_MAX_VEL_MPS_HIGH = 4, // MAX:
         SPLINE_MAX_ACC_MPSSQ_HIGH = 3.5, // MAX :
-        HIGH_FF_REV_FROM_SYSID = 0.734,
-        HIGH_P_VEL = 0.00012245,
+        HIGH_FF_REV_FROM_SYSID = 0.12666,
+        HIGH_P_VEL = 8.0836E-05,
         HIGH_I_VEL = 0,
-        HIGH_D_VEL = 0.0001,
+        HIGH_D_VEL = 0,
         NO_FAULT_CODE = 0;
 
 
