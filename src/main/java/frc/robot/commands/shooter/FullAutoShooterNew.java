@@ -99,7 +99,7 @@ public class FullAutoShooterNew extends CommandBase {
             if (aligned && Functions.isWithin(shooter.getShooterRPM(), rpm, speedError) && okToShoot()) {
                 shooter.setState(Shooter.States.READY_TO_FIRE);
             } else {
-                shooter.setState(Shooter.States.NOT_SHOOTING);
+                //shooter.setState(Shooter.States.NOT_SHOOTING);
             }
 
         }
