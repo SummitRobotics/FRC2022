@@ -225,9 +225,9 @@ public class LEDCall implements LEDHandler {
                         ? new Color8Bit(Color.kGreen)
                         : new Color8Bit(Color.kBlack);
                 } else {
-                    return (minLED + (pressure * (maxLED - minLED)) <= led)
-                        ? new Color8Bit(Color.kBlack)
-                        : new Color8Bit(Color.kGreen);
+                    return (maxLED - (pressure * (maxLED - minLED)) <= led)
+                        ? new Color8Bit(Color.kGreen)
+                        : new Color8Bit(Color.kBlack);
                 }
             }
         };
