@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -55,6 +56,12 @@ public class Drivetrain extends SubsystemBase implements Testable {
         WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858,
+        SPLINE_MAX_VEL_MPS_HIGH = 3, // MAX:
+        SPLINE_MAX_ACC_MPSSQ_HIGH = 3, // MAX :
+        HIGH_FF_REV_FROM_SYSID = 0.12666/1.3/1.2,
+        HIGH_P_VEL = 8.0836E-05/12/1.3*1.1,
+        HIGH_I_VEL = 0,
+        HIGH_D_VEL = 0,
         NO_FAULT_CODE = 0;
 
 
@@ -124,6 +131,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
     private double rightDistanceAcum = 0;
 
     private final Timer odometryTime = new Timer();
+    private boolean odometryLock = false;
 
     private final Field2d f2d;
 
@@ -201,31 +209,37 @@ public class Drivetrain extends SubsystemBase implements Testable {
         rightBackPID.setOutputRange(-.5, .5);
         
         // pid for velocity
-        leftPID.setP(0.00012245, 2);
-        leftPID.setI(0, 4);
-        leftPID.setD(0.0, 2);
+        leftPID.setP(HIGH_P_VEL, 2);
+        leftPID.setI(HIGH_I_VEL, 2);
+        leftPID.setD(HIGH_D_VEL, 2);
+        leftPID.setFF((HIGH_FF_REV_FROM_SYSID/720), 2);
 
-        rightPID.setP(0.00012245, 2);
-        rightPID.setI(0, 4);
-        rightPID.setD(0.0, 2);
+        rightPID.setP(HIGH_P_VEL, 2);
+        rightPID.setI(HIGH_I_VEL, 2);
+        rightPID.setD(HIGH_D_VEL, 2);
+        rightPID.setFF((HIGH_FF_REV_FROM_SYSID/720), 2);
         
         // pid for velocity
-        leftMiddlePID.setP(0.00012245, 2);
-        leftMiddlePID.setI(0, 4);
-        leftMiddlePID.setD(0.0, 2);
+        leftMiddlePID.setP(HIGH_P_VEL, 2);
+        leftMiddlePID.setI(HIGH_I_VEL, 2);
+        leftMiddlePID.setD(HIGH_D_VEL, 2);
+        leftMiddlePID.setFF((HIGH_FF_REV_FROM_SYSID/720), 2);
 
-        rightMiddlePID.setP(0.00012245, 2);
-        rightMiddlePID.setI(0, 4);
-        rightMiddlePID.setD(0.0, 2);
+        rightMiddlePID.setP(HIGH_P_VEL, 2);
+        rightMiddlePID.setI(HIGH_I_VEL, 2);
+        rightMiddlePID.setD(HIGH_D_VEL, 2);
+        rightMiddlePID.setFF((HIGH_FF_REV_FROM_SYSID/720), 2);
 
         // pid for velocity
-        leftBackPID.setP(0.00012245, 2);
-        leftBackPID.setI(0, 4);
-        leftBackPID.setD(0.0, 2);
+        leftBackPID.setP(HIGH_P_VEL, 2);
+        leftBackPID.setI(HIGH_I_VEL, 2);
+        leftBackPID.setD(HIGH_D_VEL, 2);
+        leftBackPID.setFF((HIGH_FF_REV_FROM_SYSID/720), 2);
 
-        rightBackPID.setP(0.00012245, 2);
-        rightBackPID.setI(0, 4);
-        rightBackPID.setD(0.0, 2);
+        rightBackPID.setP(HIGH_P_VEL, 2);
+        rightBackPID.setI(HIGH_I_VEL, 2);
+        rightBackPID.setD(HIGH_D_VEL, 2);
+        rightBackPID.setFF((HIGH_FF_REV_FROM_SYSID/720), 2);
 
         left.disableVoltageCompensation();
         right.disableVoltageCompensation();
@@ -395,8 +409,6 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @param rightMS the right motor MPS
      */
     public void setMotorTargetSpeed(double leftMS, double rightMS) {
-        //leftPID.setFF(getFeedForward().calculate(leftMS));
-        //rightPID.setFF(getFeedForward().calculate(rightMS));
         leftPID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
         leftMiddlePID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
         leftBackPID.setReference(convertMPStoRPM(leftMS), ControlType.kVelocity, 2);
@@ -432,9 +444,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
     public double convertMPStoRPM(double input) {
         double out = input / WHEEL_RADIUS_IN_METERS;
         out *= 60;
-        out *= (2 * Math.PI);
+        out /= (2 * Math.PI);
         out *= HIGH_GEAR_RATIO;
-        out /= 39.4784176044;
         return out;
     }
 
@@ -731,8 +742,10 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @param pose the new pose
      */
     public synchronized void setPose(Pose2d pose) {
+        odometryLock = true;
         zeroDistance();
         odometry.resetPosition(pose, gyro.getRotation2d());
+        odometryLock = false;
     }
 
     public synchronized Pose2d getPose() {
@@ -781,6 +794,18 @@ public class Drivetrain extends SubsystemBase implements Testable {
         }
     }
 
+    /**
+     * Returns the trajectory config for High Gear.
+     */
+    public TrajectoryConfig generateTrajectoryConfigHighGear() {
+        return new TrajectoryConfig(SPLINE_MAX_VEL_MPS_HIGH, SPLINE_MAX_ACC_MPSSQ_HIGH)
+            .setKinematics(DriveKinimatics).addConstraint(HighVoltageConstraint);
+    }
+
+    public Field2d getFieldWidget() {
+        return f2d;
+    }
+
     //TODO run a check so we dont update at a unnessaryly fast rate
     //TODO CONT beacuse its being updated by periodic and followSpline
 
@@ -789,6 +814,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * It only updates at a rate of 500hz maximum.
      */
     public synchronized void updateOdometry() {
+        if (odometryLock) return;
         //prevemts unnessarly fast updates to the odemetry (2 ms)
         if (odometryTime.get() > 0.002) {
             odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
@@ -842,6 +868,9 @@ public class Drivetrain extends SubsystemBase implements Testable {
         //builder.addDoubleProperty("rotation", this::getRotation, null);
         //f2d.initSendable(builder);
         SmartDashboard.putData(f2d);
+        builder.addDoubleProperty("x-pos", () -> this.getPose().getX(), null);
+        builder.addDoubleProperty("y-pos", () -> this.getPose().getY(), null);
+        builder.addDoubleProperty("rot-degrees", () -> this.getPose().getRotation().getDegrees(), null);
 
         // builder.addBooleanProperty("shifterStatus", this::getShift, null);
         //builder.addDoubleArrayProperty("pidValues", this::getPid, null);
