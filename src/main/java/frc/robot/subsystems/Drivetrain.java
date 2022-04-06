@@ -56,10 +56,10 @@ public class Drivetrain extends SubsystemBase implements Testable {
         WHEEL_CIRCUMFERENCE_IN_METERS = (2 * WHEEL_RADIUS_IN_METERS) * Math.PI,
         MAX_OUTPUT_VOLTAGE = 11,
         DRIVE_WIDTH = 0.6858,
-        SPLINE_MAX_VEL_MPS_HIGH = 4, // MAX:
-        SPLINE_MAX_ACC_MPSSQ_HIGH = 3.5, // MAX :
-        HIGH_FF_REV_FROM_SYSID = 0.12666,
-        HIGH_P_VEL = 8.0836E-05,
+        SPLINE_MAX_VEL_MPS_HIGH = 3, // MAX:
+        SPLINE_MAX_ACC_MPSSQ_HIGH = 3, // MAX :
+        HIGH_FF_REV_FROM_SYSID = 0.12666/1.3/1.2,
+        HIGH_P_VEL = 8.0836E-05/12/1.3*1.1,
         HIGH_I_VEL = 0,
         HIGH_D_VEL = 0,
         NO_FAULT_CODE = 0;
@@ -131,6 +131,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
     private double rightDistanceAcum = 0;
 
     private final Timer odometryTime = new Timer();
+    private boolean odometryLock = false;
 
     private final Field2d f2d;
 
@@ -741,8 +742,10 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @param pose the new pose
      */
     public synchronized void setPose(Pose2d pose) {
+        odometryLock = true;
         zeroDistance();
         odometry.resetPosition(pose, gyro.getRotation2d());
+        odometryLock = false;
     }
 
     public synchronized Pose2d getPose() {
@@ -811,6 +814,7 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * It only updates at a rate of 500hz maximum.
      */
     public synchronized void updateOdometry() {
+        if (odometryLock) return;
         //prevemts unnessarly fast updates to the odemetry (2 ms)
         if (odometryTime.get() > 0.002) {
             odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
