@@ -131,7 +131,6 @@ public class Drivetrain extends SubsystemBase implements Testable {
     private double rightDistanceAcum = 0;
 
     private final Timer odometryTime = new Timer();
-    private boolean odometryLock = false;
 
     private final Field2d f2d;
 
@@ -741,15 +740,17 @@ public class Drivetrain extends SubsystemBase implements Testable {
      *
      * @param pose the new pose
      */
-    public synchronized void setPose(Pose2d pose) {
-        odometryLock = true;
-        zeroDistance();
-        odometry.resetPosition(pose, gyro.getRotation2d());
-        odometryLock = false;
+    public void setPose(Pose2d pose) {
+        synchronized (odometry) {
+            zeroDistance();
+            odometry.resetPosition(pose, gyro.getRotation2d());
+        }
     }
 
-    public synchronized Pose2d getPose() {
-        return odometry.getPoseMeters();
+    public Pose2d getPose() {
+        synchronized (odometry) {
+            return odometry.getPoseMeters();
+        }
     }
 
     /**
@@ -813,14 +814,15 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * Updates odometry.
      * It only updates at a rate of 500hz maximum.
      */
-    public synchronized void updateOdometry() {
-        if (odometryLock) return;
-        //prevemts unnessarly fast updates to the odemetry (2 ms)
-        if (odometryTime.get() > 0.002) {
-            odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
-            odometryTime.reset();
+    public void updateOdometry() {
+        synchronized (odometry) {
+            //prevemts unnessarly fast updates to the odemetry (2 ms)
+            if (odometryTime.get() > 0.002) {
+                odometry.update(gyro.getRotation2d(), getLeftDistance(), getRightDistance());
+                odometryTime.reset();
+            }
+            f2d.setRobotPose(odometry.getPoseMeters());
         }
-        f2d.setRobotPose(odometry.getPoseMeters());
     }
 
     public double getRotation() {
