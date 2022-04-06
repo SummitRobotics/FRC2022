@@ -150,9 +150,9 @@ public class RobotContainer {
                 }),
                 new InstantCommand(() -> {
                     LEDs.getInstance().addCall("left pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm));
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm, true));
                     LEDs.getInstance().addCall("right pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm));
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm, false));
                 }),
                 new RaiseIntake(intake)
         );
@@ -160,9 +160,9 @@ public class RobotContainer {
         testInit = new SequentialCommandGroup(
             new InstantCommand(() -> {
                 LEDs.getInstance().addCall("left pressure",
-                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmLeft).pressure(pcm));
+                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmLeft).pressure(pcm, true));
                 LEDs.getInstance().addCall("right pressure",
-                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmRight).pressure(pcm));
+                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmRight).pressure(pcm, false));
             }),
             new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
