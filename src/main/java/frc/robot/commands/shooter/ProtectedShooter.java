@@ -1,72 +1,68 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
+import frc.robot.oi.inputs.OIButton;
+import frc.robot.oi.inputs.OIAxis.PrioritizedAxis;
+import frc.robot.oi.inputs.OIButton.PrioritizedButton;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.RollingAverage;
+import frc.robot.utilities.lists.AxisPriorities;
 import frc.robot.utilities.lists.PIDValues;
 
-/**
- * Manual override for the shooter.
- */
-public class midrangeShooter extends CommandBase {
-
-    Shooter shooter;
-
-    Conveyor conveyor;
-    Lemonlight limelight;
-    Drivetrain drivetrain;
+public class ProtectedShooter extends CommandBase {
+    /** Creates a new ProtectedShooter. */
+    private Conveyor conveyor;
+    private Shooter shooter;
+    private Drivetrain drivetrain;
+    private Lemonlight limelight;
+    private OIButton trigger;
+    private OIButton.PrioritizedButton prioritizedTrigger;
     RollingAverage avg = new RollingAverage(5, false);
     protected PIDController alignPID;
-    private double speed = 1610;
+    private double speed = 1795;
     private double error = 25;
-
-    /**
-     * Manual override for the shooter.
-     *
-     * @param shooter the shooter subsystem
-     * @param conveyor the conveyor subsystem
-     * @param drivetrain drivetrain to align
-     * @param limelight limelight to align
-     */
-    public midrangeShooter(Shooter shooter,
+    public ProtectedShooter(Shooter shooter,
         Conveyor conveyor,
         Drivetrain drivetrain,
-        Lemonlight limelight) {
+        Lemonlight limelight,
+        OIButton trigger) {
+        this.drivetrain = drivetrain;
         this.shooter = shooter;
         this.conveyor = conveyor;
-        this.drivetrain = drivetrain;
+        this.trigger = trigger;
         this.limelight = limelight;
         this.alignPID = new PIDController(PIDValues.ALIGN_P, PIDValues.ALIGN_I, PIDValues.ALIGN_D);
 
-        // TODO - Set these, including the constants
         alignPID.setTolerance(2, 9999999);
         alignPID.setSetpoint(0);
-        addRequirements(shooter, drivetrain);
-
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(drivetrain, shooter);
     }
-    
 
+    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        shooter.stop();
-
-        shooter.extendHood();
-        limelight.setLEDMode(LEDModes.FORCE_ON);
+        prioritizedTrigger = trigger.prioritize(AxisPriorities.MANUAL_OVERRIDE);
     }
-    /**
-     * aligns to target.
-     *
-     * @param drivetrain drivetrain to use
-     * @param horizontalOffset angle offset by
-     * @return is aligned
-     */
 
+    /**
+     *  Aligns to target.
+     *
+     * @param drivetrain drivetrain 
+     * @param horizontalOffset horizontal offset to angle to
+     * @param limelightDistanceEstimate distance
+     * @return if aligned
+     */
+    
     public boolean driveAndAlign(Drivetrain drivetrain, double horizontalOffset, double limelightDistanceEstimate) {
     
         //sets if align target based on ball color
@@ -77,7 +73,7 @@ public class midrangeShooter extends CommandBase {
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
         // }
 
-        alignPID.setSetpoint(Math.atan(Math.toRadians(12 / limelightDistanceEstimate)));
+        alignPID.setSetpoint(3);
         
         double leftPower = 0;
         double rightPower = 0;
@@ -106,12 +102,13 @@ public class midrangeShooter extends CommandBase {
             Lemonlight.MAIN_MOUNT_ANGLE,
             Lemonlight.MAIN_TARGET_HEIGHT,
             limelight.getVerticalOffset());
+        shooter.setHoodPos(true);
         double horizontalOffset = limelight.getHorizontalOffset();
         boolean aligned = driveAndAlign(drivetrain, horizontalOffset, limelightDistanceEstimate);
 
-        if (Functions.isWithin(avg.getAverage(), speed, error) && aligned) {
+        if (Functions.isWithin(avg.getAverage(), speed, error) && aligned && prioritizedTrigger.get()) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
-            System.out.println("rpm: " + shooter.getShooterRPM());
+            // System.out.println("rpm: " + shooter.getShooterRPM());
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
         }
@@ -119,17 +116,16 @@ public class midrangeShooter extends CommandBase {
         shooter.setMotorTargetSpeed(speed);
     }
 
+    // Called once the command ends or is interrupted.
     @Override
-    public void end(final boolean interrupted) {
-        shooter.stop();
+    public void end(boolean interrupted) {
         drivetrain.stop();
-        shooter.setState(Shooter.States.NOT_SHOOTING);
-        limelight.setLEDMode(LEDModes.FORCE_OFF);
+        shooter.stop();
     }
 
+    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        System.out.println("existssssss: " + conveyor.doesBallExist());
-        return !conveyor.doesBallExist();
+        return false;
     }
 }
