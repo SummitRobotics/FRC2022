@@ -203,7 +203,7 @@ public class LEDCall implements LEDHandler {
      * @param ascending Whether or not the LED number are in ascending order
      * @return the modified LEDCall
      */
-    public LEDCall pressure(PCM pcm) {
+    public LEDCall pressure(PCM pcm, boolean ascending) {
         return new LEDCall(priority, range) {
             int maxLED = 0;
             int minLED = 1000;
@@ -220,10 +220,15 @@ public class LEDCall implements LEDHandler {
                 }
 
                 double pressure = pcm.getPressure() / 120;
-
-                return (minLED + (pressure * (maxLED - minLED)) >= led)
-                    ? new Color8Bit(Color.kGreen)
-                    : new Color8Bit(Color.kBlack);
+                if (ascending) {
+                    return (minLED + (pressure * (maxLED - minLED)) >= led)
+                        ? new Color8Bit(Color.kGreen)
+                        : new Color8Bit(Color.kBlack);
+                } else {
+                    return (maxLED - (pressure * (maxLED - minLED)) <= led)
+                        ? new Color8Bit(Color.kGreen)
+                        : new Color8Bit(Color.kBlack);
+                }
             }
         };
     }

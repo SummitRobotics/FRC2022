@@ -2,11 +2,14 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.WaitUntilConveyor;
+import frc.robot.commands.autonomous.FourBallAuto;
+import frc.robot.commands.autonomous.FourBallAutoBetter;
 import frc.robot.commands.climb.*;
 import frc.robot.commands.conveyor.ConveyorAutomation;
 import frc.robot.commands.conveyor.ConveyorMO;
@@ -150,19 +153,24 @@ public class RobotContainer {
                 }),
                 new InstantCommand(() -> {
                     LEDs.getInstance().addCall("left pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm));
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm, true));
                     LEDs.getInstance().addCall("right pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm));
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm, false));
                 }),
-                new RaiseIntake(intake)
+                new RaiseIntake(intake),
+
+                // TODO: MAKE SURE TO REMOVE THIS. DO NOT LEAVE THIS IN PLEASE!!! FOR TESTING ONLY
+                new InstantCommand(() -> {
+                    drivetrain.setPose(new Pose2d(7.637, 1.867, new Rotation2d(0, -1)));
+                })
         );
 
         testInit = new SequentialCommandGroup(
             new InstantCommand(() -> {
                 LEDs.getInstance().addCall("left pressure",
-                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmLeft).pressure(pcm));
+                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmLeft).pressure(pcm, true));
                 LEDs.getInstance().addCall("right pressure",
-                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmRight).pressure(pcm));
+                    new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmRight).pressure(pcm, false));
             }),
             new InstantCommand(
                         () -> ShuffleboardDriver.statusDisplay.addStatus(
@@ -412,7 +420,7 @@ public class RobotContainer {
             new DriveByTime(drivetrain, .8, .3),         
             new ShooterAtStart(shooter, conveyor, 1100),
             new EncoderDrive(-2.4, -2.4, drivetrain),            
-            new TurnByEncoderAbsolute(0, drivetrain),
+            new TurnByEncoderAbsolute(Rotation2d.fromDegrees(0), drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);
@@ -504,6 +512,8 @@ public class RobotContainer {
             new PrintCommand("auto done"));
         ShuffleboardDriver.autoChooser.addOption("4 high", twoBallAutoHighDLC);
 
+        ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball - Better UNTESTED", new FourBallAutoBetter(drivetrain, intake, shooter, conveyor, targetingLimelight));
+        ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball", new FourBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
     }
     
     /**
