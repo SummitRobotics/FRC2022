@@ -433,6 +433,27 @@ public class RobotContainer {
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball high", twoBallAutoHigh);
+        Command threeBallHigh = new SequentialCommandGroup(
+            autoInit.get(),
+            new LowerIntake(intake),
+            // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
+            new EncoderDrive(1, 1, drivetrain, .2),
+            new WaitCommand(1),
+            new RaiseIntake(intake),
+            new EncoderDrive(-1, -1, drivetrain),
+            new WaitCommand(.5),
+            new TurnByEncoder(180, drivetrain),
+            new WaitCommand(.5),     
+            new midrangeShooter(shooter, conveyor, drivetrain, targetingLimelight).withTimeout(12),
+            new EncoderDrive(-1.4, -1.4, drivetrain),
+            new TurnByEncoder(-60, drivetrain),
+            new LowerIntake(intake),
+            new EncoderDrive(1, 1, drivetrain),
+            new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor, true),
+            new TurnByEncoder(180, drivetrain),
+            new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight),
+            new PrintCommand("auto done"));
+        ShuffleboardDriver.autoChooser.addOption("3 ball high", twoBallAutoHigh);
 
         //TODO replace with low ball changes
         Command twoBallAutoLowDLC = new SequentialCommandGroup(
