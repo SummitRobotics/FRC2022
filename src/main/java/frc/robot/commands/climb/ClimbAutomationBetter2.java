@@ -5,6 +5,7 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.climb.climbAutomationSteps.AutoAlign;
 import frc.robot.commands.climb.climbAutomationSteps.CycleArms;
@@ -48,6 +49,7 @@ public class ClimbAutomationBetter2 extends StatefullSequentalCommandGroup {
             new InstantCommand(() -> LEDs.getInstance().addCall("climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All).flashing(Colors.RED, Colors.OFF))),
             new InstantCommand(() -> climb.setDetachPos(true)),
             new MoveArms(climb, -140),
+            new PrintCommand( "better 2 paint"),
             new MoveArms(climb, Climb.FORWARD_LIMIT),
             new InstantCommand(() -> climb.setDetachPos(false)),
             new WaitCommand(.1),

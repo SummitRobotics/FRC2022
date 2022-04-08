@@ -58,11 +58,12 @@ public class EncoderDrive extends CommandBase {
     public void initialize() {
         drivetrain.stop();
         drivetrain.setPIDMaxPower(maximumPower);
+        drivetrain.zeroDistance();
         
         // TODO test if this is accurate
-        drivetrain.setLeftMotorTarget(drivetrain.getLeftEncoderPosition() + drivetrain.distToEncoder(left));
+        drivetrain.setLeftMotorTarget(drivetrain.distToEncoder(left));
         
-        drivetrain.setRightMotorTarget(drivetrain.getRightEncoderPosition() + drivetrain.distToEncoder(right));
+        drivetrain.setRightMotorTarget(drivetrain.distToEncoder(right));
     }
 
     @Override
@@ -79,8 +80,8 @@ public class EncoderDrive extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return Math.abs(drivetrain.getLeftDistance() - left) < 0.05
-            && Math.abs(drivetrain.getRightDistance() - right) < 0.05;
+        return Math.abs(drivetrain.getLeftEncoderPosition() - drivetrain.distToEncoder(left)) < 2
+            && Math.abs(drivetrain.getRightEncoderPosition() - drivetrain.distToEncoder(right)) < 2;
 
     }
 }

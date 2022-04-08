@@ -17,7 +17,7 @@ import frc.robot.utilities.lists.PIDValues;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FullAutoShooterNew extends CommandBase {
+public class FullAutoShooterTele extends CommandBase {
 
     private Conveyor conveyor;
     private Shooter shooter;
@@ -50,7 +50,7 @@ public class FullAutoShooterNew extends CommandBase {
     private PIDController movePid;
 
     /** Creates a new FullAutoShooterNew. */
-    public FullAutoShooterNew(Drivetrain drivetrain, Shooter shooter, Conveyor conveyor, Lemonlight lemonlight) {
+    public FullAutoShooterTele(Drivetrain drivetrain, Shooter shooter, Conveyor conveyor, Lemonlight lemonlight) {
         this.drivetrain = drivetrain;
         this.shooter = shooter;
         this.conveyor = conveyor;
@@ -99,7 +99,7 @@ public class FullAutoShooterNew extends CommandBase {
             if (aligned && Functions.isWithin(shooter.getShooterRPM(), rpm, speedError) && okToShoot()) {
                 shooter.setState(Shooter.States.READY_TO_FIRE);
             } else {
-                //shooter.setState(Shooter.States.NOT_SHOOTING);
+                shooter.setState(Shooter.States.NOT_SHOOTING);
             }
 
         }
@@ -186,7 +186,7 @@ public class FullAutoShooterNew extends CommandBase {
         drivetrain.stop();
         shooter.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
-        //lemonlight.setLEDMode(LEDModes.FORCE_OFF);
+        lemonlight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override

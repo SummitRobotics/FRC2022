@@ -111,26 +111,26 @@ public class RobotContainer {
         autoClimbCommand = new ClimbAutomationBetter(drivetrain, climb);
 
         teleInit = new SequentialCommandGroup(
-                new InstantCommand(
-                        () -> {
-                            // simulated robots don't have joysticks
-                            if (RobotBase.isReal()) {
-                                if (!controller1.isConnected()
-                                        || !launchpad.isConnected()
-                                        || !joystick.isConnected()) {
-                                    System.out.println(
-                                            "not enough joysticks connected,"
-                                                    + "please make sure the xbox controller,launchpad,"
-                                                    + "and joystick are connected to the driver-station");
-                                    throw (new RuntimeException("not enough joysticks connected"));
-                                }
+                // new InstantCommand(
+                //         () -> {
+                //             // simulated robots don't have joysticks
+                //             if (RobotBase.isReal()) {
+                //                 if (!controller1.isConnected()
+                //                         || !launchpad.isConnected()
+                //                         || !joystick.isConnected()) {
+                //                     System.out.println(
+                //                             "not enough joysticks connected,"
+                //                                     + "please make sure the xbox controller,launchpad,"
+                //                                     + "and joystick are connected to the driver-station");
+                //                     throw (new RuntimeException("not enough joysticks connected"));
+                //                 }
 
-                                if (!controller1.isXboxController()) {
-                                    System.out.println("controller 0 is not the xbox controller");
-                                    throw (new RuntimeException("incorrect joystick in port 0"));
-                                }
-                            }
-                        }),
+                //                 if (!controller1.isXboxController()) {
+                //                     System.out.println("controller 0 is not the xbox controller");
+                //                     throw (new RuntimeException("incorrect joystick in port 0"));
+                //                 }
+                //             }
+                //         }),
                 new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
@@ -151,18 +151,18 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }),
-                new InstantCommand(() -> {
-                    LEDs.getInstance().addCall("left pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm, true));
-                    LEDs.getInstance().addCall("right pressure",
-                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm, false));
-                }),
-                new RaiseIntake(intake),
+                // new InstantCommand(() -> {
+                //     LEDs.getInstance().addCall("left pressure",
+                //         new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm, true));
+                //     LEDs.getInstance().addCall("right pressure",
+                //         new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm, false));
+                // }),
+                new RaiseIntake(intake)
 
                 // TODO: MAKE SURE TO REMOVE THIS. DO NOT LEAVE THIS IN PLEASE!!! FOR TESTING ONLY
-                new InstantCommand(() -> {
-                    drivetrain.setPose(new Pose2d(7.637, 1.867, new Rotation2d(0, -1)));
-                })
+                //new InstantCommand(() -> {
+                //    drivetrain.setPose(new Pose2d(7.637, 1.867, new Rotation2d(0, -1)));
+                //})
         );
 
         testInit = new SequentialCommandGroup(
@@ -222,6 +222,8 @@ public class RobotContainer {
         controller1.buttonB.whenPressed(
             new RaiseIntake(intake));
 
+        //controller1.buttonY.whileHeld(new FullAutoShooterNew(drivetrain, shooter, conveyor, targetingLimelight), true);
+
         controller1.buttonX.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor).withTimeout(5));
         // FullAutoShooterAssembly fullAutoShooterAssembly = new FullAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight);
         // launchpad.buttonG.whileHeld(fullAutoShooterAssembly);
@@ -242,42 +244,43 @@ public class RobotContainer {
 
         // launchpad.buttonF.booleanSupplierBind(shooter::getHoodPos);
 
-        // Climb
-        ClimbMO climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
+        // Climb        
+        Command climbMO = new ClimbMO(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button7,
                 joystick.button6, joystick.button8);
 
         launchpad.missileA.whileHeld(climbMO);
 
-        ClimbSemiAuto climbSemiAuto = new ClimbSemiAuto(climb, joystick.button2,
-            joystick.button8, joystick.button4, joystick.button5, joystick.button3,
-            joystick.button7);
         // launchpad.missileB.toggleWhenPressed(climbSemiAuto);
         launchpad.missileB.whileHeld(autoClimbCommand);
+
+        
         launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));
 
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button7,
                 joystick.button6, joystick.button8);
 
-        launchpad.buttonA.whenHeld(climbSemiAuto);
-        launchpad.buttonA.commandBind(climbSemiAuto);
+        
 
         launchpad.buttonE.commandBind(homeArms.get(), launchpad.buttonE::whenHeld);
 
-
+        Command protectedShooter = new ProtectedShooter(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger);
+        
         Command semiAutoShooter = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY, joystick.button4, 
             joystick.button5, arcadeDrive);
         launchpad.buttonG.commandBind(semiAutoShooter, launchpad.buttonG::whileHeld);
 
-        Command sas = new FullAutoShooterNew(drivetrain, shooter, conveyor, targetingLimelight);
+        Command sas = new FullAutoShooterTele(drivetrain, shooter, conveyor, targetingLimelight);
         launchpad.buttonH.whileHeld(sas);
         launchpad.buttonH.commandBind(sas);
 
-        ClimbAutomationBetter2 climbAutomationBetter2 = new ClimbAutomationBetter2(drivetrain, climb);
+        
 
         
-        launchpad.buttonD.commandBind(climbAutomationBetter2, launchpad.buttonD::whileHeld);
+        launchpad.buttonD.commandBind(protectedShooter, launchpad.buttonD::whileHeld);
+
+        launchpad.buttonA.whileHeld(new ClimbAutomationBetter2(drivetrain, climb));
         // launchpad.missileB.whileHeld(climbSemiAuto);
         // launchpad.buttonG.whileHeld(new ArcadeDrive(drivetrain, joystick.axisY,
         // joystick.axisX, joystick.button2));
@@ -413,14 +416,15 @@ public class RobotContainer {
             new EncoderDrive(1, 1, drivetrain, .2),
             new WaitCommand(1),
             new RaiseIntake(intake),
-            new EncoderDrive(-2, -2, drivetrain),
+            new EncoderDrive(-1.8, -1.8, drivetrain),
             new WaitCommand(.5),
+            new PrintCommand("about to turn"),
             new TurnByEncoder(170, drivetrain),
+            new PrintCommand("tuigbwdiab"),
             new WaitCommand(.5),
             new DriveByTime(drivetrain, .8, .3),         
             new ShooterAtStart(shooter, conveyor, 1100),
             new EncoderDrive(-2.4, -2.4, drivetrain),            
-            new TurnByEncoderAbsolute(Rotation2d.fromDegrees(0), drivetrain),
             new PrintCommand("auto done"));
 
         ShuffleboardDriver.autoChooser.addOption("2 ball low", twoBallAutoLow);

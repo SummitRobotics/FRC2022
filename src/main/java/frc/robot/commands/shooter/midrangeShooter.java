@@ -77,7 +77,7 @@ public class midrangeShooter extends CommandBase {
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
         // }
 
-        alignPID.setSetpoint(Math.atan(Math.toRadians(12 / limelightDistanceEstimate)));
+        alignPID.setSetpoint(9);
         
         double leftPower = 0;
         double rightPower = 0;
