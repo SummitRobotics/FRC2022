@@ -24,7 +24,7 @@ public class ShooterLow extends CommandBase {
 
     SimpleButton prioritizedSimpleControlButton;
     private static final double LOW_GOAL_SPEED = 1000;
-    private final double error = 70;
+    private final double error = 100;
     OIButton shootButton;
     OIButton.PrioritizedButton prioritizedShootButton;
 
@@ -57,7 +57,7 @@ public class ShooterLow extends CommandBase {
     public void execute() {
         // shooter.setMotorPower(controlAxis.get());
 
-        if (prioritizedShootButton.get() && Functions.isWithin(shooter.getShooterRPM(), LOW_GOAL_SPEED, error)) {
+        if (prioritizedShootButton.get() ){//&& Functions.isWithin(shooter.getShooterRPM(), LOW_GOAL_SPEED, error)) {
             shooter.setState(Shooter.States.READY_TO_FIRE);
         } else {
             shooter.setState(Shooter.States.NOT_SHOOTING);
@@ -68,15 +68,15 @@ public class ShooterLow extends CommandBase {
     }
 
     @Override
-    public void end(final boolean interrupted) {
+    public void end(boolean interrupted) {
         shooter.retractHood();
         shooter.stop();
         prioritizedShootButton.destroy();
         shooter.setState(Shooter.States.NOT_SHOOTING);
     }
 
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
+   @Override
+   public boolean isFinished() {
+       return false;
+   }
 }

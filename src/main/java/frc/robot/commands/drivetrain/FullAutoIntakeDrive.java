@@ -58,12 +58,12 @@ public class FullAutoIntakeDrive extends CommandBase {
         this.drivetrain = drivetrain;
         this.limelight = limelight;
         this.conveyor = conveyor;
-        this.movePID = new PIDController(0.02, 0, 0);
+        this.movePID = new PIDController(0.015, 0, 0);
         this.alignPID = new PIDController(0.005, 0, 0.0001);
         this.intake = intake;
         // TODO - set these
         movePID.setTolerance(1, 1);
-        movePID.setSetpoint(10);
+        movePID.setSetpoint(15);
         alignPID.setTolerance(1, 1);
         alignPID.setSetpoint(0);
 
@@ -102,6 +102,9 @@ public class FullAutoIntakeDrive extends CommandBase {
                     Lemonlight.BALL_MOUNT_ANGLE,
                     Lemonlight.BALL_TARGET_HEIGHT,
                     -eachLimelight[2]) + 19;
+
+                System.out.println(distTest);
+
                 if (limelightDistanceEstimate > distTest) {
                     color = eachLimelight[0];
                     limelightDistanceEstimate = distTest;

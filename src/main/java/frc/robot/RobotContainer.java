@@ -229,11 +229,11 @@ public class RobotContainer {
         // launchpad.buttonG.whileHeld(fullAutoShooterAssembly);
         // launchpad.buttonG.commandBind(fullAutoShooterAssembly);
         // Conveyor
-        launchpad.buttonB.whileHeld(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3));
+        launchpad.buttonB.commandBind(new ConveyorMO(conveyor, joystick.axisY, joystick.button2, joystick.button3), launchpad.buttonB::whileHeld);
 
         // Intake
         // controller1.buttonB.whenReleased(new IntakeToggle(intake));
-        launchpad.buttonC.whileHeld(new IntakeMO(intake, joystick.axisY, joystick.button2));
+        launchpad.buttonC.commandBind(new IntakeMO(intake, joystick.axisY, joystick.button2), launchpad.buttonC::whileHeld);
 
         // Shooter
         ShooterMO shooterMO = new ShooterMO(shooter, joystick.axisZ, launchpad.buttonF, joystick.trigger);
@@ -255,8 +255,6 @@ public class RobotContainer {
         launchpad.missileB.whileHeld(autoClimbCommand);
 
         
-        launchpad.buttonG.whileHeld(new ShooterLow(shooter, joystick.trigger));
-
         ClimbManual climbManual = new ClimbManual(climb, joystick.axisY, joystick.button4,
                 joystick.button5, joystick.button2, joystick.button7,
                 joystick.button6, joystick.button8);
@@ -267,9 +265,9 @@ public class RobotContainer {
 
         Command protectedShooter = new ProtectedShooter(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger);
         
-        Command semiAutoShooter = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY, joystick.button4, 
-            joystick.button5, arcadeDrive);
-        launchpad.buttonG.commandBind(semiAutoShooter, launchpad.buttonG::whileHeld);
+        // Command semiAutoShooter = new SemiAutoShooterAssembly(shooter, conveyor, drivetrain, targetingLimelight, joystick.trigger, joystick.axisY, joystick.button4, 
+        //     joystick.button5, arcadeDrive);
+        launchpad.buttonG.commandBind(new ShooterLow(shooter, joystick.trigger), launchpad.buttonG::whileHeld);
 
         Command sas = new FullAutoShooterTele(drivetrain, shooter, conveyor, targetingLimelight);
         launchpad.buttonH.whileHeld(sas);
@@ -377,7 +375,7 @@ public class RobotContainer {
             new DriveByTime(drivetrain, .6, -0.2),
             new PrintCommand("auto done"));
 
-        ShuffleboardDriver.autoChooser.setDefaultOption("shoot and drive", deafultAuto);
+        ShuffleboardDriver.autoChooser.addOption("shoot and drive", deafultAuto);
 
         Command shootWaitDrive = new SequentialCommandGroup(
             autoInit.get(),
@@ -496,7 +494,7 @@ public class RobotContainer {
         ShuffleboardDriver.autoChooser.addOption("4 high", twoBallAutoHighDLC);
 
         ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball - Better UNTESTED", new FourBallAutoBetter(drivetrain, intake, shooter, conveyor, targetingLimelight));
-        ShuffleboardDriver.autoChooser.addOption("Spline 4 Ball", new FourBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
+        ShuffleboardDriver.autoChooser.setDefaultOption("Spline 4 Ball", new FourBallAuto(drivetrain, intake, shooter, conveyor, targetingLimelight));
     }
     
     /**

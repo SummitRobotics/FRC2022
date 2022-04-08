@@ -109,6 +109,7 @@ public class Shooter extends SubsystemBase implements Testable {
      * @param state the new state of the shooter
      */
     public void setState(States state) {
+        // System.out.println(state + Thread.currentThread().getStackTrace()[2].getClassName());
         if (state.equals(States.READY_TO_FIRE)) {
             firing.activate();
         } else {

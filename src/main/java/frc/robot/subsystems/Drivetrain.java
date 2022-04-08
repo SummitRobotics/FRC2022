@@ -283,8 +283,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
      */
     public void highGear() {
         lowGear.cancel();
-        oldShift = false;
         updateDistanceAcum();
+        oldShift = false;
         shift.set(false);
     }
 
@@ -293,8 +293,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
      */
     public void lowGear() {
         lowGear.activate();
-        oldShift = true;
         updateDistanceAcum();
+        oldShift = true;
         shift.set(true);
     }
 
@@ -314,8 +314,8 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * Updates the distace acumulator.
      */
     private void updateDistanceAcum() {
-        leftDistanceAcum += getLeftDistance();
-        rightDistanceAcum += getRightDistance();
+        leftDistanceAcum = getLeftDistance();
+        rightDistanceAcum = getRightDistance();
         zeroEncoders();
     }
 
