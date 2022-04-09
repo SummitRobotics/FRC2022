@@ -45,8 +45,8 @@ public class FullAutoShooterTele extends CommandBase {
     private final double alignOffset = 14;
     private final double idleSpeed = 1700;
 
-    private final double turnFrictionPower = 0.05;
-    private final double turnFrictionNoneRange = 0.5;
+    private final double turnFrictionPower = 0.04;
+    private final double turnFrictionNoneRange = 0.4;
 
 
     //not tunable
@@ -102,7 +102,7 @@ public class FullAutoShooterTele extends CommandBase {
 
 
             if (aligned && Functions.isWithin(shooter.getShooterRPM(), rpm, speedError) && okToShoot()) {
-                shooter.setState(Shooter.States.READY_TO_FIRE);
+                //shooter.setState(Shooter.States.READY_TO_FIRE);
             } else {
                 shooter.setState(Shooter.States.NOT_SHOOTING);
             }
@@ -164,23 +164,23 @@ public class FullAutoShooterTele extends CommandBase {
             alignPid.setSetpoint(0);
         }
 
-        if (Functions.isWithin(offset, 0, okToMoveError*0.8)) {
+        if (Functions.isWithin(offset, 0, okToMoveError)) {
             double power = movePid.calculate(lld);
             leftPower -= power;
             rightPower -= power;
         }
 
         //overcomes whele frictiuon
-        // if(!Functions.isWithin(offset, alignPid.getSetpoint(), turnFrictionNoneRange)){
-        //     if(offset > 0){
-        //         leftPower -= turnFrictionPower;
-        //         rightPower += turnFrictionPower;
-        //     }
-        //     else{
-        //         leftPower += turnFrictionPower;
-        //         rightPower -= turnFrictionPower;
-        //     }
-        // }
+        if(!Functions.isWithin(offset, alignPid.getSetpoint(), turnFrictionNoneRange)){
+            if(offset > alignPid.getSetpoint()){
+                leftPower += turnFrictionPower;
+                rightPower -= turnFrictionPower;
+            }
+            else{
+                leftPower -= turnFrictionPower;
+                rightPower += turnFrictionPower;
+            }
+        }
 
         double alignPower;
 
@@ -188,7 +188,7 @@ public class FullAutoShooterTele extends CommandBase {
             alignPower = alignPid.calculate(offset);
         }
         else{
-            alignPower = 0;
+             alignPower = 0;
         }
 
         leftPower -= alignPower;
@@ -215,6 +215,6 @@ public class FullAutoShooterTele extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return !conveyor.doesBallExist();
+        return false;//!conveyor.doesBallExist();
     }
 }

@@ -163,6 +163,8 @@ public class ArcadeDrive extends CommandBase {
 
         double turn = Math.pow(turnAxis.get(), 3);
 
+        //System.out.println(turn);
+
         double limiterTurn = turnLimiter.getRateLimitedValue(turn);
 
         // if (intake.getState() == Intake.States.DOWN) {
