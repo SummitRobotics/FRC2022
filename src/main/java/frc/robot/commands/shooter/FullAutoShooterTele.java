@@ -5,6 +5,7 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.devices.Lemonlight.LEDModes;
@@ -28,7 +29,7 @@ public class FullAutoShooterTele extends CommandBase {
     // First value is distance in inches and second value is offset.
     private final Map<Double, Double> waypoints = Map.ofEntries(
         Map.entry(65.0, 9.0),
-        Map.entry(155.0, 7.0)
+        Map.entry(155.0, 6.0)
     );
 
     private final double maxDist = 160;
@@ -37,12 +38,15 @@ public class FullAutoShooterTele extends CommandBase {
 
     private final double moveError = 3;
     private final double okToMoveError = 15;
-    private final double alignError = 2;
-    private final double speedError = 25;
+    private final double alignError = 0.4;
+    private final double speedError = 40;
     private final double okToSpoolError = 25;
 
     private final double alignOffset = 14;
     private final double idleSpeed = 1700;
+
+    private final double turnFrictionPower = 0.05;
+    private final double turnFrictionNoneRange = 0.5;
 
 
     //not tunable
@@ -60,6 +64,7 @@ public class FullAutoShooterTele extends CommandBase {
         movePid = new PIDController(PIDValues.MOVE_P, PIDValues.MOVE_I, PIDValues.MOVE_D);
         alignPid.setTolerance(alignError);
         movePid.setTolerance(moveError);
+        SmartDashboard.putData(alignPid);
 
     }
 
@@ -159,13 +164,32 @@ public class FullAutoShooterTele extends CommandBase {
             alignPid.setSetpoint(0);
         }
 
-        if (Functions.isWithin(offset, 0, okToMoveError)) {
+        if (Functions.isWithin(offset, 0, okToMoveError*0.8)) {
             double power = movePid.calculate(lld);
             leftPower -= power;
             rightPower -= power;
         }
 
-        double alignPower = alignPid.calculate(offset);
+        //overcomes whele frictiuon
+        // if(!Functions.isWithin(offset, alignPid.getSetpoint(), turnFrictionNoneRange)){
+        //     if(offset > 0){
+        //         leftPower -= turnFrictionPower;
+        //         rightPower += turnFrictionPower;
+        //     }
+        //     else{
+        //         leftPower += turnFrictionPower;
+        //         rightPower -= turnFrictionPower;
+        //     }
+        // }
+
+        double alignPower;
+
+        if(!Functions.isWithin(offset, alignPid.getSetpoint(), alignError)){
+            alignPower = alignPid.calculate(offset);
+        }
+        else{
+            alignPower = 0;
+        }
 
         leftPower -= alignPower;
         rightPower += alignPower;

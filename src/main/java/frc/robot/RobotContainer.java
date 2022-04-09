@@ -344,7 +344,7 @@ public class RobotContainer {
     }
 
     public void testInit() {
-        scheduler.schedule(testInit);
+        scheduler.schedule(teleInit);
     }
 
     private void createAutoCommands() {
@@ -430,6 +430,7 @@ public class RobotContainer {
         Command twoBallAutoHigh = new SequentialCommandGroup(
             autoInit.get(),
             new LowerIntake(intake),
+            new WaitCommand(2),
             // new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor),
             new EncoderDrive(1, 1, drivetrain, .2),
             new WaitCommand(1),

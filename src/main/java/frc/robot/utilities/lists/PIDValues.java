@@ -13,8 +13,8 @@ public final class PIDValues {
 
         // align PID
         ALIGN_P = 0.02,
-        ALIGN_I = 0.02,
-        ALIGN_D = 0.001,
+        ALIGN_I = 0.05,
+        ALIGN_D = 0.0015,
 
         // climb PID
         CLIMB_P = 0.15,
