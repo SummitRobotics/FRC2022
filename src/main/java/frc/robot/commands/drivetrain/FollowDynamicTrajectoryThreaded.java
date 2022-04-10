@@ -104,7 +104,7 @@ public class FollowDynamicTrajectoryThreaded extends CommandBase {
                 trajectory,
                 drivetrain::getPose,
                 // TODO tune controller values
-                new RamseteController(1.5, 0.8),
+                new RamseteController(),
                 Drivetrain.DriveKinimatics,
                 drivetrain::setMotorTargetSpeed,
                 drivetrain);

@@ -5,6 +5,7 @@
 package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.climb.climbAutomationSteps.AutoAlign;
 import frc.robot.commands.climb.climbAutomationSteps.CycleArms;
@@ -49,6 +50,7 @@ public class ClimbAutomationBetter extends StatefullSequentalCommandGroup {
             new InstantCommand(() -> climb.setDetachPos(true)),
             new MoveArms(climb, -140),
             autoAlign,
+            new PrintCommand("PAINF"),
             new MoveArms(climb, Climb.FORWARD_LIMIT),
             new InstantCommand(() -> climb.setDetachPos(false)),
             new WaitCommand(.1),

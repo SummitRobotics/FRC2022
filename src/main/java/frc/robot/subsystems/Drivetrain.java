@@ -570,15 +570,15 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return position of motor in rotations
      */
     public double getRightEncoderPosition() {
-        ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getPosition(), rightMiddleEncoder.getPosition(), rightBackEncoder.getPosition()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
-                || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
-                || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
-        return Functions.medianWithoutExtraneous(x);
+        // ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getPosition(), rightMiddleEncoder.getPosition(), rightBackEncoder.getPosition()));
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
+        //         || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+        //         || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
+        return rightEncoder.getPosition();
     }
 
     /**
@@ -587,39 +587,39 @@ public class Drivetrain extends SubsystemBase implements Testable {
      * @return position of motor in rotations
      */
     public double getLeftEncoderPosition() {
-        ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getPosition(), leftMiddleEncoder.getPosition(), leftBackEncoder.getPosition()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
-                || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
-                || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
-        return Functions.medianWithoutExtraneous(x);
+        // ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getPosition(), leftMiddleEncoder.getPosition(), leftBackEncoder.getPosition()));
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
+        //         || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+        //         || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
+        return leftEncoder.getPosition();
     }
 
     public double getLeftRPM() {
-        ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getVelocity(), leftMiddleEncoder.getVelocity(), leftBackEncoder.getVelocity()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
-                || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
-                || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
-        return Functions.medianWithoutExtraneous(x);
+        // ArrayList<Double> x = new ArrayList<Double>(List.of(leftEncoder.getVelocity(), leftMiddleEncoder.getVelocity(), leftBackEncoder.getVelocity()));
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
+        //         || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+        //         || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
+        return leftEncoder.getVelocity();
     }
 
     public double getRightRPM() {
-        ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getVelocity(), rightMiddleEncoder.getVelocity(), rightBackEncoder.getVelocity()));
-        for (CANSparkMax motor : allMotors) {
-            if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
-                || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
-                || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
-                System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
-            }
-        }
-        return Functions.medianWithoutExtraneous(x);
+        // ArrayList<Double> x = new ArrayList<Double>(List.of(rightEncoder.getVelocity(), rightMiddleEncoder.getVelocity(), rightBackEncoder.getVelocity()));
+        // for (CANSparkMax motor : allMotors) {
+        //     if (motor.getFault(CANSparkMax.FaultID.kSensorFault)
+        //         || motor.getFault(CANSparkMax.FaultID.kCANRX) || motor.getFault(CANSparkMax.FaultID.kCANTX)
+        //         || motor.getFault(CANSparkMax.FaultID.kMotorFault)) {
+        //         System.out.println("ERRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRR");
+        //     }
+        // }
+        return rightEncoder.getVelocity();
     }
 
     /**

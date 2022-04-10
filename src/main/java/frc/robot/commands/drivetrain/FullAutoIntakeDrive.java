@@ -59,7 +59,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         this.limelight = limelight;
         this.conveyor = conveyor;
         this.movePID = new PIDController(0.02, 0, 0);
-        this.alignPID = new PIDController(0.005, 0, 0);
+        this.alignPID = new PIDController(0.005, 0, 0.0001);
         this.intake = intake;
         // TODO - set these
         movePID.setTolerance(1, 1);

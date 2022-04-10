@@ -20,6 +20,7 @@ import frc.robot.utilities.lists.PIDValues;
 
 public class ProtectedShooter extends CommandBase {
     /** Creates a new ProtectedShooter. */
+    private final double angleOffset = 7.5;
     private Conveyor conveyor;
     private Shooter shooter;
     private Drivetrain drivetrain;
@@ -28,7 +29,7 @@ public class ProtectedShooter extends CommandBase {
     private OIButton.PrioritizedButton prioritizedTrigger;
     RollingAverage avg = new RollingAverage(5, false);
     protected PIDController alignPID;
-    private double speed = 1795;
+    private double speed = 1850;
     private double error = 25;
     public ProtectedShooter(Shooter shooter,
         Conveyor conveyor,
@@ -43,7 +44,7 @@ public class ProtectedShooter extends CommandBase {
         this.alignPID = new PIDController(PIDValues.ALIGN_P, PIDValues.ALIGN_I, PIDValues.ALIGN_D);
 
         alignPID.setTolerance(2, 9999999);
-        alignPID.setSetpoint(0);
+        alignPID.setSetpoint(angleOffset);
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(drivetrain, shooter);
     }
@@ -73,7 +74,7 @@ public class ProtectedShooter extends CommandBase {
         //     alignPID.setSetpoint(TARGET_WRONG_COLOR_MISS);
         // }
 
-        alignPID.setSetpoint(3);
+        alignPID.setSetpoint(angleOffset);
         
         double leftPower = 0;
         double rightPower = 0;
@@ -126,6 +127,6 @@ public class ProtectedShooter extends CommandBase {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return !conveyor.doesBallExist();
     }
 }
