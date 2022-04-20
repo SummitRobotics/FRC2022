@@ -43,7 +43,7 @@ public class FullAutoIntakeDrive extends CommandBase {
     private Conveyor conveyor;
     private Intake intake;
     private boolean isBackingUp;
-
+    private boolean isThreeBall;
     /**
      * Constructor.
      *
@@ -71,7 +71,25 @@ public class FullAutoIntakeDrive extends CommandBase {
         teamColor = DriverStation.getAlliance().toString();
         isBackingUp = false;
     }
+    public FullAutoIntakeDrive(Drivetrain drivetrain,
+        Lemonlight limelight, Conveyor conveyor, Intake intake, boolean isThreeBall) {
+        this.drivetrain = drivetrain;
+        this.limelight = limelight;
+        this.conveyor = conveyor;
+        this.movePID = new PIDController(0.02, 0, 0);
+        this.alignPID = new PIDController(0.005, 0, 0);
+        this.intake = intake;
+        // TODO - set these
+        movePID.setTolerance(1, 1);
+        movePID.setSetpoint(10);
+        alignPID.setTolerance(1, 1);
+        alignPID.setSetpoint(0);
 
+        addRequirements(drivetrain, intake);
+        teamColor = DriverStation.getAlliance().toString();
+        isBackingUp = false;
+        this.isThreeBall = isThreeBall;
+    }
     @Override
     public void initialize() {
         teamColor = DriverStation.getAlliance().toString();
@@ -160,6 +178,10 @@ public class FullAutoIntakeDrive extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return (conveyor.getIndexState() != ConveyorState.NONE && conveyor.getBeltState() != ConveyorState.NONE) || changed;
+        if (isThreeBall) {
+            return (conveyor.getIndexState() != ConveyorState.NONE || conveyor.getBeltState() != ConveyorState.NONE) || changed;
+        } else {
+            return (conveyor.getIndexState() != ConveyorState.NONE && conveyor.getBeltState() != ConveyorState.NONE) || changed;
+        }
     }
 }

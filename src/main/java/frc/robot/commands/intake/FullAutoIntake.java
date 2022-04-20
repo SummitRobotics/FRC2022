@@ -15,5 +15,8 @@ public class FullAutoIntake extends SequentialCommandGroup {
     public FullAutoIntake(Drivetrain drivetrain, Intake intake, Lemonlight limelight, Conveyor conveyor) {
         addCommands(new LowerIntake(intake), new FullAutoIntakeDrive(drivetrain, limelight, conveyor, intake));
     }
+    public FullAutoIntake(Drivetrain drivetrain, Intake intake, Lemonlight limelight, Conveyor conveyor, boolean isThreeBall) {
+        addCommands(new LowerIntake(intake), new FullAutoIntakeDrive(drivetrain, limelight, conveyor, intake, isThreeBall));
+    }
     
 }
