@@ -3,6 +3,7 @@ package frc.robot.devices.LEDs;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.devices.PCM;
+import frc.robot.utilities.RollingAverage;
 
 /**
  * Class to make an LED Call. This is so we can change the LED's on the robot.
@@ -208,6 +209,8 @@ public class LEDCall implements LEDHandler {
             int maxLED = 0;
             int minLED = 1000;
 
+            RollingAverage averagePressure = new RollingAverage(500, true);
+
             @Override
             public Color8Bit getColor(int loop, int led) {
 
@@ -218,8 +221,8 @@ public class LEDCall implements LEDHandler {
                 if (led < minLED) {
                     minLED = led;
                 }
-
-                double pressure = pcm.getPressure() / 120;
+                averagePressure.update(pcm.getPressure() / 120);
+                double pressure = averagePressure.getAverage();
                 if (ascending) {
                     return (minLED + (pressure * (maxLED - minLED)) >= led)
                         ? new Color8Bit(Color.kGreen)

@@ -151,12 +151,12 @@ public class RobotContainer {
                     launchpad.bigLEDRed.set(false);
                     launchpad.bigLEDGreen.set(false);
                 }),
-                // new InstantCommand(() -> {
-                //     LEDs.getInstance().addCall("left pressure",
-                //         new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm, true));
-                //     LEDs.getInstance().addCall("right pressure",
-                //         new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm, false));
-                // }),
+                new InstantCommand(() -> {
+                    LEDs.getInstance().addCall("left pressure",
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmLeft).pressure(pcm, true));
+                    LEDs.getInstance().addCall("right pressure",
+                        new LEDCall(LEDPriorities.PRESSURE, LEDRange.ArmRight).pressure(pcm, false));
+                }),
                 new RaiseIntake(intake)
 
                 // TODO: MAKE SURE TO REMOVE THIS. DO NOT LEAVE THIS IN PLEASE!!! FOR TESTING ONLY
@@ -344,7 +344,7 @@ public class RobotContainer {
     }
 
     public void testInit() {
-        scheduler.schedule(teleInit);
+        scheduler.schedule(testInit);
     }
 
     private void createAutoCommands() {
