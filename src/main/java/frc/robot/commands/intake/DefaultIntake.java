@@ -1,9 +1,6 @@
 package frc.robot.commands.intake;
 
 import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Conveyor;

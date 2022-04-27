@@ -49,7 +49,7 @@ public class ClimbAutomationBetter2 extends StatefullSequentalCommandGroup {
             new InstantCommand(() -> LEDs.getInstance().addCall("climbing", new LEDCall(LEDPriorities.CLIMBING, LEDRange.All).flashing(Colors.RED, Colors.OFF))),
             new InstantCommand(() -> climb.setDetachPos(true)),
             new MoveArms(climb, -140),
-            new PrintCommand( "better 2 paint"),
+            new PrintCommand("better 2 paint"),
             new MoveArms(climb, Climb.FORWARD_LIMIT),
             new InstantCommand(() -> climb.setDetachPos(false)),
             new WaitCommand(.1),

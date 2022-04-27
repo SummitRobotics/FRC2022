@@ -18,7 +18,6 @@ import frc.robot.utilities.Testable;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
 import frc.robot.utilities.lists.Ports;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,7 +41,6 @@ public class Shooter extends SubsystemBase implements Testable {
 
     private States shooterState = States.NOT_SHOOTING;
 
-    // TODO - Set these
     public static final double
             P = 0.0005,
             I = 0,

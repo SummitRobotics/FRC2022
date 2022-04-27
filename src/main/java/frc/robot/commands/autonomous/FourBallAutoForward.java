@@ -6,17 +6,28 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.LowerIntake;
 import frc.robot.commands.intake.RaiseIntake;
-import frc.robot.commands.shooter.FullAutoShooterAssembly;
 import frc.robot.commands.shooter.FullAutoShooterNew;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-
 import java.util.List;
 
+/**
+ * Four ball auto forward.
+ */
 public class FourBallAutoForward extends AutoCommand {
+
+    /**
+     * Four ball auto forward.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param intake The intake subsystem
+     * @param shooter The shooter subsystem
+     * @param conveyor The conveyor subsystem
+     * @param limelight The limelight
+     */
     public FourBallAutoForward(Drivetrain drivetrain, Intake intake, Shooter shooter, Conveyor conveyor, Lemonlight limelight) {
         super(drivetrain, new Pose2d(7.583, 2.241, new Rotation2d(0, -1.417)));
 

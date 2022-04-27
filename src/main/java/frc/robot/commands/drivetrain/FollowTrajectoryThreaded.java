@@ -5,8 +5,6 @@
 package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.controller.RamseteController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -17,9 +15,6 @@ import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.utilities.lists.Colors;
 import frc.robot.utilities.lists.LEDPriorities;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Command to follow a trajectory.

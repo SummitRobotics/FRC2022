@@ -7,16 +7,16 @@ package frc.robot.commands.shooter;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
-
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Full auto shooter new.
+ */
 public class FullAutoShooterNew extends CommandBase {
 
     private Conveyor conveyor;
@@ -49,8 +49,19 @@ public class FullAutoShooterNew extends CommandBase {
     private PIDController alignPid;
     private PIDController movePid;
 
-    /** Creates a new FullAutoShooterNew. */
-    public FullAutoShooterNew(Drivetrain drivetrain, Shooter shooter, Conveyor conveyor, Lemonlight lemonlight) {
+    /**
+     * Creates a new FullAutoShooterNew.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param shooter The shooter subsystem
+     * @param conveyor The conveyor subsystem
+     * @param lemonlight The targeting limelight
+     */
+    public FullAutoShooterNew(
+        Drivetrain drivetrain,
+        Shooter shooter,
+        Conveyor conveyor,
+        Lemonlight lemonlight) {
         this.drivetrain = drivetrain;
         this.shooter = shooter;
         this.conveyor = conveyor;

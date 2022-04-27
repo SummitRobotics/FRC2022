@@ -71,6 +71,16 @@ public class FullAutoIntakeDrive extends CommandBase {
         teamColor = DriverStation.getAlliance().toString();
         isBackingUp = false;
     }
+
+    /**
+     * Full auto intake drive.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param limelight The limelight
+     * @param conveyor The conveyor subsystem
+     * @param intake The intake subsystem
+     * @param isThreeBall Whether or not we are attempting three ball
+     */
     public FullAutoIntakeDrive(Drivetrain drivetrain,
         Lemonlight limelight, Conveyor conveyor, Intake intake, boolean isThreeBall) {
         this.drivetrain = drivetrain;
@@ -90,6 +100,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         isBackingUp = false;
         this.isThreeBall = isThreeBall;
     }
+    
     @Override
     public void initialize() {
         teamColor = DriverStation.getAlliance().toString();
@@ -169,7 +180,7 @@ public class FullAutoIntakeDrive extends CommandBase {
             }
             //drivetrain.stop();
         }
-        }   
+    }   
 
     @Override
     public void end(boolean interrupted) {
