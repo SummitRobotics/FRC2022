@@ -6,7 +6,6 @@ import java.util.Vector;
  * Utility class for 3D vectors.
  */
 public class Vector3D {
-
     private double xComponent;
     private double yComponent;
     private double zComponent;
@@ -22,6 +21,28 @@ public class Vector3D {
         this.xComponent = xComponent;
         this.yComponent = yComponent;
         this.zComponent = zComponent;
+    }
+
+    /**
+     * Enum for referencing different planes.
+     */
+    public enum Plane {
+        XYPlane,
+        XZPlane,
+        YZPlane
+    }
+
+    public enum Axis{
+        XAxis,
+        YAxis,
+        ZAxis
+    }
+
+    /**
+     * Creates a vector with x, y, z components at 0.
+     */
+    public Vector3D() {
+        this(0,0,0);
     }
 
     /**
@@ -43,6 +64,36 @@ public class Vector3D {
     }
 
     /**
+     * Sets a new x for the vector.
+     *
+     * @param value The new value
+     */
+    public Vector3D setXComponent(double value) {
+        xComponent = value;
+        return this;
+    }
+
+    /**
+     * Sets a new y for the vector.
+     *
+     * @param value The new value
+     */
+    public Vector3D setYComponent(double value) {
+        yComponent = value;
+        return this;
+    }
+
+    /**
+     * Sets a new z for the vector.
+     *
+     * @param value The new value
+     */
+    public Vector3D setZComponent(double value) {
+        zComponent = value;
+        return this;
+    }
+
+    /**
      * Returns the z or k-hat component of the vector.
      *
      * @return z component
@@ -58,6 +109,15 @@ public class Vector3D {
      */
     public double getMagnitude() {
         return Math.sqrt((xComponent * xComponent) + (yComponent * yComponent) + (zComponent * zComponent));
+    }
+
+    /**
+     * Creates a copy of the current vector.
+     *
+     * @return Creates a copy of the curent vector
+     */
+    public Vector3D copy() {
+        return new Vector3D(xComponent, yComponent, zComponent);
     }
 
     /**
@@ -184,21 +244,74 @@ public class Vector3D {
 
     /**
      * Gets the angle between the current vector and the other vector.
+     * Returns 0 if either vector is 0
      *
      * @param other The other vector
      * @return The angle between the two vectors in Radians
      */
     public double getAngleRadians(Vector3D other) {
+        if (this.getMagnitude() * other.getMagnitude() == 0) {
+            return 0;
+        }
         return Math.acos((this.dotProduct(other)) / (this.getMagnitude() * other.getMagnitude()));
     }
 
     /**
      * Gets the angle between the current vector and the other vector.
+     * Returns 0 if either vector is 0
      *
      * @param other The other vector
      * @return The angle between the two vectors in Degrees
      */
     public double getAngleDegrees(Vector3D other) {
         return Math.toDegrees(getAngleRadians(other));
+    }
+
+    /**
+     * Gets the angle in a certain plane compared to an axis.
+     *
+     * @param plane The plane we are looking at
+     * @param axis The axis we are comparing it to
+     * @return The angle in that plane.
+     */
+    public double getAngleInPlane(Plane plane, Axis axis) {
+        Vector3D tempVector = this.copy();
+        Vector3D comparisonVector;
+
+        switch (plane) {
+            case XYPlane:
+                tempVector.setZComponent(0);
+                break;
+            case XZPlane:
+                tempVector.setYComponent(0);
+                break;
+            case YZPlane:
+                tempVector.setXComponent(0);
+                break;
+            default:
+                break;
+        }
+
+        switch (axis) {
+            case XAxis:
+                comparisonVector = new Vector3D(1, 0, 0);
+                break;
+            case YAxis:
+                comparisonVector = new Vector3D(0, 1, 0);
+                break;
+            case ZAxis:
+                comparisonVector = new Vector3D(0, 0, 1);
+                break;
+            default:
+                comparisonVector = new Vector3D();
+                break;
+        }
+
+        return tempVector.getAngleRadians(comparisonVector);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("3D Vector - (X:%f, Y:%f, Z:%f)", xComponent, yComponent, zComponent);
     }
 }

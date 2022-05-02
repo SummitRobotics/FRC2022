@@ -1,6 +1,7 @@
 package frc.robot.utilities;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.devices.BallLemonlight;
 import frc.robot.devices.Lemonlight;
 import java.util.ArrayList;
 
@@ -89,10 +90,10 @@ public class CustomVisionData {
      * @return Distance estimate in inches.
      */
     private double calculateYOffset() {
-        return Lemonlight.getLimelightDistanceEstimateIN(
-                Lemonlight.BALL_MOUNT_HEIGHT,
-                Lemonlight.BALL_MOUNT_ANGLE,
-                Lemonlight.BALL_TARGET_HEIGHT,
+        return BallLemonlight.getLimelightDistanceEstimateIN(
+                BallLemonlight.BALL_MOUNT_HEIGHT,
+                BallLemonlight.BALL_MOUNT_ANGLE,
+                BallLemonlight.BALL_TARGET_HEIGHT,
                 yAngle
         );
     }
@@ -103,7 +104,7 @@ public class CustomVisionData {
      * @return X Offset estimate in inches.
      */
     private double calculateXOffset(double distance) {
-        return Lemonlight.getXOOffsetDistanceEstimateIN(
+        return BallLemonlight.getXOOffsetDistanceEstimateIN(
                 xAngle, mountXAngle, 0, Units.inchesToMeters(distance) * 100
         );
     }

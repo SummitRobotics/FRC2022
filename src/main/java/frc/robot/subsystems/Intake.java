@@ -8,6 +8,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.devices.BallLemonlight;
 import frc.robot.devices.Lemonlight;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.Testable;
@@ -55,7 +56,7 @@ public class Intake extends SubsystemBase implements Testable {
     private boolean intakeSolenoidPosition = false;
 
     // ball limelight (tested in this subsystem)
-    private Lemonlight ballLimelight;
+    private BallLemonlight ballLimelight;
 
     private final SparkMaxPIDController intakePidController = intakeMotor.getPIDController();
 
@@ -64,7 +65,7 @@ public class Intake extends SubsystemBase implements Testable {
      *
      * @param ballLimelight The limelight used for ball tracking
      */
-    public Intake(Lemonlight ballLimelight) {
+    public Intake(BallLemonlight ballLimelight) {
         this.ballLimelight = ballLimelight;
         intakePidController.setP(P);
         intakePidController.setI(I);
@@ -232,12 +233,12 @@ public class Intake extends SubsystemBase implements Testable {
         return result;
     }
 
-    @Override
-    public HashMap<String, Lemonlight> getLimelights() {
-        HashMap<String, Lemonlight> result = new HashMap<String, Lemonlight>();
-        result.put("limelight-balls", ballLimelight);
-        return result;
-    }
+//    @Override
+//    public HashMap<String, Lemonlight> getLimelights() {
+//        HashMap<String, Lemonlight> result = new HashMap<String, Lemonlight>();
+//        result.put("limelight-balls", ballLimelight);
+//        return result;
+//    }
 
     @Override
     public void initSendable(SendableBuilder builder) {

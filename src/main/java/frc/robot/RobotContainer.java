@@ -49,8 +49,8 @@ public class RobotContainer {
     private final Intake intake;
     private final Climb climb;
 
-    private final Lemonlight targetingLimelight,
-            ballDetectionLimelight;
+    private final Lemonlight targetingLimelight;
+    private final BallLemonlight ballDetectionLimelight;
     private final PCM pcm;
     private final AHRS gyro;
     private final PowerDistribution pdp;
@@ -85,9 +85,9 @@ public class RobotContainer {
 
         gyro = new AHRS();
 
-        targetingLimelight = new Lemonlight("gloworm", false, true);
+        targetingLimelight = new Lemonlight("gloworm", Lemonlight.Type.PhotonVision, new Vector3D(0,0,0), new Vector3D(0,1,0), 100);
         // TODO: need to ensure that this name is set on the limelight as well.
-        ballDetectionLimelight = new Lemonlight("limelight-balls", true, false);
+        ballDetectionLimelight = new BallLemonlight("limelight-balls");
 
         // Init Subsystems
         drivetrain = new Drivetrain(gyro);

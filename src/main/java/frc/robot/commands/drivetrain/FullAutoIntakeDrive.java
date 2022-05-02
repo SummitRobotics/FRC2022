@@ -3,6 +3,7 @@ package frc.robot.commands.drivetrain;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.devices.BallLemonlight;
 import frc.robot.devices.Lemonlight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Conveyor.ConveyorState;
@@ -32,7 +33,7 @@ public class FullAutoIntakeDrive extends CommandBase {
     private Drivetrain drivetrain;
     private String teamColor;
     // devices
-    private Lemonlight limelight;
+    private BallLemonlight limelight;
     // PID controllers
     private PIDController movePID;
     private PIDController alignPID;
@@ -54,7 +55,7 @@ public class FullAutoIntakeDrive extends CommandBase {
      */
 
     public FullAutoIntakeDrive(Drivetrain drivetrain,
-        Lemonlight limelight, Conveyor conveyor, Intake intake) {
+                               BallLemonlight limelight, Conveyor conveyor, Intake intake) {
         this.drivetrain = drivetrain;
         this.limelight = limelight;
         this.conveyor = conveyor;
@@ -72,7 +73,7 @@ public class FullAutoIntakeDrive extends CommandBase {
         isBackingUp = false;
     }
     public FullAutoIntakeDrive(Drivetrain drivetrain,
-        Lemonlight limelight, Conveyor conveyor, Intake intake, boolean isThreeBall) {
+        BallLemonlight limelight, Conveyor conveyor, Intake intake, boolean isThreeBall) {
         this.drivetrain = drivetrain;
         this.limelight = limelight;
         this.conveyor = conveyor;
@@ -115,10 +116,10 @@ public class FullAutoIntakeDrive extends CommandBase {
         }
         for (double[] eachLimelight : limelightData) {
             if ((eachLimelight[0] == 0.0 && teamColor == "Red") || (eachLimelight[0] == 1.0 && teamColor == "Blue")) {
-                distTest = Lemonlight.getLimelightDistanceEstimateIN(
-                    Lemonlight.BALL_MOUNT_HEIGHT,
-                    Lemonlight.BALL_MOUNT_ANGLE,
-                    Lemonlight.BALL_TARGET_HEIGHT,
+                distTest = BallLemonlight.getLimelightDistanceEstimateIN(
+                    BallLemonlight.BALL_MOUNT_HEIGHT,
+                    BallLemonlight.BALL_MOUNT_ANGLE,
+                    BallLemonlight.BALL_TARGET_HEIGHT,
                     -eachLimelight[2]) + 19;
 
                 System.out.println(distTest);

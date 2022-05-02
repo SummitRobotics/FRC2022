@@ -10,6 +10,7 @@ import frc.robot.subsystems.Conveyor.ConveyorState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
+import frc.robot.utilities.Vector3D;
 import frc.robot.utilities.lists.PIDValues;
 
 /**
@@ -38,6 +39,7 @@ public class FullAutoShooterAssembly extends CommandBase {
     protected double currentIndexSpeed;
     protected boolean isDrivenAndAligned;
     boolean properlyAligned;
+    Vector3D targetVector;
 
     //constants
     protected static final double
@@ -286,12 +288,8 @@ public class FullAutoShooterAssembly extends CommandBase {
     @Override
     public void execute() {
         limelightHasTarget = limelight.hasTarget();
-        limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
-            Lemonlight.MAIN_MOUNT_HEIGHT,
-            Lemonlight.MAIN_MOUNT_ANGLE,
-            Lemonlight.MAIN_TARGET_HEIGHT,
-            limelight.getVerticalOffset());
-        smoothedHorizontalOffset = limelight.getHorizontalOffset();
+        targetVector = limelight.getTargetVector();
+        limelightDistanceEstimate = targetVector.getMagnitude();
         indexState = conveyor.getIndexState();
         hoodPos = shooter.getHoodPos();
         currentMotorSpeed = shooter.getShooterRPM();
