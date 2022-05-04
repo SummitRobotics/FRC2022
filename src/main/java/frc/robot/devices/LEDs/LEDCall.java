@@ -1,5 +1,7 @@
 package frc.robot.devices.LEDs;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.devices.PCM;
@@ -232,6 +234,23 @@ public class LEDCall implements LEDHandler {
                         ? new Color8Bit(Color.kGreen)
                         : new Color8Bit(Color.kBlack);
                 }
+            }
+        };
+    }
+
+    /**
+     * LEDCall for testing axis priorities.
+     *
+     * @param button The button being tested
+     * @return the modified LEDCall
+     */
+    public LEDCall conditionalOn(BooleanSupplier supplier) {
+        return new LEDCall(priority, range) {
+            @Override
+            public Color8Bit getColor(int loop, int led) {
+                return supplier.getAsBoolean()
+                    ? new Color8Bit(Color.kGreen)
+                    : new Color8Bit(Color.kBlack);
             }
         };
     }

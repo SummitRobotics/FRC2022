@@ -17,6 +17,7 @@ import frc.robot.commands.drivetrain.*;
 import frc.robot.commands.homing.HomeByCurrent;
 import frc.robot.commands.intake.*;
 import frc.robot.commands.shooter.*;
+import frc.robot.commands.testing.PriorityTest;
 import frc.robot.commands.testing.TestComponent;
 import frc.robot.devices.*;
 import frc.robot.devices.LEDs.*;
@@ -180,12 +181,13 @@ public class RobotContainer {
                                 StatusPriorities.ENABLED)),
             new InstantCommand(() -> pcm.enableCompressorDigital()),
             homeArms.get(),
-            new TestComponent(pcm),
-            new TestComponent(intake),
-            new TestComponent(drivetrain),
-            new TestComponent(conveyor),
-            new TestComponent(climb),
-            new TestComponent(shooter)
+            // new TestComponent(pcm),
+            // new TestComponent(intake),
+            // new TestComponent(drivetrain),
+            // new TestComponent(conveyor),
+            // new TestComponent(climb),
+            // new TestComponent(shooter)
+            new PriorityTest(controller1.dPadDown, controller1.dPadUp)
         );
 
         // Configure the button bindings

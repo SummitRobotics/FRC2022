@@ -122,5 +122,4 @@ public class OIButton extends Button {
             uses.remove(this);
         }
     }
-
 }
