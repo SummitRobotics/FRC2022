@@ -125,13 +125,13 @@ public class ClimbMO extends CommandBase {
 
     @Override
     public void initialize() {
-        prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
-        prioritizedBothDetachButton = bothDetachButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        prioritizedControlAxis = controlAxis.prioritize(AxisPriorities.CLIMB);
+        prioritizedLeftMotorButton = leftMotorButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedRightMotorButton = rightMotorButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedPivotButton = pivotButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedLeftDetachButton = leftDetachButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedRightDetachButton = rightDetachButton.prioritize(AxisPriorities.CLIMB);
+        prioritizedBothDetachButton = bothDetachButton.prioritize(AxisPriorities.CLIMB);
 
         simplePrioritizedPivotButton = new SimpleButton(prioritizedPivotButton::get);
         simplePrioritizedLeftDetachButton = new SimpleButton(prioritizedLeftDetachButton::get);

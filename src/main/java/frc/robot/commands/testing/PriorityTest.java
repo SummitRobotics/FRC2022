@@ -18,6 +18,8 @@ public class PriorityTest extends CommandBase {
     private OIButton testButton;
     private OIButton.PrioritizedButton prioritizedButtonA;
     private OIButton.PrioritizedButton prioritizedButtonB;
+    private SimpleButton simplePrioritizedButtonA;
+    private SimpleButton simplePrioritizedButtonB;
 
     private OIButton switchButton;
     private SimpleButton simpleSwitchButton;
@@ -31,11 +33,13 @@ public class PriorityTest extends CommandBase {
     public void initialize() {
         prioritizedButtonA = testButton.prioritize(AxisPriorities.DEFAULT);
         prioritizedButtonB = testButton.prioritize(AxisPriorities.MANUAL_OVERRIDE);
+        simplePrioritizedButtonA = new SimpleButton(prioritizedButtonA::get);
+        simplePrioritizedButtonB = new SimpleButton(prioritizedButtonB::get);
         simpleSwitchButton = new SimpleButton(switchButton::get);
         LEDs.getInstance().addCall("TestA",
-            new LEDCall(LEDPriorities.SPLINES, LEDRange.Aarms).conditionalOn(prioritizedButtonA::get));
+            new LEDCall(LEDPriorities.SPLINES, LEDRange.Aarms).conditionalOn(simplePrioritizedButtonA::get));
         LEDs.getInstance().addCall("TestB",
-            new LEDCall(LEDPriorities.SPLINES, LEDRange.Bar).conditionalOn(prioritizedButtonB::get));
+            new LEDCall(LEDPriorities.SPLINES, LEDRange.Bar).conditionalOn(simplePrioritizedButtonB::get));
     }
 
     @Override

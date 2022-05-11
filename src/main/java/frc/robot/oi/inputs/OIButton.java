@@ -108,6 +108,9 @@ public class OIButton extends Button {
          * WARNING DO NOT USE THE PRIORITIZED BUTTON AFTER USING THIS COMMAND.
          */
         public void destroy() {
+            // Removes the priority from the list.
+            uses.remove(this);
+            
             // Only need to reassign highestPriority if the current priority
             // Is as high or higher than the highest priority.
             if (priority >= highestPriority) {
@@ -117,9 +120,6 @@ public class OIButton extends Button {
                 }
                 highestPriority = newHighestPriority;
             }
-
-            // Removes the priority from the list.
-            uses.remove(this);
         }
     }
 }
