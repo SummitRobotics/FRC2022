@@ -7,10 +7,15 @@
 
 package frc.robot.commands.drivetrain;
 
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.LEDs.LEDCall;
 import frc.robot.devices.LEDs.LEDRange;
 import frc.robot.devices.LEDs.LEDs;
+import frc.robot.oi.drivers.ControllerDriver;
 import frc.robot.oi.inputs.OIAxis;
 import frc.robot.oi.inputs.OIButton;
 import frc.robot.subsystems.Drivetrain;
@@ -34,7 +39,7 @@ public class ArcadeDrive extends CommandBase {
     private double forwardPower;
     private double reversePower;
     private boolean activateSwitchfoot;
-
+    private AHRS gyro;
     private final OIAxis.PrioritizedAxis forwardPowerAxis;
     private final OIAxis.PrioritizedAxis reversePowerAxis;
     private final OIButton.PrioritizedButton switchfootPRI;
@@ -44,7 +49,8 @@ public class ArcadeDrive extends CommandBase {
     private final ChangeRateLimiter limiter;
     private final ChangeRateLimiter turnLimiter;
 
-
+    private static final double vibrationMultiplier = .1;
+    private static final double accelerationChange = 5;
     private static final double DEAD_ZONE = .01;
 
     private static final double MAX_CHANGE_RATE = 0.05;
@@ -54,9 +60,10 @@ public class ArcadeDrive extends CommandBase {
     private final RollingAverage avgPower = new RollingAverage(2, true);
 
     private final boolean isSingleAxis;
-
+    private XboxController controller;
     private boolean ledsOn = false;
-
+    private double xSpeed = 0;
+    private double zSpeed = 0;
     /**
      * teleop driver control.
      *
@@ -72,7 +79,9 @@ public class ArcadeDrive extends CommandBase {
         OIAxis forwardPowerAxis, 
         OIAxis reversePowerAxis, 
         OIAxis turnAxis,
-        OIButton switchfoot) {
+        OIButton switchfoot, 
+        AHRS gyro, 
+        XboxController controller) {
         switchfootPRI = switchfoot.prioritize(AxisPriorities.DRIVE);
         this.switchfoot = new SimpleButton(switchfootPRI::get);
         this.drivetrain = drivetrain;
@@ -80,10 +89,10 @@ public class ArcadeDrive extends CommandBase {
         this.forwardPowerAxis = forwardPowerAxis.prioritize(AxisPriorities.DRIVE);
         this.reversePowerAxis = reversePowerAxis.prioritize(AxisPriorities.DRIVE);
         this.turnAxis = turnAxis.prioritize(AxisPriorities.DRIVE);
-
+        this.gyro = gyro;
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
         turnLimiter = new ChangeRateLimiter(0.05);
-
+        this.controller = controller;
 
         addRequirements(drivetrain);
         isSingleAxis = false;
@@ -114,7 +123,7 @@ public class ArcadeDrive extends CommandBase {
 
         limiter = new ChangeRateLimiter(MAX_CHANGE_RATE);
         turnLimiter = new ChangeRateLimiter(0.05);
-
+        
         addRequirements(drivetrain);
         isSingleAxis = true;
         ledsOn = false;
@@ -132,9 +141,16 @@ public class ArcadeDrive extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-
         double power;
-
+        double xSpeed = Math.abs(gyro.getWorldLinearAccelX());
+        double zSpeed = Math.abs(gyro.getWorldLinearAccelZ());
+        if (Math.abs(xSpeed) > accelerationChange || Math.abs(zSpeed) > accelerationChange){
+            controller.setRumble(RumbleType.kLeftRumble, (xSpeed + zSpeed)*vibrationMultiplier);
+            controller.setRumble(RumbleType.kRightRumble, (xSpeed + zSpeed)*vibrationMultiplier);
+        } else {
+            controller.setRumble(RumbleType.kLeftRumble, 0);
+            controller.setRumble(RumbleType.kRightRumble, 0);
+        }
         if (isSingleAxis) {
             power = Math.pow(Functions.deadzone(DEAD_ZONE, forwardPowerAxis.get()), 3);
         } else {
@@ -190,7 +206,7 @@ public class ArcadeDrive extends CommandBase {
                 LEDs.getInstance().removeCall("reversed");
             }
         }
-
+        
         if (!activateSwitchfoot) {
             drivetrain.setLeftMotorPower(leftPower);
             drivetrain.setRightMotorPower(rightPower);

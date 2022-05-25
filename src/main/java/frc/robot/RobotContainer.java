@@ -25,7 +25,9 @@ import frc.robot.subsystems.*;
 import frc.robot.utilities.*;
 import frc.robot.utilities.lists.*;
 import java.util.function.Supplier;
-
+//TODO 
+// make controller rumble
+//get dumb k&m to work
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -41,7 +43,7 @@ public class RobotContainer {
     private final ControllerDriver controller1;
     private final LaunchpadDriver launchpad;
     private final JoystickDriver joystick;
-
+    private Keyboard key;
     // Subsystems
     private final Drivetrain drivetrain;
     private final Shooter shooter;
@@ -65,16 +67,17 @@ public class RobotContainer {
     private final Command testInit;
     private ClimbAutomationBetter autoClimbCommand;
     private Command arcadeDrive;
-
+    private XboxController xboxController;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-
+        xboxController = new XboxController(Ports.XBOX_PORT);
         scheduler = CommandScheduler.getInstance();
         controller1 = new ControllerDriver(Ports.XBOX_PORT);
         launchpad = new LaunchpadDriver(Ports.LAUNCHPAD_PORT);
         joystick = new JoystickDriver(Ports.JOYSTICK_PORT);
+        key = new Keyboard();
         lidar = new LidarV4(0x62);
         colorSensor = new ColorSensor();
         pdp = new PowerDistribution(1, ModuleType.kRev);
@@ -104,7 +107,9 @@ public class RobotContainer {
             controller1.rightTrigger,
             controller1.leftTrigger,
             controller1.leftX,
-            controller1.dPadAny);
+            controller1.dPadAny, 
+            gyro, 
+            xboxController);
 
         homeArms = () -> new ParallelCommandGroup(new HomeByCurrent(climb.getLeftArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT), new HomeByCurrent(climb.getRightArmHomeable(), .2, 30, Climb.BACK_LIMIT, Climb.FORWARD_LIMIT));
 
@@ -213,11 +218,17 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         ShuffleboardDriver.homeArms.commandBind(homeArms.get(), ShuffleboardDriver.homeArms::whenPressed);
-
+        key.Shift.whenReleased(new InstantCommand(drivetrain::toggleShift));
+        key.E.whenPressed(new IntakeToggle(intake));
+        key.Q.whileHeld(new FullAutoIntake(drivetrain, intake, ballDetectionLimelight, conveyor));
+        key.A.whileHeld(new TurnByEncoder(999, drivetrain));
+        key.D.whileHeld(new TurnByEncoder(-999, drivetrain));
+        key.W.whileHeld(new DriveByTime(drivetrain, 999, 1));
+        key.S.whileHeld(new DriveByTime(drivetrain, 999, -1));
         controller1.rightBumper.whenReleased(new InstantCommand(drivetrain::highGear));
         controller1.leftBumper.whenReleased(new InstantCommand(drivetrain::lowGear));
-
-
+        
+        
         controller1.buttonA.whenPressed(new LowerIntake(intake));
         controller1.buttonB.whenPressed(
             new RaiseIntake(intake));
