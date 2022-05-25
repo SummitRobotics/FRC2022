@@ -5,11 +5,10 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
 import frc.robot.oi.inputs.OIButton;
-import frc.robot.oi.inputs.OIAxis.PrioritizedAxis;
-import frc.robot.oi.inputs.OIButton.PrioritizedButton;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
@@ -31,6 +30,7 @@ public class ProtectedShooter extends CommandBase {
     protected PIDController alignPID;
     private double speed = 1850;
     private double error = 25;
+
     public ProtectedShooter(Shooter shooter,
         Conveyor conveyor,
         Drivetrain drivetrain,
@@ -98,13 +98,9 @@ public class ProtectedShooter extends CommandBase {
         // shooter.setMotorPower(controlAxis.get());
         shooter.setHoodPos(false);
         avg.update(shooter.getShooterRPM());
-        double limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
-            Lemonlight.MAIN_MOUNT_HEIGHT,
-            Lemonlight.MAIN_MOUNT_ANGLE,
-            Lemonlight.MAIN_TARGET_HEIGHT,
-            limelight.getVerticalOffset());
+        double limelightDistanceEstimate = Units.metersToInches(limelight.getLimelightDistanceEstimate());
         shooter.setHoodPos(true);
-        double horizontalOffset = limelight.getHorizontalOffset();
+        double horizontalOffset = Units.radiansToDegrees(limelight.getHorizontalOffset());
         boolean aligned = driveAndAlign(drivetrain, horizontalOffset, limelightDistanceEstimate);
 
         if (Functions.isWithin(avg.getAverage(), speed, error) && aligned && prioritizedTrigger.get()) {

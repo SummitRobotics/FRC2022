@@ -164,7 +164,7 @@ public class Lemonlight implements Sendable {
     }
 
     public double getVerticalOffset() {
-        return getTargetVector().getAngleInPlane(Vector3D.Plane.YZPlane, Vector3D.Axis.YAxis)
+        return getTargetVector().getAngleInPlane(Vector3D.Plane.YZPlane, Vector3D.Axis.YAxis);
     }
 
     /**

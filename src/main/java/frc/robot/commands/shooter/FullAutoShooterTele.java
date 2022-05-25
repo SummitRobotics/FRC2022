@@ -5,22 +5,21 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
-import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
-
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Semi-automated shooting method used in teleop.
+ */
 public class FullAutoShooterTele extends CommandBase {
 
-    private Conveyor conveyor;
     private Shooter shooter;
     private Drivetrain drivetrain;
     private Lemonlight lemonlight;
@@ -32,9 +31,7 @@ public class FullAutoShooterTele extends CommandBase {
         Map.entry(155.0, 6.0)
     );
 
-    private final double maxDist = 160;
     private final double hoodDistCutoff = 125; 
-    private final double minDist = 50;
 
     private final double moveError = 3;
     private final double okToMoveError = 15;
@@ -42,7 +39,6 @@ public class FullAutoShooterTele extends CommandBase {
     private final double speedError = 40;
     private final double okToSpoolError = 25;
 
-    private final double alignOffset = 14;
     private final double idleSpeed = 1700;
 
     private final double turnFrictionPower = 0.04;
@@ -53,11 +49,17 @@ public class FullAutoShooterTele extends CommandBase {
     private PIDController alignPid;
     private PIDController movePid;
 
-    /** Creates a new FullAutoShooterNew. */
-    public FullAutoShooterTele(Drivetrain drivetrain, Shooter shooter, Conveyor conveyor, Lemonlight lemonlight) {
+    /** Creates a new FullAutoShooterNew.
+     *
+     * @param drivetrain The drivetrain subsystem
+     * @param shooter The shooter subsystem
+     * @param lemonlight The limelight
+    */
+    public FullAutoShooterTele(Drivetrain drivetrain,
+        Shooter shooter,
+        Lemonlight lemonlight) {
         this.drivetrain = drivetrain;
         this.shooter = shooter;
-        this.conveyor = conveyor;
         this.lemonlight = lemonlight;
 
         alignPid = new PIDController(PIDValues.ALIGN_P, PIDValues.ALIGN_I, PIDValues.ALIGN_D);
@@ -80,11 +82,7 @@ public class FullAutoShooterTele extends CommandBase {
         if (!lemonlight.hasTarget()) {
             noTarget();
         } else {
-            double lld  = Lemonlight.getLimelightDistanceEstimateIN(
-                Lemonlight.MAIN_MOUNT_HEIGHT,
-                Lemonlight.MAIN_MOUNT_ANGLE,
-                Lemonlight.MAIN_TARGET_HEIGHT,
-                lemonlight.getVerticalOffset());
+            double lld  = Units.metersToInches(lemonlight.getLimelightDistanceEstimate());
 
             shooter.setHoodPos(lld > hoodDistCutoff);
 
@@ -149,7 +147,7 @@ public class FullAutoShooterTele extends CommandBase {
     }
 
     private boolean alignAndDrive(double lld) {
-        double offset = lemonlight.getHorizontalOffset();
+        double offset = Units.radiansToDegrees(lemonlight.getHorizontalOffset());
 
         double leftPower = 0;
         double rightPower = 0;
@@ -170,13 +168,12 @@ public class FullAutoShooterTele extends CommandBase {
             rightPower -= power;
         }
 
-        //overcomes whele frictiuon
-        if(!Functions.isWithin(offset, alignPid.getSetpoint(), turnFrictionNoneRange)){
-            if(offset > alignPid.getSetpoint()){
+        //overcomes wheel friction
+        if (!Functions.isWithin(offset, alignPid.getSetpoint(), turnFrictionNoneRange)) {
+            if (offset > alignPid.getSetpoint()) {
                 leftPower += turnFrictionPower;
                 rightPower -= turnFrictionPower;
-            }
-            else{
+            } else {
                 leftPower -= turnFrictionPower;
                 rightPower += turnFrictionPower;
             }
@@ -184,11 +181,10 @@ public class FullAutoShooterTele extends CommandBase {
 
         double alignPower;
 
-        if(!Functions.isWithin(offset, alignPid.getSetpoint(), alignError)){
+        if (!Functions.isWithin(offset, alignPid.getSetpoint(), alignError)) {
             alignPower = alignPid.calculate(offset);
-        }
-        else{
-             alignPower = 0;
+        } else {
+            alignPower = 0;
         }
 
         leftPower -= alignPower;
@@ -210,11 +206,11 @@ public class FullAutoShooterTele extends CommandBase {
         drivetrain.stop();
         shooter.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
-        lemonlight.setLEDMode(LEDModes.FORCE_OFF);
+        // lemonlight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override
     public boolean isFinished() {
-        return false;//!conveyor.doesBallExist();
+        return false; //!conveyor.doesBallExist();
     }
 }

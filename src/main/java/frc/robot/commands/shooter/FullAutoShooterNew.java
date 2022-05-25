@@ -5,18 +5,19 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.Functions;
 import frc.robot.utilities.lists.PIDValues;
-
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Full auto shooter.
+ */
 public class FullAutoShooterNew extends CommandBase {
 
     private Conveyor conveyor;
@@ -31,9 +32,7 @@ public class FullAutoShooterNew extends CommandBase {
         Map.entry(155.0, 7.0)
     );
 
-    private final double maxDist = 160;
     private final double hoodDistCutoff = 125; 
-    private final double minDist = 50;
 
     private final double moveError = 3;
     private final double okToMoveError = 15;
@@ -41,7 +40,6 @@ public class FullAutoShooterNew extends CommandBase {
     private final double speedError = 25;
     private final double okToSpoolError = 25;
 
-    private final double alignOffset = 14;
     private final double idleSpeed = 1700;
 
 
@@ -49,8 +47,18 @@ public class FullAutoShooterNew extends CommandBase {
     private PIDController alignPid;
     private PIDController movePid;
 
-    /** Creates a new FullAutoShooterNew. */
-    public FullAutoShooterNew(Drivetrain drivetrain, Shooter shooter, Conveyor conveyor, Lemonlight lemonlight) {
+    /** Creates a new FullAutoShooterNew.
+     *
+     * @param drivetrain The drivetrain system
+     * @param shooter The shooter subsystem
+     * @param conveyor The conveyor subsystem
+     * @param lemonlight The targeting limelight
+    */
+    public FullAutoShooterNew(
+        Drivetrain drivetrain,
+        Shooter shooter,
+        Conveyor conveyor,
+        Lemonlight lemonlight) {
         this.drivetrain = drivetrain;
         this.shooter = shooter;
         this.conveyor = conveyor;
@@ -75,11 +83,7 @@ public class FullAutoShooterNew extends CommandBase {
         if (!lemonlight.hasTarget()) {
             noTarget();
         } else {
-            double lld  = Lemonlight.getLimelightDistanceEstimateIN(
-                Lemonlight.MAIN_MOUNT_HEIGHT,
-                Lemonlight.MAIN_MOUNT_ANGLE,
-                Lemonlight.MAIN_TARGET_HEIGHT,
-                lemonlight.getVerticalOffset());
+            double lld  = Units.metersToInches(lemonlight.getLimelightDistanceEstimate());
 
             shooter.setHoodPos(lld > hoodDistCutoff);
 
@@ -144,7 +148,7 @@ public class FullAutoShooterNew extends CommandBase {
     }
 
     private boolean alignAndDrive(double lld) {
-        double offset = lemonlight.getHorizontalOffset();
+        double offset = Units.radiansToDegrees(lemonlight.getHorizontalOffset());
 
         double leftPower = 0;
         double rightPower = 0;

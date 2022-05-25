@@ -1,9 +1,9 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.devices.Lemonlight;
-import frc.robot.devices.Lemonlight.LEDModes;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Shooter;
@@ -57,7 +57,7 @@ public class midrangeShooter extends CommandBase {
         shooter.stop();
 
         shooter.extendHood();
-        limelight.setLEDMode(LEDModes.FORCE_ON);
+        // limelight.setLEDMode(LEDModes.FORCE_ON);
     }
     /**
      * aligns to target.
@@ -101,12 +101,8 @@ public class midrangeShooter extends CommandBase {
         // shooter.setMotorPower(controlAxis.get());
         shooter.setHoodPos(false);
         avg.update(shooter.getShooterRPM());
-        double limelightDistanceEstimate = Lemonlight.getLimelightDistanceEstimateIN(
-            Lemonlight.MAIN_MOUNT_HEIGHT,
-            Lemonlight.MAIN_MOUNT_ANGLE,
-            Lemonlight.MAIN_TARGET_HEIGHT,
-            limelight.getVerticalOffset());
-        double horizontalOffset = limelight.getHorizontalOffset();
+        double limelightDistanceEstimate = Units.metersToInches(limelight.getLimelightDistanceEstimate());
+        double horizontalOffset = Units.radiansToDegrees(limelight.getHorizontalOffset());
         boolean aligned = driveAndAlign(drivetrain, horizontalOffset, limelightDistanceEstimate);
 
         if (Functions.isWithin(avg.getAverage(), speed, error) && aligned) {
@@ -124,7 +120,7 @@ public class midrangeShooter extends CommandBase {
         shooter.stop();
         drivetrain.stop();
         shooter.setState(Shooter.States.NOT_SHOOTING);
-        limelight.setLEDMode(LEDModes.FORCE_OFF);
+        // limelight.setLEDMode(LEDModes.FORCE_OFF);
     }
 
     @Override
