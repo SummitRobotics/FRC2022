@@ -1,5 +1,6 @@
 package frc.robot.devices;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -137,9 +138,20 @@ public class Lemonlight implements Sendable {
      *
      * @return the horizontal offset
      */
-    public double getHorizontalOffset() {       
-        return tx.getDouble(0); 
-        
+    public double getHorizontalOffsetRaw() {
+        return tx.getDouble(0);
+    }
+
+    public double getHorizontalOffset(double distanceOffset, double horizontalOffset) {
+        return -getTargetVector(distanceOffset, horizontalOffset).getAngleInPlane(Vector3D.Plane.XYPlane, Vector3D.Axis.YAxis);
+    }
+
+    public double getHorizontalOffset() {
+        return getHorizontalOffset(0, 0);
+    }
+
+    public double getLimelightDistanceEstimate() {
+        return getTargetVector().setZComponent(0).getMagnitude();
     }
 
     /**
@@ -147,8 +159,12 @@ public class Lemonlight implements Sendable {
      *
      * @return the vertical offset
      */
-    public double getVerticalOffset() {
+    public double getVerticalOffsetRaw() {
         return ty.getDouble(0);
+    }
+
+    public double getVerticalOffset() {
+        return getTargetVector().getAngleInPlane(Vector3D.Plane.YZPlane, Vector3D.Axis.YAxis)
     }
 
     /**
@@ -227,5 +243,8 @@ public class Lemonlight implements Sendable {
 
         builder.addDoubleProperty("offset", this::getHorizontalOffset, null);
         builder.addStringProperty("targetVector", () -> getTargetVector().toString(), null);
+        builder.addDoubleProperty("vectorMagnitude", ()-> getTargetVector().getMagnitude(), null);
+        builder.addDoubleProperty("targetDistance", () -> getTargetVector().setZComponent(0).getMagnitude(), null);
+        builder.addDoubleProperty("angleVector", ()-> Math.toDegrees(getTargetVector().getAngleInPlane(Vector3D.Plane.XYPlane, Vector3D.Axis.YAxis)), null);
     }
 }

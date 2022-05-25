@@ -85,7 +85,7 @@ public class RobotContainer {
 
         gyro = new AHRS();
 
-        targetingLimelight = new Lemonlight("gloworm", Lemonlight.Type.PhotonVision, new Vector3D(0,0,0), new Vector3D(0,1,0), 100);
+        targetingLimelight = new Lemonlight("gloworm", Lemonlight.Type.PhotonVision, new Vector3D(0,0.3,0.79), new Vector3D(0, Math.cos(Math.toRadians(35.5)), Math.sin(Math.toRadians(35.5))), 2.645 - 0.83);
         // TODO: need to ensure that this name is set on the limelight as well.
         ballDetectionLimelight = new BallLemonlight("limelight-balls");
 
