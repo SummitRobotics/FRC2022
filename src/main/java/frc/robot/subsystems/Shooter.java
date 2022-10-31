@@ -257,6 +257,24 @@ public class Shooter extends SubsystemBase implements Testable {
         return shooterState.toString();
     }
 
+    /**
+     * Wrapper to get the temperature of the main motor in degrees Celsius.
+     *
+     * @return temperature
+     */
+    public double getMainTemperature() {
+        return shooterMotorMain.getMotorTemperature();
+    }
+
+    /**
+     * Wrapper to get the temperature of the secondary motor in degrees Celsius.
+     *
+     * @return temperature
+     */
+    public double getFollowTemperature() {
+        return shooterMotorFollow.getMotorTemperature();
+    }
+
     @Override
     public String getTestName() {
         return "Shooter";
@@ -288,6 +306,8 @@ public class Shooter extends SubsystemBase implements Testable {
         builder.addDoubleProperty("shooterRPM", this::getShooterRPM, null);
         builder.addDoubleProperty("shooterSetpoint", () -> setPoint, null);
         builder.addBooleanProperty("hoodPosition", this::getHoodPos, null);
+        builder.addDoubleProperty("mainTemperature", this::getMainTemperature, null);
+        builder.addDoubleProperty("followTemperature", this::getFollowTemperature, null);
         // builder.addStringProperty("shooterState", this::getShooterStateAsText, null);
     }
 }

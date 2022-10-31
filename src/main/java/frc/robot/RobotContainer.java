@@ -336,6 +336,29 @@ public class RobotContainer {
      * runs once every ~20ms when in teleop.
      */
     public void teleopPeriodic() {
+
+        // Run checks for overheating motors
+
+        double mainTemperature = shooter.getMainTemperature();
+        double followTemperature = shooter.getFollowTemperature();
+
+        if (mainTemperature >= 75) {
+            ShuffleboardDriver.statusDisplay.addStatus(
+                "Shooter motor is overheating!",
+                "Temperature of main motor is " + mainTemperature + " degrees Celsius.",
+                Colors.RED,
+                StatusPriorities.OVERHEATING_MOTOR
+            );
+        }
+
+        if (followTemperature >= 75) {
+            ShuffleboardDriver.statusDisplay.addStatus(
+                "Shooter motor is overheating!",
+                "Temperature of follow motor is " + followTemperature + " degrees Celsius.",
+                Colors.RED,
+                StatusPriorities.OVERHEATING_MOTOR
+            );
+        }
     }
 
     /**
