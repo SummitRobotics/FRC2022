@@ -25,7 +25,7 @@ public class OverheatWarnings extends CommandBase {
         double mainTemperature = shooter.getMainTemperature();
         double followTemperature = shooter.getFollowTemperature();
 
-        if (mainTemperature >= 10) {
+        if (mainTemperature >= 75) {
             ShuffleboardDriver.statusDisplay.addStatus(
                 "Shooter motor is overheating!",
                 "Temperature of main motor is " + mainTemperature + " degrees Celsius.",
@@ -34,7 +34,7 @@ public class OverheatWarnings extends CommandBase {
             );
         }
 
-        if (followTemperature >= 10) {
+        if (followTemperature >= 75) {
             ShuffleboardDriver.statusDisplay.addStatus(
                 "Shooter motor is overheating!",
                 "Temperature of follow motor is " + followTemperature + " degrees Celsius.",
