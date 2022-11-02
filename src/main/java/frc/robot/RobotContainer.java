@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.commands.OverheatWarnings;
 import frc.robot.commands.WaitUntilConveyor;
 import frc.robot.commands.autonomous.FourBallAuto;
 import frc.robot.commands.autonomous.FourBallAutoBetter;
@@ -132,6 +133,7 @@ public class RobotContainer {
                 //                 }
                 //             }
                 //         }),
+                new OverheatWarnings(shooter),
                 new InstantCommand(() -> pcm.enableCompressorDigital()),
                 new InstantCommand(() -> ShuffleboardDriver.statusDisplay.removeStatus("auto")),
                 new InstantCommand(
@@ -167,6 +169,7 @@ public class RobotContainer {
         );
 
         testInit = new SequentialCommandGroup(
+            new OverheatWarnings(shooter),
             new InstantCommand(() -> {
                 LEDs.getInstance().addCall("left pressure",
                     new LEDCall(LEDPriorities.SPLINES, LEDRange.ArmLeft).pressure(pcm, true));
@@ -186,7 +189,7 @@ public class RobotContainer {
             // new TestComponent(drivetrain),
             // new TestComponent(conveyor),
             // new TestComponent(climb),
-            // new TestComponent(shooter)
+            // new TestComponent(shooter),
             new PriorityTest(controller1.dPadDown, controller1.dPadUp)
         );
 
@@ -335,8 +338,7 @@ public class RobotContainer {
     /**
      * runs once every ~20ms when in teleop.
      */
-    public void teleopPeriodic() {
-    }
+    public void teleopPeriodic() {}
 
     /**
      * runs when robot is inited to teleop.
